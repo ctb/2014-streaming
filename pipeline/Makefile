@@ -3,7 +3,10 @@
 NULLGRAPH=~/dev/nullgraph
 KHMER=~/dev/khmer
 
-all: compare mcompare compare3 mcompare3 rcompare rcompare3
+all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam
+
+bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
+	mrna-reads.sorted.bam
 
 clean:
 	-rm -f simple-genome.fa simple-genome-reads.dn.kh simple-genome-reads.sam
