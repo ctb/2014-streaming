@@ -17,7 +17,7 @@ def main():
 
     outfp = open(args.posfile, 'w')
     for k in d:
-        posns = map(str, sorted(d[k]))
+        posns = map(str, sorted(set(d[k])))
         outfp.write('%s %s\n' % (k, ",".join(posns)))
     outfp.close()
 

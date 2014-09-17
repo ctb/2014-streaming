@@ -9,6 +9,7 @@ def find_first_unique(kh, sequence, cutoff):
 
     start = 0
     end = len(sequence) - K + 1
+    posns = []
 
     # skip over errors at beginning
     while start < end:
@@ -17,24 +18,33 @@ def find_first_unique(kh, sequence, cutoff):
         start += 1
 
     if start > 0:
-        if start < K:         # error in first K
-            return [start - 1]
+        if start >= K:
+            # multiple errors => unresolvable
+            return [-1]
+        else:          # error in first K
+            posns.append(start - 1)
 
-        # multiple errors => unresolvable, probably.
-        return [-1]
-
-    # ok, start = 0 & we find first k-mer overlapping an error, if any.
+    # ok, now find next k-mer overlapping an error, if any.
     while start < end:
         kmer = sequence[start:start + K]
 
         c = kh.get(kmer)
+        print start, c
         if c <= cutoff:
             pos = start + K - 1
-            return [pos]
+            posns.append(pos)
+            
+            while start < end:
+                if kh.get(sequence[start:start+K]) > cutoff:
+                    break
+                start += 1
+        else:
+            start += 1
 
-        start += 1
+    if not posns:
+        return None
         
-    return None                         # no errors
+    return posns
 
 def main():
     parser = argparse.ArgumentParser()
@@ -46,9 +56,11 @@ def main():
     kh = khmer.load_counting_hash(args.table)
 
     for record in screed.open(args.sequences):
-        pos = find_first_unique(kh, record.sequence, args.cutoff)
-        if pos is not None and len(pos) >= 0 and pos[0] != -1:
-            print record.name, ",".join(map(str, pos))
+        #if record.name != 'read573':
+        #    continue
+        posns = find_first_unique(kh, record.sequence, args.cutoff)
+        if posns is not None and len(posns) > 0 and posns[0] != -1:
+            print record.name, ",".join(map(str, posns))
         else:
             print record.name
 

@@ -30,15 +30,15 @@ def main():
         n += 1
         vb = b.get(k)
         if vb:
-            if va[0] in vb:
+            if va == vb:
                 m += 1
-            elif 100 - va[0] - 1 in vb:
-                m += 1
-            elif min(vb) < 20 or max(vb) > 80:
-                pass
             else:
-                print k, va, vb
-                unexplained += 1
+                rva = list(sorted([ 100 - x - 1 for x in va ]))
+                if rva == vb:
+                    m += 1
+                else:
+                    print k, va, rva, vb
+                    unexplained += 1
 
     o = 0
     for k, vb in b.iteritems():

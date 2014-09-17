@@ -44,3 +44,6 @@ compare: simple-genome-errors.pos simple-genome-sam-mismatches.pos
 compare2: simple-genome-errors.pos simple-genome-reads.mut.pos
 	./compare-pos.py simple-genome-errors.pos simple-genome-reads.mut.pos
 
+compare3: simple-genome-sam-mismatches.pos simple-genome-reads.mut.pos
+	./compare-pos.py simple-genome-sam-mismatches.pos simple-genome-reads.mut.pos
+
