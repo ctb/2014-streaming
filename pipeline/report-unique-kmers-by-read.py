@@ -29,7 +29,6 @@ def find_first_unique(kh, sequence, cutoff):
         kmer = sequence[start:start + K]
 
         c = kh.get(kmer)
-        print start, c
         if c <= cutoff:
             pos = start + K - 1
             posns.append(pos)
@@ -51,13 +50,18 @@ def main():
     parser.add_argument('table')
     parser.add_argument('sequences')
     parser.add_argument('-C', '--cutoff', default=2, type=int)
+    parser.add_argument('--coverage', default=20, type=int)
+    parser.add_argument('-V', '--variable', default=False, action='store_true')
     args = parser.parse_args()
 
     kh = khmer.load_counting_hash(args.table)
 
     for record in screed.open(args.sequences):
-        #if record.name != 'read573':
-        #    continue
+        if args.variable:
+            med, _, _ = kh.get_median_count(record.sequence)
+            if med < args.coverage:
+                continue
+            
         posns = find_first_unique(kh, record.sequence, args.cutoff)
         if posns is not None and len(posns) > 0 and posns[0] != -1:
             print record.name, ",".join(map(str, posns))
