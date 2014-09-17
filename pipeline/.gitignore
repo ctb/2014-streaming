@@ -1,0 +1,7 @@
+*.bam
+*.sam
+*.fai
+*.ebwt
+*.pos
+*.mut
+*.bai
