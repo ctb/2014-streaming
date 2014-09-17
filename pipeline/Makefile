@@ -7,6 +7,7 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3
 
 clean:
 	-rm -f simple-genome.fa simple-genome-reads.dn.kh simple-genome-reads.sam
+	-rm -f *-reads.fa
 
 ##### simple genome
 
