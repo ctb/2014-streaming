@@ -20,6 +20,9 @@ simple-genome.fa:
 simple-genome-reads.fa: simple-genome.fa
 	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 simple-genome.fa --mutation-details simple-genome-reads.mut > simple-genome-reads.fa
 
+simple-genome-perfect.fa: simple-genome.fa
+	$(NULLGRAPH)/make-reads.py -S 2 -e 0 -r 100 -C 100 simple-genome.fa > simple-genome-perfect.fa
+
 simple-genome-reads.mut.pos: simple-genome-reads.fa
 	./convert-mut-to-pos.py simple-genome-reads.mut simple-genome-reads.mut.pos
 
@@ -43,6 +46,16 @@ simple-genome-reads.sorted.bam: simple-genome-reads.sam
 simple-genome-sam-mismatches.pos: simple-genome-reads.sam
 	./sam-scan.py simple-genome.fa simple-genome-reads.sam simple-genome-reads.fa > simple-genome-sam-mismatches.pos
 
+simple-genome-reads.fa.abundtrim: simple-genome-reads.fa
+	~/dev/khmer/sandbox/trim-low-abund.py -k 20 -Z 20 -C 5 simple-genome-reads.fa
+
+simple-genome-abundtrim.sam: simple-genome-reads.fa.abundtrim \
+	simple-genome-reads.sam
+	bowtie simple-genome -f simple-genome-reads.fa.abundtrim -S simple-genome-abundtrim.sam
+
+simple-genome-abundtrim-sam-mismatches.pos: simple-genome-abundtrim.sam
+	./sam-scan.py simple-genome.fa simple-genome-abundtrim.sam simple-genome-reads.fa.abundtrim > simple-genome-abundtrim-sam-mismatches.pos
+
 compare: simple-genome-errors.pos simple-genome-sam-mismatches.pos
 	./compare-pos.py simple-genome-errors.pos simple-genome-sam-mismatches.pos simple-genome-reads.fa
 
@@ -55,7 +68,7 @@ compare3: simple-genome-sam-mismatches.pos simple-genome-reads.mut.pos
 ##### simple metagenome
 
 simple-metagenome-reads.fa: simple-metagenome.fa
-	$(NULLGRAPH)/make-biased-reads.py -S 1 -e .01 -r 100 -C 100 simple-metagenome.fa --mutation-details simple-metagenome-reads.mut > simple-metagenome-reads.fa
+	$(NULLGRAPH)/make-biased-reads.py -S 1 -e .01 -r 100 -C 10 simple-metagenome.fa --mutation-details simple-metagenome-reads.mut > simple-metagenome-reads.fa
 
 simple-metagenome-reads.mut.pos: simple-metagenome-reads.fa
 	./convert-mut-to-pos.py simple-metagenome-reads.mut simple-metagenome-reads.mut.pos
@@ -79,6 +92,16 @@ simple-metagenome-reads.sorted.bam: simple-metagenome-reads.sam
 
 simple-metagenome-sam-mismatches.pos: simple-metagenome-reads.sam
 	./sam-scan.py simple-metagenome.fa simple-metagenome-reads.sam simple-metagenome-reads.fa > simple-metagenome-sam-mismatches.pos
+
+simple-metagenome-reads.fa.abundtrim: simple-metagenome-reads.fa
+	~/dev/khmer/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 simple-metagenome-reads.fa
+
+simple-metagenome-abundtrim.sam: simple-metagenome-reads.fa.abundtrim \
+	simple-metagenome-reads.sam
+	bowtie simple-metagenome -f simple-metagenome-reads.fa.abundtrim -S simple-metagenome-abundtrim.sam
+
+simple-metagenome-abundtrim-sam-mismatches.pos: simple-metagenome-abundtrim.sam
+	./sam-scan.py simple-metagenome.fa simple-metagenome-abundtrim.sam simple-metagenome-reads.fa.abundtrim > simple-metagenome-abundtrim-sam-mismatches.pos
 
 mcompare: simple-metagenome-errors.pos simple-metagenome-sam-mismatches.pos
 	./compare-pos.py simple-metagenome-errors.pos simple-metagenome-sam-mismatches.pos simple-metagenome-reads.fa
@@ -116,6 +139,16 @@ mrna-reads.sorted.bam: mrna-reads.sam
 
 mrna-sam-mismatches.pos: mrna-reads.sam
 	./sam-scan.py mrna.fa mrna-reads.sam mrna-reads.fa > mrna-sam-mismatches.pos
+
+mrna-reads.fa.abundtrim: mrna-reads.fa
+	~/dev/khmer/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 mrna-reads.fa
+
+mrna-abundtrim.sam: mrna-reads.fa.abundtrim \
+	mrna-reads.sam
+	bowtie mrna -f mrna-reads.fa.abundtrim -S mrna-abundtrim.sam
+
+mrna-abundtrim-sam-mismatches.pos: mrna-abundtrim.sam
+	./sam-scan.py mrna.fa mrna-abundtrim.sam mrna-reads.fa.abundtrim > mrna-abundtrim-sam-mismatches.pos
 
 rcompare: mrna-errors.pos mrna-sam-mismatches.pos
 	./compare-pos.py mrna-errors.pos mrna-sam-mismatches.pos mrna-reads.fa
