@@ -4,7 +4,7 @@ import screed
 import khmer
 import argparse
 
-def find_first_unique(kh, sequence, cutoff):
+def find_low_abund_kmers(kh, sequence, cutoff):
     K = kh.ksize()
 
     start = 0
@@ -13,7 +13,7 @@ def find_first_unique(kh, sequence, cutoff):
 
     # skip over errors at beginning
     while start < end:
-        if kh.get(sequence[start:start+K]) > cutoff:
+        if kh.get(sequence[start:start+K]) >= cutoff:
             break
         start += 1
 
@@ -29,12 +29,12 @@ def find_first_unique(kh, sequence, cutoff):
         kmer = sequence[start:start + K]
 
         c = kh.get(kmer)
-        if c <= cutoff:
+        if c < cutoff:
             pos = start + K - 1
             posns.append(pos)
             
             while start < end:
-                if kh.get(sequence[start:start+K]) > cutoff:
+                if kh.get(sequence[start:start+K]) >= cutoff:
                     break
                 start += 1
         else:
@@ -49,7 +49,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('table')
     parser.add_argument('sequences')
-    parser.add_argument('-C', '--cutoff', default=2, type=int)
+    parser.add_argument('-C', '--cutoff', default=3, type=int)
     parser.add_argument('--coverage', default=20, type=int)
     parser.add_argument('-V', '--variable', default=False, action='store_true')
     args = parser.parse_args()
@@ -62,7 +62,7 @@ def main():
             if med < args.coverage:
                 continue
             
-        posns = find_first_unique(kh, record.sequence, args.cutoff)
+        posns = find_low_abund_kmers(kh, record.sequence, args.cutoff)
         if posns is not None and len(posns) > 0 and posns[0] != -1:
             print record.name, ",".join(map(str, posns))
         else:

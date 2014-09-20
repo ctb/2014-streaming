@@ -3,7 +3,8 @@
 NULLGRAPH=~/dev/nullgraph
 KHMER=~/dev/khmer
 
-all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam
+all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
+	compare4 mcompare4 rcompare4
 
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 	mrna-reads.sorted.bam
@@ -30,7 +31,7 @@ simple-genome-reads.dn.kh: simple-genome-reads.fa
 	normalize-by-median.py -k 20 -C 20 simple-genome-reads.fa -s simple-genome-reads.dn.kh -x 2e6 -N 4
 
 simple-genome-errors.pos: simple-genome-reads.dn.kh
-	./report-unique-kmers-by-read.py simple-genome-reads.dn.kh simple-genome-reads.fa > simple-genome-errors.pos
+	./report-errors-by-read.py simple-genome-reads.dn.kh simple-genome-reads.fa > simple-genome-errors.pos
 
 simple-genome-reads.sam: simple-genome-reads.fa
 	bowtie-build simple-genome.fa simple-genome > /dev/null
@@ -65,6 +66,12 @@ compare2: simple-genome-errors.pos simple-genome-reads.mut.pos
 compare3: simple-genome-sam-mismatches.pos simple-genome-reads.mut.pos
 	./compare-pos.py simple-genome-sam-mismatches.pos simple-genome-reads.mut.pos simple-genome-reads.fa
 
+simple-genome-stream-mismatches.pos: simple-genome-reads.fa
+	./calc-errors-few-pass.py simple-genome-reads.fa > simple-genome-stream-mismatches.pos
+
+compare4: simple-genome-stream-mismatches.pos simple-genome-reads.mut.pos
+	./compare-pos.py simple-genome-stream-mismatches.pos simple-genome-reads.mut.pos simple-genome-reads.fa
+
 ##### simple metagenome
 
 simple-metagenome-reads.fa: simple-metagenome.fa
@@ -77,7 +84,7 @@ simple-metagenome-reads.dn.kh: simple-metagenome-reads.fa
 	normalize-by-median.py -k 20 -C 20 simple-metagenome-reads.fa -s simple-metagenome-reads.dn.kh -x 2e6 -N 4
 
 simple-metagenome-errors.pos: simple-metagenome-reads.dn.kh
-	./report-unique-kmers-by-read.py -V --coverage 20 simple-metagenome-reads.dn.kh simple-metagenome-reads.fa > simple-metagenome-errors.pos
+	./report-errors-by-read.py -V --coverage 20 simple-metagenome-reads.dn.kh simple-metagenome-reads.fa > simple-metagenome-errors.pos
 
 simple-metagenome-reads.sam: simple-metagenome-reads.fa
 	bowtie-build simple-metagenome.fa simple-metagenome > /dev/null
@@ -112,6 +119,12 @@ mcompare2: simple-metagenome-errors.pos simple-metagenome-reads.mut.pos
 mcompare3: simple-metagenome-sam-mismatches.pos simple-metagenome-reads.mut.pos
 	./compare-pos.py simple-metagenome-sam-mismatches.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa
 
+simple-metagenome-stream-mismatches.pos: simple-metagenome-reads.fa
+	./calc-errors-few-pass.py simple-metagenome-reads.fa > simple-metagenome-stream-mismatches.pos
+
+mcompare4: simple-metagenome-stream-mismatches.pos simple-metagenome-reads.mut.pos
+	./compare-pos.py simple-metagenome-stream-mismatches.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa
+
 ##### simple mrna molecule with three isoforms (1234, 124, 134)
 
 mrna-reads.fa: mrna.fa
@@ -124,7 +137,7 @@ mrna-reads.dn.kh: mrna-reads.fa
 	normalize-by-median.py -k 20 -C 20 mrna-reads.fa -s mrna-reads.dn.kh -x 2e6 -N 4
 
 mrna-errors.pos: mrna-reads.dn.kh
-	./report-unique-kmers-by-read.py -V --coverage 20 mrna-reads.dn.kh mrna-reads.fa > mrna-errors.pos
+	./report-errors-by-read.py -V --coverage 20 mrna-reads.dn.kh mrna-reads.fa > mrna-errors.pos
 
 mrna-reads.sam: mrna-reads.fa
 	bowtie-build mrna.fa mrna > /dev/null
@@ -158,3 +171,9 @@ rcompare2: mrna-errors.pos mrna-reads.mut.pos
 
 rcompare3: mrna-sam-mismatches.pos mrna-reads.mut.pos
 	./compare-pos.py mrna-sam-mismatches.pos mrna-reads.mut.pos mrna-reads.fa
+
+mrna-stream-mismatches.pos: mrna-reads.fa
+	./calc-errors-few-pass.py mrna-reads.fa > mrna-stream-mismatches.pos
+
+rcompare4: mrna-stream-mismatches.pos mrna-reads.mut.pos
+	./compare-pos.py mrna-stream-mismatches.pos mrna-reads.mut.pos mrna-reads.fa
