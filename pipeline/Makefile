@@ -12,6 +12,7 @@ bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 clean:
 	-rm -f simple-genome.fa simple-genome-reads.dn.kh simple-genome-reads.sam
 	-rm -f *-reads.fa
+	-rm -f *.abundtrim *.ebwt *.fai *.pos *.keep *.bam *.mut *.bai *.sam *.kh
 
 ##### simple genome
 
