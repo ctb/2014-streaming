@@ -138,7 +138,8 @@ def main():
               'sequences kept aside in %s' % pass2filename
         for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:
-                print '... x 2', n, pass2filename, read_reads, read_bp
+                print >>sys.stderr, '... x 2', n, pass2filename, read_reads, \
+                      read_bp
 
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
