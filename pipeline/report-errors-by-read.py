@@ -55,11 +55,15 @@ def main():
     args = parser.parse_args()
 
     kh = khmer.load_counting_hash(args.table)
+    n_skipped_variable = 0
+    n_total = 0
 
     for record in screed.open(args.sequences):
+        n_total += 1
         if args.variable:
             med, _, _ = kh.get_median_count(record.sequence)
             if med < args.coverage:
+                n_skipped_variable += 1
                 continue
             
         posns = find_low_abund_kmers(kh, record.sequence, args.cutoff)
@@ -67,6 +71,9 @@ def main():
             print record.name, ",".join(map(str, posns))
         else:
             print record.name
+
+    sys.stderr.write('Skipped %d reads of %d total due to -V\n' % \
+                     (n_skipped_variable, n_total))
 
 if __name__ == '__main__':
    main()
