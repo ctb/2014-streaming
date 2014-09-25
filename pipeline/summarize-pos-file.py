@@ -23,6 +23,7 @@ def main():
 
     posdict = dict(read_pos_file(args.posfile))
     all_reads = set([ record.name for record in screed.open(args.reads) ])
+    sum_bp = sum([ len(record.sequence) for record in screed.open(args.reads) ])
 
     n = 0
     m = 0
@@ -35,6 +36,8 @@ def main():
 
     print 'posfile %s: %d mutated reads of %d; %d mutations total' % \
           (args.posfile, n, len(all_reads), m)
+    print '%d bp total' % (sum_bp,)
+    print 'overall error rate: %f%%' % (100. * m / float(sum_bp))
 
     
 if __name__ == '__main__':

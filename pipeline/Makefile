@@ -73,6 +73,10 @@ simple-genome-stream-mismatches.pos: simple-genome-reads.fa
 compare4: simple-genome-stream-mismatches.pos simple-genome-reads.mut.pos
 	./compare-pos.py simple-genome-stream-mismatches.pos simple-genome-reads.mut.pos simple-genome-reads.fa
 
+compare5: simple-genome-sam-mismatches.pos simple-genome-abundtrim-sam-mismatches.pos
+	./summarize-pos-file.py simple-genome-sam-mismatches.pos simple-genome-reads.fa
+	./summarize-pos-file.py simple-genome-abundtrim-sam-mismatches.pos simple-genome-reads.fa.abundtrim
+
 ##### simple metagenome
 
 simple-metagenome-reads.fa: simple-metagenome.fa
@@ -126,6 +130,10 @@ simple-metagenome-stream-mismatches.pos: simple-metagenome-reads.fa
 mcompare4: simple-metagenome-stream-mismatches.pos simple-metagenome-reads.mut.pos
 	./compare-pos.py simple-metagenome-stream-mismatches.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa
 
+mcompare5: simple-metagenome-sam-mismatches.pos simple-metagenome-abundtrim-sam-mismatches.pos
+	./summarize-pos-file.py simple-metagenome-sam-mismatches.pos simple-metagenome-reads.fa
+	./summarize-pos-file.py simple-metagenome-abundtrim-sam-mismatches.pos simple-metagenome-reads.fa.abundtrim
+
 ##### simple mrna molecule with three isoforms (1234, 124, 134)
 
 mrna-reads.fa: mrna.fa
@@ -178,3 +186,7 @@ mrna-stream-mismatches.pos: mrna-reads.fa
 
 rcompare4: mrna-stream-mismatches.pos mrna-reads.mut.pos
 	./compare-pos.py mrna-stream-mismatches.pos mrna-reads.mut.pos mrna-reads.fa
+
+rcompare5: mrna-sam-mismatches.pos mrna-abundtrim-sam-mismatches.pos
+	./summarize-pos-file.py mrna-sam-mismatches.pos mrna-reads.fa
+	./summarize-pos-file.py mrna-abundtrim-sam-mismatches.pos mrna-reads.fa.abundtrim
