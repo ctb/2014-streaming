@@ -105,7 +105,53 @@ We calculated the prediction sensitivity to be 68.9\% and the
 prediction specificity to be 71.2\%.  For the simple mRNAseq data set,
 524 of 568 reads (92.3\%) met the coverage criterion, with 153 true
 positives, 255 true negatives, 87 false negatives (including the low
-coverage reads), and 73 false positives, for a prediction sensitivity
-of 63.8\% and prediction specificity of 67.7\%.
+coverage reads not examined), and 73 false positives, for a prediction
+sensitivity of 63.8\% and prediction specificity of 67.7\%.
+
+@ real data / measurements
+
+\subsection{A streaming algorithm can be used to detect errors based on read coverage}
+
+Even with digital normalization, the spectral error detection approach
+outlined above is a 2-pass offline algorithm for any given data set -
+the first pass normalizes the read set and records the k-mer
+abundances, while the second pass examines the reads.  For large data
+sets, streaming algorithms can be considerably more efficient.
+
+Shotgun sequencing oversamples most regions -- for example, for a 100x
+coverage genomic data set, we would expect 50\% or more of the genome
+to be represented in more than 100 reads.  This is a consequence of
+the Poisson-random sampling that underlies shotgun sequencing
+(cite... Waterman?)  This oversampling provides an opportunity,
+however; if we regard the read data set as a stream of incoming data,
+some portions of the reference will more highly sampled earlier in the
+stream than others.  For example, in mRNAseq, highly expressed
+transcripts will on average be highly sampled much earlier than
+low-expressed transcripts.
+
+If highly sampled regions could be detected in advance of assembly,
+twe could apply the same approaches used above to do error detection
+in a streaming fashion.  Digital normalization provides such a method:
+by measuring coverage for each read against an online De Bruijn graph,
+reads that reach a specified coverage threshold can be examined for
+errors immediately.  Those reads that had not yet reached high
+coverage could be set aside and re-examined later.  This could result
+in significant runtime savings: for a genomic data set with 100x
+coverage, no more than 20\% of the reads would need to be examined
+twice.
+
+In Figure XXX, we show diginorm-generated coverage saturation curves
+for error-free simulated reads from synthetic and a real ({\em
+  E. coli}) genome, as well as simulated reads with error from a
+synthetic genome, and real reads from the {\em E. coli} genome.  In
+all cases, we see that more than BLAH \% of reads reach an estimated
+coverage of 20 no more than ZAH \% of the way through the data set.
+
+@ discuss streaming error detection results.
+
+\subsection{A streaming algorithm for error trimming}
+
+We can now implement a streaming algorithm for error {\em trimming} of
+any shotgun data.
 
 \end{document}
