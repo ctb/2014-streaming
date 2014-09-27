@@ -22,6 +22,9 @@ simple-genome.fa:
 simple-genome-reads.fa: simple-genome.fa
 	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 simple-genome.fa --mutation-details simple-genome-reads.mut > simple-genome-reads.fa
 
+simple-genome-reads-even.fa: simple-genome.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 simple-genome.fa --mutation-details simple-genome-reads-even.mut --even > simple-genome-reads-even.fa
+
 simple-genome-perfect.fa: simple-genome.fa
 	$(NULLGRAPH)/make-reads.py -S 2 -e 0 -r 100 -C 100 simple-genome.fa > simple-genome-perfect.fa
 
@@ -39,6 +42,15 @@ simple-genome-reads.sam: simple-genome-reads.fa
 	samtools faidx simple-genome.fa
 
 	bowtie simple-genome -f simple-genome-reads.fa -S simple-genome-reads.sam
+
+simple-genome-reads-even.sam: simple-genome-reads-even.fa
+	bowtie-build simple-genome.fa simple-genome > /dev/null
+	samtools faidx simple-genome.fa
+
+	bowtie simple-genome -f simple-genome-reads-even.fa -S simple-genome-reads-even.sam
+
+simple-genome-reads-even.sam.errhist: simple-genome-reads-even.sam
+	./sam-scan-errhist.py simple-genome.fa simple-genome-reads-even.sam simple-genome-reads-even.fa > simple-genome-reads-even.sam.errhist
 
 simple-genome-reads.sorted.bam: simple-genome-reads.sam
 	samtools import simple-genome.fa.fai simple-genome-reads.sam simple-genome-reads.bam
