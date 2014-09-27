@@ -13,7 +13,7 @@ K-mer spectral analysis is a powerful approach to error detection and
 correction in shotgun sequencing data that uses k-mer abundances to
 determine likely errors (cite Pevzner, Quake, khmer-counting paper).
 While approaches derived from spectral analysis can be very accurate
--- Zhang et al. (2014) suggest that spectral analysis is considerably
+-- Zhang et al. (2014) show that spectral analysis is considerably
 more effective at finding errors than quality-based approaches -- it
 is also very compute intensive: most implementations count k-mers
 across entire sequencing data sets, which can be memory- or
@@ -50,7 +50,7 @@ negatives). The errors in 124 reads were miscalled -- while the reads
 each had one or more errors, the positions were not correctly called
 -- and three reads were incorrectly predicted to contain errors,
 leading to a total of 127 false positives.  Using the above
-definitions, we calculated the prediction sensitivity to be 77.9% and
+definitions, we calculated the prediction sensitivity to be 77.9\% and
 the prediction specificity to be 71.4\%.
 
 @@put in picture of k-mer abundance spectrum before and after?
@@ -71,8 +71,7 @@ can accumulate and increase over the threshold for trusted k-mers,
 thus appearing to be correct; and second, correct reads from low
 coverage regions yield k-mers below the trusted k-mer threshold and
 appear to be incorrect.  In practice, therefore, error correction for
-metagenomic and transcriptome data uses more complex approaches than a
-single threshold.
+metagenomic and transcriptome data must use other approaches.
 
 If we apply diginorm to variable coverage data, we address the problem
 of accumulated errors from high-abundance regions by eliminating the
@@ -80,8 +79,8 @@ majority of the reads from these regions; this is a form of error
 correction, detailed in the original diginorm paper (cite diginorm).
 However, we can also address the issue of low-abundance regions by
 using the median k-mer abundance to estimate which reads are too
-low-abundance to analyze; in effect, we can ignore reads that are
-outside of a desired coverage rage (Figure XXX).
+low-abundance to analyze; in effect, we ignore reads that are
+below the minimum coverage needed for error detection (Figure XXX).
 
 @graph with read abundance spectrum ,showing which reads we will
 call errors in.
@@ -153,10 +152,10 @@ coverage of 20 no more than ZAH \% of the way through the data set.
 
 We can now implement a streaming algorithm for error {\em trimming} of
 any shotgun data.  This follows directly from streaming error
-detection: instead of identifying the locations of all errors, we
-truncate the read at the first (5') low abundance k-mer.  (While it is
-possible to split reads around errors, this introduces complications
-in downstream read processing.)
+detection: instead of identifying the locations of {\em all} errors,
+we truncate the read at the {\em first} (5') low abundance k-mer.
+(While it is possible to split reads around errors, this introduces
+complications in downstream read processing.)
 
 On the simple genome with counts from the digitally normalized reads,
 this trimming approach eliminates 149 reads entirely due to a starting
@@ -203,10 +202,77 @@ reads using the single-pass algorithm described above (see Methods for
 implementation details).  We also separately called errors by mapping
 with bowtie and examining mismatches.  The results are shown in Figure
 YYY; the difference in predicted vs actual mismatch profiles has an
-average of .04\%, with a variance of .0002\% across positions.
+average of 0.04\%, with a variance of 0.0002\% across positions.  The
+predicted per-base error rate is 0.57\%, while the true error rate is
+0.65\%; this underestimate may be due to ignoring reads with multiple
+errors in them that present as too low-coverage to assess.
 
 @@show figure with shaded color indicating difference
 
 We next applied to ecoli data.@@
+
+@@error rates? apply regression?
+
+\section{Discussion}
+
+\subsection{Digital normalization enables k-mer spectral error detection in fariable abundance shotgun data}
+
+Reference-free error detection and correction in shotgun data from
+metagenomic, transcriptomic, and amplified samples typically requires
+specialized approaches (cite, discuss).  Here we demonstrate
+that after digital normalization, k-mer abundance spectral approaches
+can be applied to reads estimated to have high coverage.  This should
+generalize to any error detection, trimming, and counting approaches
+that rely on k-mer abundance.
+
+One significant disadvantage of the variable abundance approach is
+that low-coverage reads cannot be trimmed because we do not know
+whether they are from low-abundance molecules or are highly erroneous.
+This must be taken into account for downstream analysis; for example,
+while assemblers must already ignore or correct these erroneous reads,
+quantitation approaches using e.g. mapping should be not be applied
+to the trimmed data.
+
+(@This is where applying Quake would be a useful demonstration.)
+
+% Will this apply to all error correctors?
+% -V means that highly erroneous reads are kept, but htye're all low coverage.
+
+\subsection{Read coverage estimates enable streaming few-pass approaches to error detection and trimming}
+
+K-mer spectral error detection and trimming approaches require two
+complete passes through the data - one for calculating k-mer
+abundances, and one for trimming reads.  Here we develop an approach
+to streaming error detection and trimming that relies on uneven
+coverage saturation as the read data set is traversed.  Again, this
+approach should be general.
+
+%Will this apply to all error correctors?
+
+%The kind of trimming we implement is only useful for lower memory
+%assembly, etc. Should not be used prior to quantification assembly as
+%it will bias against high cov.
+
+\subsection{Empirical error profiles can be calculated on subsets of Illumina shotgun data}
+
+Useful for cores etc: quick evaluation of sequencing quality, regardless
+of origin.
+
+\subsection{Concluding thoughts}
+
+Primary practical - The kind of trimming we implement is only useful
+for low memory assembly of variable coverage data sets, but we have
+plenty.
+
+Time- and memory-efficient error profile calculation is practically useful
+for large sequencing cores.
+
+Dealing with variants is outside the scope of this work, but 50/50
+variants should not be trimmed.  What about repeats?
+
+Streaming methods for error correction and variant calling, more generally.
+
+Theory needed for thresholding, but, in theory, thresholds should be
+static.  (We can demonstrate that there is little variation.?
 
 \end{document}
