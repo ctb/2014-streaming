@@ -92,7 +92,7 @@ compare5: simple-genome-sam-mismatches.pos simple-genome-abundtrim-sam-mismatche
 	./summarize-pos-file.py simple-genome-abundtrim-sam-mismatches.pos simple-genome-reads.fa.abundtrim
 
 simple-genome-reads-even.fa.errhist: simple-genome-reads-even.fa
-	-$(KHMER)/sandbox/calc-error-profile.py simple-genome-reads-even.fa simple-genome-reads-even.fa
+	-$(KHMER)/sandbox/calc-error-profile.py simple-genome-reads-even.fa
 
 ##### simple metagenome
 

@@ -63,7 +63,7 @@ def main():
     for n, i in enumerate(positions[:max_length]):
         print n, i, float(i) / float(length_count[n])
 
-    print >>sys.stderr, "error rate: %.1f%%" % \
+    print >>sys.stderr, "error rate: %.2f%%" % \
           (100.0 * sum(positions) / float(sum(lengths)))
 
 if __name__ == '__main__':
