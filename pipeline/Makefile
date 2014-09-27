@@ -4,7 +4,9 @@ NULLGRAPH=~/dev/nullgraph
 KHMER=~/dev/khmer
 
 all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
-	compare4 mcompare4 rcompare4
+	compare4 mcompare4 rcompare4 \
+	simple-genome-reads-even.sam.errhist \
+	simple-genome-reads-even.fa.errhist
 
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 	mrna-reads.sorted.bam
@@ -61,7 +63,7 @@ simple-genome-sam-mismatches.pos: simple-genome-reads.sam
 	./sam-scan.py simple-genome.fa simple-genome-reads.sam simple-genome-reads.fa > simple-genome-sam-mismatches.pos
 
 simple-genome-reads.fa.abundtrim: simple-genome-reads.fa
-	~/dev/khmer/sandbox/trim-low-abund.py -k 20 -Z 20 -C 5 simple-genome-reads.fa
+	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 20 -C 5 simple-genome-reads.fa
 
 simple-genome-abundtrim.sam: simple-genome-reads.fa.abundtrim \
 	simple-genome-reads.sam
@@ -88,6 +90,9 @@ compare4: simple-genome-stream-mismatches.pos simple-genome-reads.mut.pos
 compare5: simple-genome-sam-mismatches.pos simple-genome-abundtrim-sam-mismatches.pos
 	./summarize-pos-file.py simple-genome-sam-mismatches.pos simple-genome-reads.fa
 	./summarize-pos-file.py simple-genome-abundtrim-sam-mismatches.pos simple-genome-reads.fa.abundtrim
+
+simple-genome-reads-even.fa.errhist: simple-genome-reads-even.fa
+	-$(KHMER)/sandbox/calc-error-profile.py simple-genome-reads-even.fa simple-genome-reads-even.fa
 
 ##### simple metagenome
 
@@ -118,7 +123,7 @@ simple-metagenome-sam-mismatches.pos: simple-metagenome-reads.sam
 	./sam-scan.py simple-metagenome.fa simple-metagenome-reads.sam simple-metagenome-reads.fa > simple-metagenome-sam-mismatches.pos
 
 simple-metagenome-reads.fa.abundtrim: simple-metagenome-reads.fa
-	~/dev/khmer/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 simple-metagenome-reads.fa
+	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 simple-metagenome-reads.fa
 
 simple-metagenome-abundtrim.sam: simple-metagenome-reads.fa.abundtrim \
 	simple-metagenome-reads.sam
@@ -175,7 +180,7 @@ mrna-sam-mismatches.pos: mrna-reads.sam
 	./sam-scan.py mrna.fa mrna-reads.sam mrna-reads.fa > mrna-sam-mismatches.pos
 
 mrna-reads.fa.abundtrim: mrna-reads.fa
-	~/dev/khmer/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 mrna-reads.fa
+	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 mrna-reads.fa
 
 mrna-abundtrim.sam: mrna-reads.fa.abundtrim \
 	mrna-reads.sam
