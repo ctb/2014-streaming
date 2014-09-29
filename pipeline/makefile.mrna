@@ -1,0 +1,54 @@
+mrna-reads.fa: mrna.fa
+	$(NULLGRAPH)/make-biased-reads.py -S 1 -e .01 -r 100 -C 100 mrna.fa --mutation-details mrna-reads.mut > mrna-reads.fa
+
+mrna-reads.mut.pos: mrna-reads.fa
+	./convert-mut-to-pos.py mrna-reads.mut mrna-reads.mut.pos
+
+mrna-reads.dn.kh: mrna-reads.fa
+	normalize-by-median.py -k 20 -C 20 mrna-reads.fa -s mrna-reads.dn.kh -x 2e6 -N 4
+
+mrna-errors.pos: mrna-reads.dn.kh
+	./report-errors-by-read.py -V --coverage 20 mrna-reads.dn.kh mrna-reads.fa > mrna-errors.pos
+
+mrna-reads.sam: mrna-reads.fa
+	bowtie-build mrna.fa mrna > /dev/null
+	samtools faidx mrna.fa
+
+	bowtie mrna -f mrna-reads.fa -S mrna-reads.sam
+
+mrna-reads.sorted.bam: mrna-reads.sam
+	samtools import mrna.fa.fai mrna-reads.sam mrna-reads.bam
+	samtools sort mrna-reads.bam mrna-reads.sorted
+	samtools index mrna-reads.sorted.bam
+
+mrna-sam-mismatches.pos: mrna-reads.sam
+	./sam-scan.py mrna.fa mrna-reads.sam mrna-reads.fa > mrna-sam-mismatches.pos
+
+mrna-reads.fa.abundtrim: mrna-reads.fa
+	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 mrna-reads.fa
+
+mrna-abundtrim.sam: mrna-reads.fa.abundtrim \
+	mrna-reads.sam
+	bowtie mrna -f mrna-reads.fa.abundtrim -S mrna-abundtrim.sam
+
+mrna-abundtrim-sam-mismatches.pos: mrna-abundtrim.sam
+	./sam-scan.py mrna.fa mrna-abundtrim.sam mrna-reads.fa.abundtrim > mrna-abundtrim-sam-mismatches.pos
+
+rcompare: mrna-errors.pos mrna-sam-mismatches.pos
+	./compare-pos.py mrna-errors.pos mrna-sam-mismatches.pos mrna-reads.fa
+
+rcompare2: mrna-errors.pos mrna-reads.mut.pos
+	./compare-pos.py mrna-errors.pos mrna-reads.mut.pos mrna-reads.fa
+
+rcompare3: mrna-sam-mismatches.pos mrna-reads.mut.pos
+	./compare-pos.py mrna-sam-mismatches.pos mrna-reads.mut.pos mrna-reads.fa
+
+mrna-stream-mismatches.pos: mrna-reads.fa
+	./calc-errors-few-pass.py mrna-reads.fa > mrna-stream-mismatches.pos
+
+rcompare4: mrna-stream-mismatches.pos mrna-reads.mut.pos
+	./compare-pos.py mrna-stream-mismatches.pos mrna-reads.mut.pos mrna-reads.fa
+
+rcompare5: mrna-sam-mismatches.pos mrna-abundtrim-sam-mismatches.pos
+	./summarize-pos-file.py mrna-sam-mismatches.pos mrna-reads.fa
+	./summarize-pos-file.py mrna-abundtrim-sam-mismatches.pos mrna-reads.fa.abundtrim
