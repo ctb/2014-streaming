@@ -4,6 +4,7 @@ import screed
 import khmer
 import argparse
 
+# NOT USED
 def find_low_abund_kmers(kh, sequence, cutoff):
     K = kh.ksize()
 
@@ -58,6 +59,10 @@ def main():
     n_skipped_variable = 0
     n_total = 0
 
+    print >>sys.stderr, "K:", kh.ksize()
+    print >>sys.stderr, "CUTOFF:", args.cutoff
+    print >>sys.stderr, "NORMALIZE_LIMIT:", args.coverage
+
     for record in screed.open(args.sequences):
         n_total += 1
         if args.variable:
@@ -66,7 +71,8 @@ def main():
                 n_skipped_variable += 1
                 continue
             
-        posns = find_low_abund_kmers(kh, record.sequence, args.cutoff)
+        #posns = find_low_abund_kmers(kh, record.sequence, args.cutoff)
+        posns = kh.find_low_abund_kmers(record.sequence, args.cutoff)
         if posns is not None and len(posns) > 0 and posns[0] != -1:
             print record.name, ",".join(map(str, posns))
         else:

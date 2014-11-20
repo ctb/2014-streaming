@@ -14,7 +14,7 @@ simple-genome-reads.mut.pos: simple-genome-reads.fa
 	./convert-mut-to-pos.py simple-genome-reads.mut simple-genome-reads.mut.pos
 
 simple-genome-reads.dn.kh: simple-genome-reads.fa
-	normalize-by-median.py -k 20 -C 20 simple-genome-reads.fa -s simple-genome-reads.dn.kh -x 2e6 -N 4
+	~/dev/khmer/scripts/normalize-by-median.py -k 20 -C 20 simple-genome-reads.fa -s simple-genome-reads.dn.kh -x 2e6 -N 4 -R simple-genome.report
 
 simple-genome-errors.pos: simple-genome-reads.dn.kh
 	./report-errors-by-read.py simple-genome-reads.dn.kh simple-genome-reads.fa > simple-genome-errors.pos
@@ -62,7 +62,7 @@ compare3: simple-genome-sam-mismatches.pos simple-genome-reads.mut.pos
 	./compare-pos.py simple-genome-sam-mismatches.pos simple-genome-reads.mut.pos simple-genome-reads.fa
 
 simple-genome-stream-mismatches.pos: simple-genome-reads.fa
-	./calc-errors-few-pass.py simple-genome-reads.fa > simple-genome-stream-mismatches.pos
+	./calc-errors-few-pass.py -k 20 -x 2e6 -Z 20 simple-genome-reads.fa > simple-genome-stream-mismatches.pos
 
 compare4: simple-genome-stream-mismatches.pos simple-genome-reads.mut.pos
 	./compare-pos.py simple-genome-stream-mismatches.pos simple-genome-reads.mut.pos simple-genome-reads.fa

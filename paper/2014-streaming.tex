@@ -4,22 +4,31 @@
 
 \begin{document}
 
-\section{Results}
+\title{Streaming approaches to error detection and trimming in the analysis of
+short sequencing reads}
+\author{TBD}
+\maketitle
 
-\subsection{Coverage-normalized data can be used to locate
-errors in high-coverage shotgun sequencing data}
+\section{Introduction}
 
 K-mer spectral analysis is a powerful approach to error detection and
 correction in shotgun sequencing data that uses k-mer abundances to
 determine likely errors (cite Pevzner, Quake, khmer-counting paper).
-While approaches derived from spectral analysis can be very accurate
--- Zhang et al. (2014) show that spectral analysis is considerably
-more effective at finding errors than quality-based approaches -- it
-is also very compute intensive: most implementations count k-mers
-across entire sequencing data sets, which can be memory- or
-I/O-intensive for large data sets.
+Approaches derived from spectral analysis can be very accurate: Zhang
+et al. (2014) show that spectral analysis is considerably more
+effective at finding errors than quality-based approaches (cite).  However,
+spectral analysis is also very compute intensive; most implementations
+must count k-mers across entire sequencing data sets, which can be
+memory- or I/O-intensive for large data sets.
 
-Brown et al. (2012) introduced a single-pass algorithm for normalizing
+Streaming algorithms can offer improved algorithmic and computational
+efficiency in the analysis of large data sets (cite).  Streaming
+algorithms typically examine the data only once, and scale in memory
+usage sublinearly with respect to the input data.  Streaming
+algorithms have not been applied to k-mer spectral analysis of reads,
+although XXX (melsted).
+
+Brown et al. (2012) introduced a streaming algorithm for normalizing
 k-mer abundance spectra, termed ``digital normalization'' (abbreviated
 as ``diginorm'').  This procedure estimates the k-mer coverage of each
 read in an online algorithm, by calculating the median k-mer abundance
@@ -32,6 +41,21 @@ diginorm is to reduce the data set size that must be considered for
 downstream processing, such as {\em de novo} assembly (cite trinity,
 elijah, etc.)
 
+Here we develop a streaming algorithm for k-mer spectral analysis,
+based on digital normalization, that can detect and remove errors in
+sequencing reads.  This algorithm operates in sublinear memory, and
+examines the data at most twice.  The approach offers a general
+framework for detecting and making use of graph saturation and could
+potentially be used for error correction, variant calling, and
+a streaming implementation of assembly.  Moreover, it can be applied to
+data sets with variable coverage such as transcriptomes, metagenomes, and
+amplified genomic DNA.
+
+\section{Results}
+
+\subsection{Coverage-normalized data can be used to locate
+errors in high-coverage shotgun sequencing data}
+
 To determine if digital normalization could be applied prior to k-mer
 spectral error detection, we first generated a synthetic data set from
 a simulated low-complexity genome (``simple genome''; see Methods for
@@ -41,6 +65,7 @@ and used k-mer counts from the downsampled read set to detect errors
 by looking for bases at the beginning or ends of low-abundance regions
 in each read. We used a ``trusted k-mer'' cutoff of $C_0 = 3$ as our
 abundance cutoff, below which we assumed k-mers were erroneous (see Methods).
+% note, need to put in diginorm #s
 
 Of the 531 reads in the simple genome with one or more errors,
 predicted errors matched exactly for 317 of them (true positives), and
@@ -57,7 +82,15 @@ the prediction specificity to be 71.4\%.
 
 @list in a table: matched exactly, etc. rundown.
 
-@next, E. coli?
+We next applied digital normalization and k-mer spectral error
+detection to an Illumina data set from E. coli MG1655 (cite Chitsaz).
+We mapped 5m untrimmed reads to the known E. coli MG1655 genome with
+bowtie1 (cite) and calculated mismatches between the reads and the
+genome as errors in the reads.  This yielded 8.0m errors in 2.2m reads,
+for an overall error rate of 1.60\%.  Using these errors as ground truth,
+we found approximately 940,000 true positives, 2.8m true negatives,
+895,000 false positives, and 356,000 false negatives.  This yielded
+a sensitivity to errors of 72.4\% and a specificity of 51.1\%.
 
 \subsection{Coverage-normalized data can be used to locate errors in variable
 coverage shotgun sequencing data}
@@ -78,18 +111,21 @@ of accumulated errors from high-abundance regions by eliminating the
 majority of the reads from these regions; this is a form of error
 correction, detailed in the original diginorm paper (cite diginorm).
 However, we can also address the issue of low-abundance regions by
-using the median k-mer abundance to estimate which reads are too
-low-abundance to analyze; in effect, we ignore reads that are
-below the minimum coverage needed for error detection (Figure XXX).
+ignoring reads that are as yet low coverage; here we can again use
+the median k-mer abundance to estimate which reads are too
+low-abundance to analyze (Figure XXX).
 
 @graph with read abundance spectrum ,showing which reads we will
 call errors in.
+
+% make mcompare2
+% make rcompare2
 
 We generated two more synthetic data sets, ``simple metagenome'' and
 ``simple mRNAseq,'' which contain both high- and low-abundance species
 (see Table XXX for data set details).  After generating synthetic
 reads with a 1\% error rate and applying digital normalization to
-k=20/C=20, we again applied our spectral error detection approach
+k=20/C=20, we again applied spectral error detection
 using the normalized counts, but with the modification that only reads
 with a median k-mer abundance of 20 or greater were examined.  For the
 simple metagenome data set, 2254 of 2347 reads (96.0\%) met the
@@ -114,10 +150,13 @@ sensitivity of 63.8\% and prediction specificity of 67.7\%.
 Even with digital normalization, the spectral error detection approach
 outlined above is a 2-pass offline algorithm for any given data set -
 the first pass normalizes the read set and records the k-mer
-abundances, while the second pass examines the reads.  For large data
-sets, streaming algorithms can be considerably more efficient.
+abundances, while the second pass examines the reads.  A streaming
+approach could avoid some or all of a second pass, leading to
+greater efficiency.
 
-Shotgun sequencing oversamples most regions -- for example, for a 100x
+Here we can make use of the redundancy of shotgun sequencing to avoid
+examining much of the data twice. Shotgun
+sequencing oversamples most regions -- for example, for a 100x
 coverage genomic data set, we would expect 50\% or more of the genome
 to be represented in more than 100 reads.  This is a consequence of
 the Poisson-random sampling that underlies shotgun sequencing
@@ -146,6 +185,59 @@ synthetic genome, and real reads from the {\em E. coli} genome.  In
 all cases, we see that more than BLAH \% of reads reach an estimated
 coverage of 20 no more than ZAH \% of the way through the data set.
 
+% make compare4
+
+%531 erroneous reads in simple-genome-stream-mismatches.pos
+%531 erroneous reads in simple-genome-reads.mut.pos
+%400 reads in common => all error positions AGREE
+%128 DISAGREE
+%total # of reads: 1000
+%TP: 400
+%TN: 466
+%FP: 131
+%FN: 3
+%sensitivity: 0.992555831266
+%specificity: 0.75329566855
+
+When we apply this saturation-based approach to the simulated ``simple
+genome'', we find 400 TP, 466 TN, 131 FP, and 3 FN, for a sensitivity
+of 99.3\% and a specificity of 75.3\%.  (I don't know why this is better
+than the full genome; massive decrease in FN? CTB.)
+
+% make rcompare4
+% 568
+% 289 erroneous reads in mrna-stream-mismatches.pos
+% 309 erroneous reads in mrna-reads.mut.pos
+% 212 reads in common => all error positions AGREE
+% 71 DISAGREE
+% total # of reads: 568
+% TP: 212
+% TN: 253
+% FP: 77
+% FN: 26
+% sensitivity: 0.890756302521
+% specificity: 0.733564013841
+
+% make mcompare4
+% 2347
+% 1116 erroneous reads in simple-metagenome-stream-mismatches.pos
+% 1216 erroneous reads in simple-metagenome-reads.mut.pos
+% 876 reads in common => all error positions AGREE
+% 235 DISAGREE
+% total # of reads: 2347
+% TP: 876
+% TN: 1126
+% FP: 240
+% FN: 105
+% sensitivity: 0.892966360856
+% specificity: 0.784946236559
+
+Likewise, when we apply the approach to the simulated ``simple
+metagenome'' and ``simple mRNAseq'' data sets, we achieve
+sensitivity/specificity to the precise locations of errors in reads of
+89.3\% and 78.5\% on the metagenome and 89.1\%/73.4\% on the mRNASeq
+(see Table YYY for details).
+
 @ discuss streaming error detection results.
 
 \subsection{A streaming algorithm for error trimming}
@@ -154,10 +246,11 @@ We can now implement a streaming algorithm for error {\em trimming} of
 any shotgun data.  This follows directly from streaming error
 detection: instead of identifying the locations of {\em all} errors,
 we truncate the read at the {\em first} (5') low abundance k-mer.
-(While it is possible to split reads around errors, this introduces
-complications in downstream read processing.)
+(While it is possible to split reads around errors rather than
+truncating them, this introduces complications in downstream read
+processing.)
 
-On the simple genome with counts from the digitally normalized reads,
+On the ``simple genome'' with counts from the digitally normalized reads,
 this trimming approach eliminates 149 reads entirely due to a starting
 low-abundance k-mer, and truncated another 392 reads.  Of the 100,000
 bp in the simulated reads, 31,910 (31.9\%) were removed by the
@@ -175,7 +268,31 @@ were eliminated, bringing the overall error rate from 0.62\% to
 56,800 bases (34.34\%).  The initial error rate was 0.65\% and the
 final error rate was 0.07\%.
 
-@@@ real data
+% ecoli-report-untrim.txt ('make ecoli-report-untrim.txt')
+%posfile ecoli-reads.sam.pos: 2176576 mutated reads of 5000000; 7952048 mutations total
+%500000000 bp total
+%overall error rate: 1.590410%
+
+% ecoli-report-trim.txt ('make ecoli-report-trim.txt')
+%posfile ecoli-abundtrim.sam.pos: 171582 mutated reads of 4878226; 198192 mutations total
+%435223632 bp total
+%overall error rate: 0.045538%
+
+% output of make ecoli_ref-5m.fastq.gz.abundtrim
+%read 5000000 reads, 500000000 bp
+%wrote 4878226 reads, 435223632 bp
+%removed 121774 reads and trimmed 2046584 reads
+%trimmed or removed 12.96% of bases (64776368 total)
+%output in *.abundtrim
+
+Applying the streaming error trimming to the E. coli MG1655 data set
+used in section XXX, we trimmed 2.0m reads and removed nearly 122,000
+reads entirely.  Of 7.6m errors, all but 198,000 were removed,
+bringing the error rate from 1.60\% to 0.5\%.  Trimming discarded 64
+Mbp of the original 500 Mbp (13.0\%).
+
+@ mrna
+@ real metagenome
 
 \subsection{Illumina error rates and error profiles can be determined from a
 small sample of sequencing data}

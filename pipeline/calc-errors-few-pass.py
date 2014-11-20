@@ -1,10 +1,4 @@
 #! /usr/bin/env python2
-#
-# This file is part of khmer, http://github.com/ged-lab/khmer/, and is
-# Copyright (C) Michigan State University, 2009-2013. It is licensed under
-# the three-clause BSD license; see doc/LICENSE.txt.
-# Contact: khmer-project@idyll.org
-#
 """
 Streaming error finding.
 
@@ -21,9 +15,9 @@ import tempfile
 import shutil
 
 DEFAULT_NORMALIZE_LIMIT = 20
-DEFAULT_CUTOFF = 2
+DEFAULT_CUTOFF = 3
 
-DEFAULT_K = 32
+DEFAULT_K = 20
 DEFAULT_N_HT = 4
 DEFAULT_MIN_HASHSIZE = 1e6
 
@@ -84,6 +78,12 @@ def main():
     CUTOFF = args.abund_cutoff
     NORMALIZE_LIMIT = args.normalize_to
 
+    print >>sys.stderr, "K:", K
+    print >>sys.stderr, "HT SIZE:", HT_SIZE
+    print >>sys.stderr, "N HT:", N_HT
+    print >>sys.stderr, "CUTOFF:", CUTOFF
+    print >>sys.stderr, "NORMALIZE_LIMIT:", NORMALIZE_LIMIT
+
     print >>sys.stderr, 'making hashtable'
     ht = khmer.new_counting_hash(K, HT_SIZE, N_HT)
 
@@ -124,7 +124,7 @@ def main():
                 ht.consume(seq)
                 pass2fp.write(output_single(read))
                 save_pass2 += 1
-            else:                       # trim!!
+            else:
                 posns = ht.find_low_abund_kmers(seq, CUTOFF)
                 print read.name, ",".join(map(str, posns))
                 
@@ -134,7 +134,7 @@ def main():
               (filename, save_pass2, n, filename)
 
     for orig_filename, pass2filename in pass2list:
-        print >>sys.stderr,'second pass: looking at' + \
+        print >>sys.stderr,'second pass: looking at ' + \
               'sequences kept aside in %s' % pass2filename
         for n, read in enumerate(screed.open(pass2filename)):
             if n % 10000 == 0:

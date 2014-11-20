@@ -22,7 +22,7 @@ def main():
     n = 0
     for samline in ignore_at(open(args.samfile)):
         n += 1
-        if n % 1000 == 0:
+        if n % 10000 == 0:
             print >>sys.stderr, '...', n
 
         readname, _, refname, refpos, _, _, _, _, _, seq = samline.split()[:10]
