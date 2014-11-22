@@ -8,7 +8,8 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	simple-genome-reads-even.sam.errhist \
 	simple-genome-reads-even.fa.errhist \
 	ecoli-report-untrim.txt \
-	ecoli-report-trim.txt
+	ecoli-report-trim.txt \
+	ecoli-errfree-report.txt
 
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 	mrna-reads.sorted.bam
@@ -84,3 +85,9 @@ ecoli-report-untrim.txt: ecoli-reads.sam.pos ecoli_ref-5m.fastq.gz
 # abundance trimmed reads, based on mapping to the reference.
 ecoli-report-trim.txt: ecoli-abundtrim.sam.pos ecoli_ref-5m.fastq.gz.abundtrim
 	./summarize-pos-file.py ecoli-abundtrim.sam.pos ecoli_ref-5m.fastq.gz.abundtrim > ecoli-report-trim.txt
+
+ecoli-errfree-reads.fa: ecoliMG1655.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e 0 -r 100 -C 100 ecoliMG1655.fa > ecoli-errfree-reads.fa
+
+ecoli-errfree-report.txt: ecoli-errfree-reads.fa
+	~/dev/khmer/scripts/normalize-by-median.py -x 1e8 -N 4 -k 20 -C 20 ecoli-errfree-reads.fa -R ecoli-errfree-report.txt
