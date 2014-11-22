@@ -1,6 +1,7 @@
 % reviewers: Zam, Jared?
 
-\documentstyle{article}
+\documentclass{article}
+\usepackage{graphicx}
 
 \begin{document}
 
@@ -81,6 +82,8 @@ the prediction specificity to be 71.4\%.
 @@put in picture of k-mer abundance spectrum before and after?
 
 @list in a table: matched exactly, etc. rundown.
+
+% make ecoli-report.txt
 
 We next applied digital normalization and k-mer spectral error
 detection to an Illumina data set from E. coli MG1655 (cite Chitsaz).
@@ -167,16 +170,29 @@ stream than others.  For example, in mRNAseq, highly expressed
 transcripts will on average be highly sampled much earlier than
 low-expressed transcripts.
 
-If highly sampled regions could be detected in advance of assembly,
-twe could apply the same approaches used above to do error detection
-in a streaming fashion.  Digital normalization provides such a method:
-by measuring coverage for each read against an online De Bruijn graph,
-reads that reach a specified coverage threshold can be examined for
-errors immediately.  Those reads that had not yet reached high
-coverage could be set aside and re-examined later.  This could result
-in significant runtime savings: for a genomic data set with 100x
-coverage, no more than 20\% of the reads would need to be examined
-twice.
+If highly sampled regions could be detected during iteration over the
+read data set, we could apply the same approaches used above to do
+error detection in a streaming fashion.  Digital normalization
+provides such a method: by measuring coverage for each read against an
+online De Bruijn graph, reads that reach a specified coverage
+threshold can be examined for errors immediately.  Those reads that
+had not yet reached high coverage could be set aside and re-examined
+later.  This could result in significant runtime savings: for a
+genomic data set with 100x coverage, no more than 20\% of the reads
+would need to be examined twice.
+
+The conceptual idea is presented in Figure XXX.
+
+\begin{figure}[!ht]
+ \centerline{\includegraphics[width=4in]{./figures/graph-saturation}}
+\caption{\bf Diagram of streaming error detection. In a first pass
+over the read data, reads are loaded in until the graph locus to which
+they belong is saturated.  From that point on, reads are examined for
+errors and not loaded into the graph.  In a second pass, only the subset
+of reads loaded into the graph are examined for errors.}
+\label{fig:bar}
+\end{figure}
+
 
 In Figure XXX, we show diginorm-generated coverage saturation curves
 for error-free simulated reads from synthetic and a real ({\em
