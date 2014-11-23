@@ -44,7 +44,7 @@ mcompare3: simple-metagenome-sam-mismatches.pos simple-metagenome-reads.mut.pos
 	./compare-pos.py simple-metagenome-sam-mismatches.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa
 
 simple-metagenome-stream-mismatches.pos: simple-metagenome-reads.fa
-	./calc-errors-few-pass.py simple-metagenome-reads.fa > simple-metagenome-stream-mismatches.pos
+	./calc-errors-few-pass.py -V simple-metagenome-reads.fa > simple-metagenome-stream-mismatches.pos
 
 mcompare4: simple-metagenome-stream-mismatches.pos simple-metagenome-reads.mut.pos
 	./compare-pos.py simple-metagenome-stream-mismatches.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa

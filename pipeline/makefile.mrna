@@ -44,7 +44,7 @@ rcompare3: mrna-sam-mismatches.pos mrna-reads.mut.pos
 	./compare-pos.py mrna-sam-mismatches.pos mrna-reads.mut.pos mrna-reads.fa
 
 mrna-stream-mismatches.pos: mrna-reads.fa
-	./calc-errors-few-pass.py mrna-reads.fa > mrna-stream-mismatches.pos
+	./calc-errors-few-pass.py -V mrna-reads.fa > mrna-stream-mismatches.pos
 
 rcompare4: mrna-stream-mismatches.pos mrna-reads.mut.pos
 	./compare-pos.py mrna-stream-mismatches.pos mrna-reads.mut.pos mrna-reads.fa

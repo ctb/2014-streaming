@@ -4,12 +4,14 @@ NULLGRAPH=~/dev/nullgraph
 KHMER=~/dev/khmer
 
 all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
-	compare4 mcompare4 rcompare4 \
+	compare4 mcompare4 rcompare4 compare5 compare6 \
 	simple-genome-reads-even.sam.errhist \
 	simple-genome-reads-even.fa.errhist \
 	ecoli-report-untrim.txt \
 	ecoli-report-trim.txt \
-	ecoli-errfree-report.txt
+	ecoli-errfree-report.txt \
+	simple-genome-kmers.hist \
+	simple-genome-dn-kmers.hist
 
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 	mrna-reads.sorted.bam

@@ -46,11 +46,11 @@ Here we develop a streaming algorithm for k-mer spectral analysis,
 based on digital normalization, that can detect and remove errors in
 sequencing reads.  This algorithm operates in sublinear memory, and
 examines the data at most twice.  The approach offers a general
-framework for detecting and making use of graph saturation and could
-potentially be used for error correction, variant calling, and
-a streaming implementation of assembly.  Moreover, it can be applied to
-data sets with variable coverage such as transcriptomes, metagenomes, and
-amplified genomic DNA.
+framework for making use of locus-specific graph saturation and could
+potentially be used for error correction, variant calling, and a
+streaming implementation of assembly.  Moreover, it can be applied to
+data sets with variable coverage such as transcriptomes, metagenomes,
+and amplified genomic DNA.
 
 \section{Results}
 
@@ -58,30 +58,69 @@ amplified genomic DNA.
 errors in high-coverage shotgun sequencing data}
 
 To determine if digital normalization could be applied prior to k-mer
-spectral error detection, we first generated a synthetic data set from
+spectral error detection, we first tried it on a simulated data set.
+We generated a synthetic data set from
 a simulated low-complexity genome (``simple genome''; see Methods for
-generation and Table XXX for data set details).  We then applied
-digital normalization to a median 20-mer coverage of 20 (k=20, C=20)
-and used k-mer counts from the downsampled read set to detect errors
-by looking for bases at the beginning or ends of low-abundance regions
-in each read. We used a ``trusted k-mer'' cutoff of $C_0 = 3$ as our
-abundance cutoff, below which we assumed k-mers were erroneous (see Methods).
-% note, need to put in diginorm #s
+generation and Table XXX for data set details). We then applied
+digital normalization to a median 20-mer coverage of 20 (k=20, C=20).
 
-Of the 531 reads in the simple genome with one or more errors,
-predicted errors matched exactly for 317 of them (true positives), and
-466 reads were correctly predicted to contain no errors (true
-negatives). 90 reads were falsely predicted to have no errors (false
-negatives). The errors in 124 reads were miscalled -- while the reads
-each had one or more errors, the positions were not correctly called
--- and three reads were incorrectly predicted to contain errors,
-leading to a total of 127 false positives.  Using the above
-definitions, we calculated the prediction sensitivity to be 77.9\% and
-the prediction specificity to be 71.4\%.
+The k-mer spectrum before and after digital normalization is shown in
+Figure~\ref{fig:spectrum}.  This also illustrates the concept
+underlying k-mer spectral error detection: in high coverage data sets,
+the {\em correct} k-mers are cleanly separated from the k-mers resulting
+from errors, and so a simple abundance cutoff can classify k-mers as
+correct or incorrect.
 
-@@put in picture of k-mer abundance spectrum before and after?
+\begin{figure}[!ht]
+ \centerline{\includegraphics[width=4in]{./figures/kmer-spectrum}}
+\caption{\bf K-mer spectrum of a simple artificial data set, before and after digital normalization.  The peaks at 1 represents erroneous k-mers resulting
+from (simulated) error; the peaks centered at 80 (raw) and 20 (diginorm)
+represent k-mers truly present in the genome which are present in many reads.}
+\label{fig:spectrum}
+\end{figure}
 
-@list in a table: matched exactly, etc. rundown.
+% note, need to put in diginorm #s. Or do we? In Methods, maybe?
+
+%% make compare2
+
+We next used k-mer counts from the downsampled read set to detect
+errors in the original read set.  The algorithm is straightforward: we
+look for bases at the beginning or ends of low-abundance regions in
+each read. We used a ``trusted k-mer'' cutoff of $C_0 = 3$ as our
+abundance cutoff, below which we assumed k-mers were erroneous (see
+Methods).  Of the 531 simulated reads from the simple genome
+containing one or more errors, predicted errors matched the known
+truth exactly for 443 of them (true positives), and 466 reads were
+correctly predicted to contain no errors (true negatives). 0 reads
+were falsely predicted to have no errors (false negatives). The errors
+in 88 reads were miscalled -- while the reads each had one or more
+errors, the positions were not correctly called -- and three reads
+were incorrectly predicted to contain errors, leading to a total of 91
+false positives.  Using the above definitions, we calculated the
+prediction sensitivity to be 100\% and the prediction specificity to
+be 83.0\%.
+
+%% make compare6
+%545 erroneous reads in simple-genome-errors-nodn.pos
+%531 erroneous reads in simple-genome-reads.mut.pos
+%440 reads in common => all error positions AGREE
+%91 DISAGREE
+%total # of reads: 1000
+%TP: 440
+%TN: 455
+%FP: 105
+%FN: 0
+%sensitivity: 1.0
+%specificity: 0.807339449541
+
+This is similar to the results of spectral error detection using the
+unnormalized counts, which yielded 440 TP, 455 TN, 105 FP, and 0 FN,
+for a sensitivity of 100\% and a specificity of 80.7\%; the only
+difference in parameters for this analysis is that we used a cutoff of
+10 rather than 3, to account for the shifted k-mer spectrum from
+diginorm.
+
+@list in a table: matched exactly, etc. rundown.  Columnar etc.
 
 % make ecoli-report.txt
 
@@ -94,6 +133,8 @@ for an overall error rate of 1.60\%.  Using these errors as ground truth,
 we found approximately 940,000 true positives, 2.8m true negatives,
 895,000 false positives, and 356,000 false negatives.  This yielded
 a sensitivity to errors of 72.4\% and a specificity of 51.1\%.
+
+@add in unnormalized
 
 \subsection{Coverage-normalized data can be used to locate errors in variable
 coverage shotgun sequencing data}
@@ -113,12 +154,12 @@ If we apply diginorm to variable coverage data, we address the problem
 of accumulated errors from high-abundance regions by eliminating the
 majority of the reads from these regions; this is a form of error
 correction, detailed in the original diginorm paper (cite diginorm).
-However, we can also address the issue of low-abundance regions by
+We can also address the issue of low-abundance regions by
 ignoring reads that are as yet low coverage; here we can again use
 the median k-mer abundance to estimate which reads are too
 low-abundance to analyze (Figure XXX).
 
-@graph with read abundance spectrum ,showing which reads we will
+@graph with read abundance spectrum, showing which reads we will
 call errors in.
 
 % make mcompare2
@@ -132,23 +173,23 @@ k=20/C=20, we again applied spectral error detection
 using the normalized counts, but with the modification that only reads
 with a median k-mer abundance of 20 or greater were examined.  For the
 simple metagenome data set, 2254 of 2347 reads (96.0\%) met the
-coverage criterion.  Of the 2347 reads total, the errors in 658
-erroneous reads were called perfectly (TP) and 1126 of the reads with
-no errors were correctly called as error-free (TN).  297 reads were
+coverage criterion.  Of the 2347 reads total, the errors in 978
+erroneous reads were called perfectly (TP) and 1125 of the reads with
+no errors were correctly called as error-free (TN).  68 reads were
 incorrectly determined to be error free (FN; including the reads that
-were too low coverage to be considered).  Of the remaining 266 reads,
-261 were miscalled (errors existed but were not exactly called) and 5
+were too low coverage to be considered).  Of the remaining 176 reads,
+170 were miscalled (errors existed but were not exactly called) and 6
 were incorrectly called as erroneous when they were in fact correct.
-We calculated the prediction sensitivity to be 68.9\% and the
-prediction specificity to be 71.2\%.  For the simple mRNAseq data set,
-524 of 568 reads (92.3\%) met the coverage criterion, with 153 true
-positives, 255 true negatives, 87 false negatives (including the low
-coverage reads not examined), and 73 false positives, for a prediction
-sensitivity of 63.8\% and prediction specificity of 67.7\%.
+We calculated the prediction sensitivity to be 93.5\% and the
+prediction specificity to be 84.7\%.  For the simple mRNAseq data set,
+524 of 568 reads (92.3\%) met the coverage criterion, with 228 true
+positives, 250 true negatives, 29 false negatives (including the low
+coverage reads not examined), and 61 false positives, for a prediction
+sensitivity of 88.7\% and prediction specificity of 78.9\%.
 
-@ real data / measurements
+@ real data / measurements - sherine, QP.
 
-\subsection{A streaming algorithm can be used to detect errors based on read coverage}
+\subsection{A streaming algorithm for error detection}
 
 Even with digital normalization, the spectral error detection approach
 outlined above is a 2-pass offline algorithm for any given data set -
@@ -181,7 +222,7 @@ later.  This could result in significant runtime savings: for a
 genomic data set with 100x coverage, no more than 20\% of the reads
 would need to be examined twice.
 
-The conceptual idea is presented in Figure XXX.
+The conceptual idea is presented in Figure~\ref{fig:concept}.
 
 \begin{figure}[!ht]
  \centerline{\includegraphics[width=4in]{./figures/graph-saturation}}
@@ -190,95 +231,71 @@ over the read data, reads are loaded in until the graph locus to which
 they belong is saturated.  From that point on, reads are examined for
 errors and not loaded into the graph.  In a second pass, only the subset
 of reads loaded into the graph are examined for errors.}
-\label{fig:bar}
+\label{fig:concept}
 \end{figure}
 
+In Figure~\ref{fig:saturation}, we show diginorm-generated coverage
+saturation curves for both real and error-free simulated reads from
+{\em E. coli} MG1655.  In both cases, we see that by about 1m reads,
+the majority of reads comes from loci with an estimated sequencing
+depth of 20 or higher, and hence can be used for error analysis on the
+first pass through the data.  Only those reads collected on the first
+pass need to be examined again.
 
-In Figure XXX, we show diginorm-generated coverage saturation curves
-for error-free simulated reads from synthetic and a real ({\em
-  E. coli}) genome, as well as simulated reads with error from a
-synthetic genome, and real reads from the {\em E. coli} genome.  In
-all cases, we see that more than BLAH \% of reads reach an estimated
-coverage of 20 no more than ZAH \% of the way through the data set.
+\begin{figure}[!ht]
+ \centerline{\includegraphics[width=4in]{./figures/saturation}}
+\caption{\bf Saturation curve of a real and a simulated {\em E. coli} read data
+set.  Reads are collected when they have an estimated coverage of less
+than 20; in the early phase ($<$ 1m reads), almost all reads are
+collected, but soon the majority of reads come from loci with an estimated
+sequencing depth of $>$ 20 and are rejected.}
+\label{fig:saturation}
+\end{figure}
 
 % make compare4
 
-%531 erroneous reads in simple-genome-stream-mismatches.pos
-%531 erroneous reads in simple-genome-reads.mut.pos
-%400 reads in common => all error positions AGREE
-%128 DISAGREE
-%total # of reads: 1000
-%TP: 400
-%TN: 466
-%FP: 131
-%FN: 3
-%sensitivity: 0.992555831266
-%specificity: 0.75329566855
+When we apply this streaming approach to the simulated reads from the
+``simple genome'', we find identical numbers to the full two-pass
+approach: 443 TP, 466 TN, 91 FP, and 0 FN, for a sensitivity of 100\%
+and a specificity of 83.0\%.  Likewise, for the ``simple metagenome''
+and ``simple mRNAseq'' data sets, we obtain nearly identical and
+identical results, respectively, with the streaming approach; due to
+differences in the order in which reads are examined, the simple
+metagenome fails to detect one true positive and erroneously finds
+errrors in three extra reads.
 
-When we apply this saturation-based approach to the simulated ``simple
-genome'', we find 400 TP, 466 TN, 131 FP, and 3 FN, for a sensitivity
-of 99.3\% and a specificity of 75.3\%.  (I don't know why this is better
-than the full genome; massive decrease in FN? CTB.)
-
-% make rcompare4
-% 568
-% 289 erroneous reads in mrna-stream-mismatches.pos
-% 309 erroneous reads in mrna-reads.mut.pos
-% 212 reads in common => all error positions AGREE
-% 71 DISAGREE
-% total # of reads: 568
-% TP: 212
-% TN: 253
-% FP: 77
-% FN: 26
-% sensitivity: 0.890756302521
-% specificity: 0.733564013841
-
-% make mcompare4
-% 2347
-% 1116 erroneous reads in simple-metagenome-stream-mismatches.pos
-% 1216 erroneous reads in simple-metagenome-reads.mut.pos
-% 876 reads in common => all error positions AGREE
-% 235 DISAGREE
-% total # of reads: 2347
-% TP: 876
-% TN: 1126
-% FP: 240
-% FN: 105
-% sensitivity: 0.892966360856
-% specificity: 0.784946236559
-
-Likewise, when we apply the approach to the simulated ``simple
-metagenome'' and ``simple mRNAseq'' data sets, we achieve
-sensitivity/specificity to the precise locations of errors in reads of
-89.3\% and 78.5\% on the metagenome and 89.1\%/73.4\% on the mRNASeq
-(see Table YYY for details).
+@ do we put these numbers into a table? They're basically identical.
 
 @ discuss streaming error detection results.
 
+@ apply to E. coli?
+
 \subsection{A streaming algorithm for error trimming}
 
-We can now implement a streaming algorithm for error {\em trimming} of
-any shotgun data.  This follows directly from streaming error
-detection: instead of identifying the locations of {\em all} errors,
-we truncate the read at the {\em first} (5') low abundance k-mer.
+Once errors can be {\em detected} with a streaming algorithm, it is simple
+to remove errors from reads by trimming the read at the first error.
 (While it is possible to split reads around errors rather than
 truncating them, this introduces complications in downstream read
 processing.)
 
-On the ``simple genome'' with counts from the digitally normalized reads,
-this trimming approach eliminates 149 reads entirely due to a starting
-low-abundance k-mer, and truncated another 392 reads.  Of the 100,000
-bp in the simulated reads, 31,910 (31.9\%) were removed by the
-trimming process.  In exchange, trimming eliminated all of the errors,
-bringing the overall error rate from 0.63\% to 0.00\%.
+% make compare5
+
+On the ``simple genome'' with counts from the digitally normalized
+reads, this trimming approach eliminates 149 reads entirely due to a
+starting low-abundance k-mer, and truncates another 392 reads.  Of the
+100,000 bp in the simulated reads, 31,910 (31.9\%) were removed by the
+trimming process.  In exchange, trimming eliminated {\em all} of the
+errors, bringing the overall error rate from 0.63\% to 0.00\%.
+
+% make mcompare5
+% make rcompare5
 
 For the simple metagenome we used the variable abundance approach
 described above and only trimmed reads with estimated coverage of 20
 or higher.  Here, of 2347 reads containing 234,700 bp, 314 reads
 (13.4\%) were removed and 851 reads (36.3\%) were trimmed, discarding
 a total of 74,321 bases (31.7\%).  Of 1451 errors total, all but 61
-were eliminated, bringing the overall error rate from 0.62\% to
+were eliminated, bringing the overall per-base error rate from 0.62\% to
 0.04\%.  The simple mRNAseq data set showed similar improvement: 83 of
 568 reads were removed, and 208 were trimmed, removing 19,507 of
 56,800 bases (34.34\%).  The initial error rate was 0.65\% and the

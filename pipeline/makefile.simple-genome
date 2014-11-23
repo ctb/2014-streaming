@@ -4,6 +4,12 @@ simple-genome.fa:
 simple-genome-reads.fa: simple-genome.fa
 	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 simple-genome.fa --mutation-details simple-genome-reads.mut > simple-genome-reads.fa
 
+simple-genome-kmers.hist: simple-genome.fa
+	$(KHMER)/scripts/abundance-dist-single.py -k 20 simple-genome-reads.fa simple-genome-kmers.hist
+
+simple-genome-dn-kmers.hist: simple-genome-reads.dn.kh
+	$(KHMER)/scripts/abundance-dist-single.py -k 20 simple-genome-reads.fa.keep simple-genome-dn-kmers.hist
+
 simple-genome-reads-even.fa: simple-genome.fa
 	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 simple-genome.fa --mutation-details simple-genome-reads-even.mut --even > simple-genome-reads-even.fa
 
@@ -13,8 +19,14 @@ simple-genome-perfect.fa: simple-genome.fa
 simple-genome-reads.mut.pos: simple-genome-reads.fa
 	./convert-mut-to-pos.py simple-genome-reads.mut simple-genome-reads.mut.pos
 
+simple-genome-reads.kh: simple-genome-reads.fa
+	load-into-counting.py simple-genome-reads.kh -k 20 -x 2e6 -N 4 simple-genome-reads.fa
+
+simple-genome-errors-nodn.pos: simple-genome-reads.kh
+	./report-errors-by-read.py -C 15 simple-genome-reads.kh simple-genome-reads.fa > simple-genome-errors-nodn.pos
+
 simple-genome-reads.dn.kh: simple-genome-reads.fa
-	~/dev/khmer/scripts/normalize-by-median.py -k 20 -C 20 simple-genome-reads.fa -s simple-genome-reads.dn.kh -x 2e6 -N 4 -R simple-genome.report
+	normalize-by-median.py -k 20 -C 20 simple-genome-reads.fa -s simple-genome-reads.dn.kh -x 2e6 -N 4 -R simple-genome.report
 
 simple-genome-errors.pos: simple-genome-reads.dn.kh
 	./report-errors-by-read.py simple-genome-reads.dn.kh simple-genome-reads.fa > simple-genome-errors.pos
@@ -74,3 +86,5 @@ compare5: simple-genome-sam-mismatches.pos simple-genome-abundtrim-sam-mismatche
 simple-genome-reads-even.fa.errhist: simple-genome-reads-even.fa
 	-$(KHMER)/sandbox/calc-error-profile.py simple-genome-reads-even.fa
 
+compare6: simple-genome-reads.mut.pos simple-genome-errors-nodn.pos
+	./compare-pos.py simple-genome-errors-nodn.pos simple-genome-reads.mut.pos simple-genome-reads.fa

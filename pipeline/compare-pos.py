@@ -61,7 +61,7 @@ def main():
         if len(vb):
             o += 1
 
-    print len(a)
+    print >>sys.stderr, 'total # of reads analyzed: %d' % (len(a),)
     print >>sys.stderr, '%d erroneous reads in %s' % (n, args.pos_a)
     print >>sys.stderr, '%d erroneous reads in %s' % (o, args.pos_b)
     print >>sys.stderr, '%d reads in common => all error positions AGREE' % (m,)
