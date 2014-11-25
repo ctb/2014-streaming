@@ -30,7 +30,8 @@ include makefile.simple-metagenome
 ##### simple mrna molecule with three isoforms (1234, 124, 134)
 include makefile.mrna
 
-#####
+##### mouse 1m rnaseq data set (real)
+include makefile.rseq
 
 ecoli1: ecoli-report.txt
 
