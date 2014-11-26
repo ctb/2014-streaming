@@ -61,12 +61,12 @@ def main():
         if len(vb):
             o += 1
 
-    print >>sys.stderr, 'total # of reads analyzed: %d' % (len(a),)
-    print >>sys.stderr, '%d erroneous reads in %s' % (n, args.pos_a)
-    print >>sys.stderr, '%d erroneous reads in %s' % (o, args.pos_b)
-    print >>sys.stderr, '%d reads in common => all error positions AGREE' % (m,)
-    print >>sys.stderr, '%d DISAGREE' % (unexplained,)
-    print >>sys.stderr, 'total # of reads:', len(all_reads)
+    print 'total # of reads analyzed: %d' % (len(a),)
+    print '%d erroneous reads in %s' % (n, args.pos_a)
+    print '%d erroneous reads in %s' % (o, args.pos_b)
+    print '%d reads in common => all error positions AGREE' % (m,)
+    print '%d DISAGREE' % (unexplained,)
+    print 'total # of reads:', len(all_reads)
 
     # assume a is prediction, b is correct
     
@@ -91,7 +91,7 @@ def main():
 
     print 'TP:', tp
     print 'TN:', tn
-    print 'FP:', fp
+    print 'FP: %d (%d + %d)' % (fp, unexplained, fp-unexplained)
     print 'FN:', fn
 
     print 'sensitivity:', tp / float(tp + fn)

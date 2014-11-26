@@ -7,11 +7,12 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	compare4 mcompare4 rcompare4 compare5 compare6 \
 	simple-genome-reads-even.sam.errhist \
 	simple-genome-reads-even.fa.errhist \
+	ecoli1 \
 	ecoli-report-untrim.txt \
 	ecoli-report-trim.txt \
 	ecoli-errfree-report.txt \
 	simple-genome-kmers.hist \
-	simple-genome-dn-kmers.hist
+	simple-genome-dn-kmers.hist \
 
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 	mrna-reads.sorted.bam
@@ -32,7 +33,7 @@ include makefile.mrna
 
 #####
 
-ecoli1: ecoli-report.txt
+ecoli1: ecoli-report.txt ecoli-report-nodn.txt
 
 # bowtie index for ecoliMG1655.fa
 ecoli.1.ebwt: ecoliMG1655.fa
@@ -47,6 +48,16 @@ ecoli-reads.sam: ecoli_ref-5m.fastq.gz ecoli.1.ebwt
 # i.e. errors, determined from mapping.
 ecoli-reads.sam.pos: ecoli-reads.sam
 	./sam-scan.py ecoliMG1655.fa ecoli-reads.sam ecoli_ref-5m.fastq.gz > ecoli-reads.sam.pos
+
+# ecoli_ref.kh contains the counting table of k-mers in the raw read data set.
+ecoli_ref.kh: ecoli_ref-5m.fastq.gz
+	load-into-counting.py ecoli_ref.kh -k 20 -x 2e8 -N 4 ecoli_ref-5m.fastq.gz
+
+ecoli-reads-nodn.errors.pos: ecoli_ref.kh
+	./report-errors-by-read.py -C 15 ecoli_ref.kh ecoli_ref-5m.fastq.gz > ecoli-reads-nodn.errors.pos
+
+ecoli-report-nodn.txt: ecoli-reads-nodn.errors.pos
+	./compare-pos.py ecoli-reads-nodn.errors.pos ecoli-reads.sam.pos ecoli_ref-5m.fastq.gz > ecoli-report-nodn.txt
 
 # ecoli_ref.dn.kh contains the counting table output by digital normalization
 # of the raw E. coli reads.
