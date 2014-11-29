@@ -220,3 +220,54 @@ ecoli_nodn_corr:
 	$(QUAKE)/bin/cov_model.py ecoli_raw_counts.out
 	$(QUAKE)/bin/correct -f quake_list.txt -p 4 -q 33 -c 7 -z -m ecoli_raw_counts.out
 	mv ecoli_ref-5m.cor.fastq.gz ecoli_ref-5m.raw.cor.fastq.gz
+
+###
+
+podar:  podar.1.ebwt \
+	podar-reads.sam \
+	podar-reads.sam.pos \
+	podar.dn.kh \
+	podar-reads.erros.pos \
+	podar.fastq.gz.abundtrim \
+	podar-abundtrim.sam \
+	podar-abundtrim.sam.pos \
+	podar-report-untrim.txt \
+	podar-report-trim.txt \
+	podar-report.txt \
+	podar1
+
+podar1: podar-report.txt
+
+podar-report.txt: podar-reads.errors.pos podar-reads.sam.pos
+	./compare-pos.py podar-reads.errors.pos podar-reads.sam.pos podar-1.fastq >podar-report.txt
+
+podar.1.ebwt: podar-ref.fa
+	bowtie-build podar-ref.fa podar
+	samtools faidx podar-ref.fa
+
+podar-reads.sam: podar-1.fastq podar.1.ebwt
+	bowtie podar -q podar-1.fastq -S podar-reads.sam
+
+podar-reads.sam.pos: podar-reads.sam
+	./sam-scan.py podar-ref.fa podar-reads.sam podar-1.fastq >podar-reads.sam.pos
+
+podar.dn.kh: podar-1.fastq
+	 normalize-by-median.py -x 1e8 -N 4 -k 20 -C 20 -s podar.dn.kh podar-1.fastq -R podar-dn-report.txt
+
+podar-reads.erros.pos: podar-1.fastq  podar.dn.kh
+	 ./report-errors-by-read.py -Z --coverage 20 podar.dn.kh podar-1.fastq > podar-reads.errors.pos 	
+
+podar.fastq.gz.abundtrim: podar-1.fastq
+	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 20 -C 5 -x 1e9 -N 4 podar-1.fastq
+
+podar-abundtrim.sam: podar-1.fastq.abundtrim
+	bowtie podar -q podar-1.fastq.abundtrim -S podar-abundtrim.sam
+
+podar-abundtrim.sam.pos: podar-abundtrim.sam
+	./sam-scan.py podar-ref.fa podar-abundtrim.sam podar-1.fastq.abundtrim > podar-abundtrim.sam.pos
+
+podar-report-untrim.txt:podar-reads.sam.pos podar-1.fastq
+	./summarize-pos-file.py podar-reads.sam.pos podar-1.fastq > podar-report-untrim.txt
+
+podar-report-trim.txt: podar-abundtrim.sam.pos podar-1.fastq.abundtrim
+	./summarize-pos-file.py podar-abundtrim.sam.pos podar-1.fastq.abundtrim > podar-report-trim.txt 
