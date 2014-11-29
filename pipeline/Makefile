@@ -2,6 +2,8 @@
 
 NULLGRAPH=~/dev/nullgraph
 KHMER=~/dev/khmer
+QUAKE=../Quake
+JELLYFISH=/usr/local/bin/jellyfish
 
 all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	compare4 mcompare4 rcompare4 compare5 compare6 \
@@ -200,3 +202,21 @@ repgenome-compare.txt: repgenome-10-reads.calc.pos repgenome-10-reads.mut.pos
 	./compare-pos-2.py 8 repgenome-8-reads.mut.pos repgenome-8-reads.calc.pos repgenome-8-reads.fa >> repgenome-compare.txt
 	./compare-pos-2.py 9 repgenome-9-reads.mut.pos repgenome-9-reads.calc.pos repgenome-9-reads.fa >> repgenome-compare.txt
 	./compare-pos-2.py 10 repgenome-10-reads.mut.pos repgenome-10-reads.calc.pos repgenome-10-reads.fa >> repgenome-compare.txt
+
+####
+
+ecoli_dn_corr:
+	echo ecoli_ref-5m.fastq.gz > quake_list.txt
+	ln -fs /usr/local/bin/jellyfish .
+	#cat ecoli_ref-5m.fastq.gz.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_dn_counts.out
+	$(QUAKE)/bin/cov_model.py ecoli_dn_counts.out > ecoli_dn_counts.cov
+	$(QUAKE)/bin/correct -f quake_list.txt -p 4 -k 14 -q 33 -c 7 -z -m ecoli_dn_counts.out
+	mv ecoli_ref-5m.cor.fastq.gz ecoli_ref-5m.dn.cor.fastq.gz
+
+ecoli_nodn_corr:
+	echo ecoli_ref-5m.fastq.gz > quake_list.txt
+	ln -fs /usr/local/bin/jellyfish .
+	cat ecoli_ref-5m.fastq.gz.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_raw_counts.out
+	$(QUAKE)/bin/cov_model.py ecoli_raw_counts.out
+	$(QUAKE)/bin/correct -f quake_list.txt -p 4 -q 33 -c 7 -z -m ecoli_raw_counts.out
+	mv ecoli_ref-5m.cor.fastq.gz ecoli_ref-5m.raw.cor.fastq.gz
