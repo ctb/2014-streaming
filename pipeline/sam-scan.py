@@ -32,7 +32,10 @@ def main():
         refpos = int(refpos)
 
         #assert record.name == readname, (record.name, readname)
-        ref = genome_dict[refname][refpos-1:refpos+len(seq) - 1]
+        try:
+            ref = genome_dict[refname][refpos-1:refpos+len(seq) - 1]
+        except KeyError:
+            print >>sys.stderr, "unknown refname: %s; ignoring (read %s)" % (refname, readname)
         #print ref
         #print seq
 

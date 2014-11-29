@@ -8,3 +8,5 @@
 *.keep
 *.abundtrim
 *.errhist
+repeat-*.fa
+repgenome-*.fa

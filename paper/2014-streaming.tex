@@ -473,10 +473,7 @@ median k-mer abundance is an underestimate of coverage for highly erroneous
 reads.  (In k-mer spectral error analysis of genomes, low abundance reads
 can simply be assumed to be highly erroneous.)
 
-(@This is where applying Quake would be a useful demonstration.)
-
-% Will this apply to all error correctors?
-% -V means that highly erroneous reads are kept, but htye're all low coverage.
+(@This is where applying Quake to diginorm reads would be a useful demonstration.)
 
 \subsection{A streaming algorithm for read analysis}
 
@@ -486,7 +483,8 @@ graph.  As with digital normalization, the algorithm is sublinear in
 its memory use because only k-mer counts in the retained reads are
 tracked.  The algorithm looks at every read once, and some reads
 twice; the exact number is dictated by biological features of the
-data set as well as the error rate.
+data set as well as the error rate, but for several real data sets is below
+30\% (Table~\ref{tab:streaming_counts}).
 
 This algorithm can potentially be applied to any shotgun sequencing
 data set, including genomic, transcriptomic, metagenomic, and
