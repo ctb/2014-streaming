@@ -107,16 +107,6 @@ ecoli-errfree-reads.fa: ecoliMG1655.fa
 ecoli-errfree-report.txt: ecoli-errfree-reads.fa
 	~/dev/khmer/scripts/normalize-by-median.py -x 1e8 -N 4 -k 20 -C 20 ecoli-errfree-reads.fa -R ecoli-errfree-report.txt
 
-# ecoli-reads.dn.cor.sam is the bowtie mapping of the DN-Quake-corrected reads to the reference genome.
-ecoli-reads.dn.cor.sam: ecoli_ref-5m.cor.fastq ecoli.1.ebwt
-	bowtie ecoli -q ecoli_ref-5m.cor.fastq -S ecoli-reads.dn.cor.sam
-
-# ecoli-reads.sam.pos is the 'pos' file containing the locations of mismatches,
-# i.e. errors, determined from mapping.
-ecoli-reads.dn.cor.sam.pos: ecoli-reads.dn.cor.sam
-	./sam-scan.py ecoliMG1655.fa ecoli-reads.dn.cor.sam ecoli_ref-5m.cor.fastq > ecoli-reads.dn.cor.sam.pos
-
-
 #####
 
 repeat-10.fa:
@@ -222,6 +212,30 @@ ecoli_ref-5m.raw.cor.fastq.gz:
 	$(QUAKE)/bin/cov_model.py ecoli_raw_counts.out
 	$(QUAKE)/bin/correct -f quake_list.txt -p 4 -k 14 -q 33 -c 7.2 -z -m ecoli_raw_counts.out
 	mv ecoli_ref-5m.cor.fastq.gz ecoli_ref-5m.raw.cor.fastq.gz
+
+# ecoli-reads.dn.cor.sam is the bowtie mapping of the DN-Quake-corrected reads to the reference genome.
+ecoli-reads.dn.cor.sam: ecoli_ref-5m.dn.cor.fastq.gz ecoli.1.ebwt
+	gunzip -c ecoli_ref-5m.dn.cor.fastq.gz | bowtie ecoli -q - -S ecoli-reads.dn.cor.sam
+
+# ecoli-reads.dn.cor.sam.pos is the 'pos' file containing the locations
+# of mismatches from the dn quake-corrected reads.
+ecoli-reads.dn.cor.sam.pos: ecoli-reads.dn.cor.sam
+	./sam-scan.py ecoliMG1655.fa ecoli-reads.dn.cor.sam ecoli_ref-5m.dn.cor.fastq.gz > ecoli-reads.dn.cor.sam.pos
+
+quake-ecoli-dn-cor.txt: ecoli-reads.dn.cor.sam.pos
+	./summarize-pos-file.py ecoli-reads.dn.cor.sam.pos ecoli_ref-5m.dn.cor.fastq.gz > quake-ecoli-dn-cor.txt
+
+# ecoli-reads.raw.cor.sam is the bowtie mapping of the Quake-corrected reads to the reference genome.
+ecoli-reads.raw.cor.sam: ecoli_ref-5m.raw.cor.fastq.gz ecoli.1.ebwt
+	gunzip -c ecoli_ref-5m.raw.cor.fastq.gz | bowtie ecoli -q - -S ecoli-reads.raw.cor.sam
+
+# ecoli-reads.raw.cor.sam.pos is the 'pos' file containing the locations
+# of mismatches from the raw quake-corrected reads.
+ecoli-reads.raw.cor.sam.pos: ecoli-reads.raw.cor.sam
+	./sam-scan.py ecoliMG1655.fa ecoli-reads.raw.cor.sam ecoli_ref-5m.raw.cor.fastq.gz > ecoli-reads.raw.cor.sam.pos
+
+quake-ecoli-raw-cor.txt: ecoli-reads.raw.cor.sam.pos
+	./summarize-pos-file.py ecoli-reads.raw.cor.sam.pos ecoli_ref-5m.raw.cor.fastq.gz > quake-ecoli-raw-cor.txt
 
 ###
 
