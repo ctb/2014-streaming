@@ -5,8 +5,6 @@ import screed
 
 # read in list of error positions per read
 
-READLEN=100
-
 def read_pos_file(filename):
     for line in open(filename):
         line = line.strip()
@@ -31,7 +29,12 @@ def main():
     b = dict(read_pos_file(args.pos_b))
 
     # get list of all reads
-    all_reads = set([ record.name for record in screed.open(args.reads) ])
+    print >>sys.stderr, 'loading reads from', args.reads
+    all_names = set()
+    all_lengths = {}
+    for record in screed.open(args.reads):
+        all_names.add(record.name)
+        all_lengths[record.name] = len(record.sequence)
 
     n = 0                               # in a
     m = 0                               # number of matches
@@ -49,6 +52,7 @@ def main():
         if va == vb:                # match
             m += 1
         else:
+            READLEN = all_lengths[k]
             rva = list(sorted([ READLEN - x - 1 for x in va ]))
             if rva == vb:           # match (reverse complement)
                 m += 1
@@ -66,14 +70,14 @@ def main():
     print '%d erroneous reads in %s' % (o, args.pos_b)
     print '%d reads in common => all error positions AGREE' % (m,)
     print '%d DISAGREE' % (unexplained,)
-    print 'total # of reads:', len(all_reads)
+    print 'total # of reads:', len(all_names)
 
     # assume a is prediction, b is correct
     
     incorrect_in_a = set([ k for k in a if a[k] ])
     incorrect_in_b = set([ k for k in b if b[k] ])
-    correct_in_a = all_reads - set([ k for k in a if a[k] ])
-    correct_in_b = all_reads - set([ k for k in b if b[k] ])
+    correct_in_a = all_names - set([ k for k in a if a[k] ])
+    correct_in_b = all_names - set([ k for k in b if b[k] ])
     
     # m is reads thought to be erroneous by a, agree with b
     tp = m
@@ -83,7 +87,7 @@ def main():
     fp = len(incorrect_in_a.intersection(correct_in_b)) + unexplained
 
     # fn: reads through to be correct by a, but actually erroneous (in b)
-    correct_in_a = all_reads - incorrect_in_a
+    correct_in_a = all_names - incorrect_in_a
     fn = len(correct_in_a.intersection(incorrect_in_b))
 
     # tn: reads thought to be correct in both a and b
@@ -97,7 +101,7 @@ def main():
     print 'sensitivity:', tp / float(tp + fn)
     print 'specificity:', tp / float(tp + fp)
 
-    assert len(all_reads) == tp+tn+fp+fn, len(all_reads) - (tp+tn+fp+fn)
+    assert len(all_names) == tp+tn+fp+fn, len(all_names) - (tp+tn+fp+fn)
     
 if __name__ == '__main__':
     main()
