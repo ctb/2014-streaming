@@ -59,3 +59,10 @@ target/
 
 .ipynb_checkpoints
 
+Quake/
+boost-1.57.0.tar.bz2
+boost_1_57_0/
+jellyfish-1.1.11.tar.gz
+jellyfish-1.1.11/
+paper/install-quake.sh
+quake-0.3.5.tar.gz
