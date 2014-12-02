@@ -2,24 +2,22 @@ rseq: rseq_compare2 rseq_compare4 rseq_compare5
 
 rseq_compare2: rseq-errors.pos rseq-sam-mismatches.pos
 	./compare-pos.py rseq-errors.pos rseq-sam-mismatches.pos rseq-reads.fa
-	
+
 rseq-reads.fa: mouse-5m.fq
 	head -4000000 mouse-5m.fq  >rseq-reads.fa
-	
+
 rseq-errors.pos: rseq-reads.dn.kh
 	./report-errors-by-read.py -V --coverage 20 rseq-reads.dn.kh rseq-reads.fa > rseq-errors.pos
 
 rseq-reads.dn.kh: rseq-reads.fa
 	normalize-by-median.py -k 20 -C 20 rseq-reads.fa -s rseq-reads.dn.kh -x 1e8 -N 4
 
-
 rseq-reads.sam: rseq-reads.fa
 	bowtie-build trinity-300.fa rseq > /dev/null
 	samtools faidx trinity-300.fa
 
 	bowtie rseq -q rseq-reads.fa -S rseq-reads.sam
-	
-	
+
 rseq-sam-mismatches.pos: rseq-reads.sam
 	./sam-scan.py trinity-300.fa rseq-reads.sam rseq-reads.fa > rseq-sam-mismatches.pos
 
