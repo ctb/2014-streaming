@@ -19,6 +19,7 @@ def read_pos_file(filename):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('ident')
     parser.add_argument('pos_a')
     parser.add_argument('pos_b')
     parser.add_argument('reads')
@@ -65,12 +66,12 @@ def main():
         if len(vb):
             o += 1
 
-    print 'total # of reads analyzed: %d' % (len(a),)
-    print '%d erroneous reads in %s' % (n, args.pos_a)
-    print '%d erroneous reads in %s' % (o, args.pos_b)
-    print '%d reads in common => all error positions AGREE' % (m,)
-    print '%d DISAGREE' % (unexplained,)
-    print 'total # of reads:', len(all_names)
+#    print 'total # of reads analyzed: %d' % (len(a),)
+#    print '%d erroneous reads in %s' % (n, args.pos_a)
+#    print '%d erroneous reads in %s' % (o, args.pos_b)
+#    print '%d reads in common => all error positions AGREE' % (m,)
+#    print '%d DISAGREE' % (unexplained,)
+#    print 'total # of reads:', len(all_names)
 
     # assume a is prediction, b is correct
     
@@ -93,13 +94,18 @@ def main():
     # tn: reads thought to be correct in both a and b
     tn = len(correct_in_a.intersection(correct_in_b))
 
-    print 'TP:', tp
-    print 'TN:', tn
-    print 'FP: %d (%d + %d)' % (fp, unexplained, fp-unexplained)
-    print 'FN:', fn
+    if tp + fp != 0:
+        specificity = tp / float(tp + fp)
+    else:
+        specificity = -1
 
-    print 'sensitivity:', tp / float(tp + fn)
-    print 'specificity:', tp / float(tp + fp)
+    if tp + fn != 0:
+        sensitivity = tp / float(tp + fn)
+    else:
+        sensitivity = -1
+
+    print args.ident, tp, tn, fp, unexplained, fp-unexplained, \
+          sensitivity, specificity
 
     assert len(all_names) == tp+tn+fp+fn, len(all_names) - (tp+tn+fp+fn)
     

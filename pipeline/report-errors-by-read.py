@@ -61,7 +61,11 @@ def main():
 
     print >>sys.stderr, "K:", kh.ksize()
     print >>sys.stderr, "CUTOFF:", args.cutoff
-    print >>sys.stderr, "NORMALIZE_LIMIT:", args.coverage
+    if args.variable:
+        print >>sys.stderr, "variable coverage flag set;"
+        print >>sys.stderr, "NORMALIZE_LIMIT:", args.coverage
+    else:
+        print >>sys.stderr, "assuming even coverage - no -V"
 
     for record in screed.open(args.sequences):
         n_total += 1
@@ -78,8 +82,9 @@ def main():
         else:
             print record.name
 
-    sys.stderr.write('Skipped %d reads of %d total due to -V\n' % \
-                     (n_skipped_variable, n_total))
+    if args.variable:
+        sys.stderr.write('Skipped %d reads of %d total due to -V\n' % \
+                         (n_skipped_variable, n_total))
 
 if __name__ == '__main__':
    main()

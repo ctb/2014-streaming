@@ -131,7 +131,7 @@ def main():
         pass2fp.close()
 
         print >>sys.stderr, '%s: kept aside %d of %d from first pass, in %s' %\
-              (filename, save_pass2, n, filename)
+              (filename, save_pass2, n + 1, filename)
 
     for orig_filename, pass2filename in pass2list:
         print >>sys.stderr,'second pass: looking at ' + \
