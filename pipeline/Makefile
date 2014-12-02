@@ -134,16 +134,16 @@ repgenome-10.fa: repeat-10.fa
 	$(NULLGRAPH)/mix-into-genome.py repeat-10.fa > repgenome-10.fa
 
 repgenome-10-reads.fa: repgenome-10.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-1.fa --mutation-details repgenome-1-reads.mut > repgenome-1-reads.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-2.fa --mutation-details repgenome-2-reads.mut > repgenome-2-reads.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-3.fa --mutation-details repgenome-3-reads.mut > repgenome-3-reads.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-4.fa --mutation-details repgenome-4-reads.mut > repgenome-4-reads.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-5.fa --mutation-details repgenome-5-reads.mut > repgenome-5-reads.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-6.fa --mutation-details repgenome-6-reads.mut > repgenome-6-reads.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-7.fa --mutation-details repgenome-7-reads.mut > repgenome-7-reads.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-8.fa --mutation-details repgenome-8-reads.mut > repgenome-8-reads.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-9.fa --mutation-details repgenome-9-reads.mut > repgenome-9-reads.fa
-	$(NULLGRAPH)/make-reads.py -S 1 -e .00 -r 100 -C 100 repgenome-10.fa --mutation-details repgenome-10-reads.mut > repgenome-10-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-1.fa --mutation-details repgenome-1-reads.mut > repgenome-1-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-2.fa --mutation-details repgenome-2-reads.mut > repgenome-2-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-3.fa --mutation-details repgenome-3-reads.mut > repgenome-3-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-4.fa --mutation-details repgenome-4-reads.mut > repgenome-4-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-5.fa --mutation-details repgenome-5-reads.mut > repgenome-5-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-6.fa --mutation-details repgenome-6-reads.mut > repgenome-6-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-7.fa --mutation-details repgenome-7-reads.mut > repgenome-7-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-8.fa --mutation-details repgenome-8-reads.mut > repgenome-8-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-9.fa --mutation-details repgenome-9-reads.mut > repgenome-9-reads.fa
+	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 repgenome-10.fa --mutation-details repgenome-10-reads.mut > repgenome-10-reads.fa
 
 repgenome-10-reads.mut.pos: repgenome-10-reads.mut repgenome-10.fa
 	./convert-mut-to-pos.py repgenome-1-reads.mut repgenome-1-reads.mut.pos
