@@ -4,29 +4,40 @@ import sys
 import screed
 
 # read in list of error positions per read
-
-def read_pos_file(filename):
+def read_pos_file(filename, ignore_set):
     for line in open(filename):
         line = line.strip()
         try:
             read, posns = line.split(' ', 2)
-            posns = map(int, posns.split(','))
         except ValueError:
             read = line
             posns = []
-            
+
+        if posns:
+            if posns is 'V':
+                ignore_set.add(read)
+                posns = []
+            else:
+                posns = map(int, posns.split(','))
+
         yield read, posns
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-V', '--variable', default=False, action='store_true')
     parser.add_argument('pos_a')
     parser.add_argument('pos_b')
     parser.add_argument('reads')
     args = parser.parse_args()
 
+    ignore_set = set() # reads to ignore because of low coverage
+
     # read in two lists of positions & errors
-    a = dict(read_pos_file(args.pos_a))
-    b = dict(read_pos_file(args.pos_b))
+    a = dict(read_pos_file(args.pos_a, ignore_set))
+    b = dict(read_pos_file(args.pos_b, ignore_set))
+
+    if not args.variable:               # eliminate ignore_set
+        ignore_set = set()
 
     # get list of all reads
     print >>sys.stderr, 'loading reads from', args.reads
@@ -39,8 +50,13 @@ def main():
     n = 0                               # in a
     m = 0                               # number of matches
     unexplained = 0
+    n_ignored = 0
     
     for k, va in a.iteritems():
+        if k in ignore_set:
+            n_ignored += 1
+            continue
+
         if not va:
             continue
         
@@ -66,6 +82,7 @@ def main():
             o += 1
 
     print 'total # of reads analyzed: %d' % (len(a),)
+    print 'IGNORED due to -V:', n_ignored
     print '%d erroneous reads in %s' % (n, args.pos_a)
     print '%d erroneous reads in %s' % (o, args.pos_b)
     print '%d reads in common => all error positions AGREE' % (m,)
@@ -87,7 +104,7 @@ def main():
     fp = len(incorrect_in_a.intersection(correct_in_b)) + unexplained
 
     # fn: reads through to be correct by a, but actually erroneous (in b)
-    correct_in_a = all_names - incorrect_in_a
+    correct_in_a = all_names - ignore_set - incorrect_in_a
     fn = len(correct_in_a.intersection(incorrect_in_b))
 
     # tn: reads thought to be correct in both a and b
@@ -101,7 +118,8 @@ def main():
     print 'sensitivity:', tp / float(tp + fn)
     print 'specificity:', tp / float(tp + fp)
 
-    assert len(all_names) == tp+tn+fp+fn, len(all_names) - (tp+tn+fp+fn)
+    assert len(all_names) - n_ignored == \
+           tp+tn+fp+fn, len(all_names) - (tp+tn+fp+fn)
     
 if __name__ == '__main__':
     main()
