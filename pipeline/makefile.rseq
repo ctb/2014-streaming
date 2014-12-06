@@ -1,43 +1,54 @@
 rseq: rseq_compare2 rseq_compare4 rseq_compare5
 
-rseq_compare2: rseq-errors.pos rseq-sam-mismatches.pos
-	./compare-pos.py rseq-errors.pos rseq-sam-mismatches.pos rseq-reads.fa
+rseq_compare2: rseq_compare2.txt
+	cat rseq_compare2.txt
 
-rseq-reads.fa: mouse-5m.fq
-	head -4000000 mouse-5m.fq  >rseq-reads.fa
+rseq_compare2.txt: rseq-errors.pos rseq-sam-mismatches.pos
+	./compare-pos.py -V rseq-errors.pos rseq-sam-mismatches.pos rseq-reads.fq.gz > rseq_compare2.txt
+
+rseq-reads.fq.gz: mouse-5m.fq.gz
+	gunzip -c mouse-5m.fq.gz | head -4000000 | gzip -9c > rseq-reads.fq.gz
 
 rseq-errors.pos: rseq-reads.dn.kh
-	./report-errors-by-read.py -V --coverage 20 rseq-reads.dn.kh rseq-reads.fa > rseq-errors.pos
+	./report-errors-by-read.py -V --coverage 20 rseq-reads.dn.kh rseq-reads.fq.gz > rseq-errors.pos
 
-rseq-reads.dn.kh: rseq-reads.fa
-	normalize-by-median.py -k 20 -C 20 rseq-reads.fa -s rseq-reads.dn.kh -x 1e8 -N 4
+rseq-reads.dn.kh: rseq-reads.fq.gz
+	normalize-by-median.py -k 20 -C 20 rseq-reads.fq.gz -s rseq-reads.dn.kh -x 1e8 -N 4
 
-rseq-reads.sam: rseq-reads.fa
-	bowtie-build trinity-300.fa rseq > /dev/null
-	samtools faidx trinity-300.fa
+rseq.1.ebwt: rna.fa
+	bowtie-build rna.fa rseq > /dev/null
+	samtools faidx rna.fa
 
-	bowtie rseq -q rseq-reads.fa -S rseq-reads.sam
+rseq-reads.sam: rseq-reads.fq.gz rseq.1.ebwt
+
+	gunzip -c rseq-reads.fq.gz | bowtie rseq -q - -S rseq-reads.sam
 
 rseq-sam-mismatches.pos: rseq-reads.sam
-	./sam-scan.py trinity-300.fa rseq-reads.sam rseq-reads.fa > rseq-sam-mismatches.pos
+	./sam-scan.py rna.fa rseq-reads.sam rseq-reads.fq.gz > rseq-sam-mismatches.pos
 
-rseq-stream-mismatches.pos: rseq-reads.fa
-	./calc-errors-few-pass.py -V rseq-reads.fa > rseq-stream-mismatches.pos
+rseq-stream-mismatches.pos: rseq-reads.fq.gz
+	./calc-errors-few-pass.py -V rseq-reads.fq.gz -x 1e8 -N 4 > rseq-stream-mismatches.pos
 
-rseq_compare4: rseq-stream-mismatches.pos rseq-sam-mismatches.pos
-	./compare-pos.py rseq-stream-mismatches.pos rseq-sam-mismatches.pos rseq-reads.fa
+rseq_compare4.txt: rseq-stream-mismatches.pos rseq-sam-mismatches.pos
+	./compare-pos.py -V rseq-stream-mismatches.pos rseq-sam-mismatches.pos rseq-reads.fq.gz > rseq_compare4.txt
 
-rseq_compare5: rseq-sam-mismatches.pos rseq-abundtrim-sam-mismatches.pos
-	./summarize-pos-file.py rseq-sam-mismatches.pos rseq-reads.fa
-	./summarize-pos-file.py rseq-abundtrim-sam-mismatches.pos rseq-reads.fa.abundtrim
+rseq_compare4: rseq_compare4.txt
+	cat rseq_compare4.txt
 
-rseq-reads.fa.abundtrim: rseq-reads.fa
-	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 rseq-reads.fa
+rseq_compare5.txt: rseq-sam-mismatches.pos rseq-abundtrim-sam-mismatches.pos
+	./summarize-pos-file.py rseq-sam-mismatches.pos rseq-reads.fq.gz > rseq_compare5.txt
+	./summarize-pos-file.py rseq-abundtrim-sam-mismatches.pos rseq-reads.fq.gz.abundtrim >> rseq_compare5.txt
 
-rseq-abundtrim.sam: rseq-reads.fa.abundtrim \
+rseq_compare5: rseq_compare5.txt
+	cat rseq_compare5.txt
+
+rseq-reads.fq.gz.abundtrim: rseq-reads.fq.gz
+	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 -x 1e8 -N 4 rseq-reads.fq.gz
+
+rseq-abundtrim.sam: rseq-reads.fq.gz.abundtrim \
 	rseq-reads.sam
-	bowtie rseq -q rseq-reads.fa.abundtrim -S rseq-abundtrim.sam
+	bowtie rseq -q rseq-reads.fq.gz.abundtrim -S rseq-abundtrim.sam
 
 rseq-abundtrim-sam-mismatches.pos: rseq-abundtrim.sam
-	./sam-scan.py trinity-300.fa rseq-abundtrim.sam rseq-reads.fa.abundtrim > rseq-abundtrim-sam-mismatches.pos
+	./sam-scan.py rna.fa rseq-abundtrim.sam rseq-reads.fq.gz.abundtrim > rseq-abundtrim-sam-mismatches.pos
 
