@@ -68,19 +68,26 @@ def main():
         print >>sys.stderr, "assuming even coverage - no -V"
 
     for record in screed.open(args.sequences):
+        seq = record.sequence.replace('N', 'A')
+
         n_total += 1
+
+        varskip = False
         if args.variable:
-            med, _, _ = kh.get_median_count(record.sequence)
+            med, _, _ = kh.get_median_count(seq)
             if med < args.coverage:
+                varskip = True
                 n_skipped_variable += 1
-                continue
             
-        #posns = find_low_abund_kmers(kh, record.sequence, args.cutoff)
-        posns = kh.find_low_abund_kmers(record.sequence, args.cutoff)
-        if posns is not None and len(posns) > 0 and posns[0] != -1:
-            print record.name, ",".join(map(str, posns))
+        if varskip:
+            print record.name, 'V'
         else:
-            print record.name
+            #posns = find_low_abund_kmers(kh, seq, args.cutoff)
+            posns = kh.find_low_abund_kmers(seq, args.cutoff)
+            if posns is not None and len(posns) > 0 and posns[0] != -1:
+                print record.name, ",".join(map(str, posns))
+            else:
+                print record.name
 
     if args.variable:
         sys.stderr.write('Skipped %d reads of %d total due to -V\n' % \
