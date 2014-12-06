@@ -21,6 +21,8 @@ DEFAULT_K = 20
 DEFAULT_N_HT = 4
 DEFAULT_MIN_HASHSIZE = 1e6
 
+# see Zhang et al., http://arxiv.org/abs/1309.2975
+MAX_FALSE_POSITIVE_RATE = 0.8
 
 def output_single(read):
     name = read.name
@@ -133,6 +135,7 @@ def main():
         print >>sys.stderr, '%s: kept aside %d of %d from first pass, in %s' %\
               (filename, save_pass2, n + 1, filename)
 
+    n_omitted = 0
     for orig_filename, pass2filename in pass2list:
         print >>sys.stderr,'second pass: looking at ' + \
               'sequences kept aside in %s' % pass2filename
@@ -148,6 +151,10 @@ def main():
                 posns = ht.find_low_abund_kmers(seq, CUTOFF)
                 print read.name, ",".join(map(str, posns))
 
+            if args.variable_coverage and med < NORMALIZE_LIMIT:
+                print read.name, 'V'
+                n_omitted += 1
+
         print >>sys.stderr, 'removing %s' % pass2filename
         os.unlink(pass2filename)
 
@@ -155,6 +162,21 @@ def main():
     shutil.rmtree(tempdir)
 
     print >>sys.stderr, 'read %d reads, %d bp' % (read_reads, read_bp,)
+    if args.variable_coverage:
+        print >>sys.stderr, 'omitted %d reads for -V' % (n_omitted)
+
+    fp_rate = khmer.calc_expected_collisions(ht)
+    print >>sys.stderr, \
+          'fp rate estimated to be {fpr:1.3f}'.format(fpr=fp_rate)
+
+    if fp_rate > MAX_FALSE_POSITIVE_RATE:
+        print >> sys.stderr, "**"
+        print >> sys.stderr, ("** ERROR: the k-mer counting table is too small"
+                              " for this data set. Increase tablesize/# "
+                              "tables.")
+        print >> sys.stderr, "**"
+        print >> sys.stderr, "** Do not use these results!!"
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
