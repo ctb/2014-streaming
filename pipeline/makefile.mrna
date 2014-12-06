@@ -38,7 +38,7 @@ rcompare: mrna-errors.pos mrna-sam-mismatches.pos
 	./compare-pos.py mrna-errors.pos mrna-sam-mismatches.pos mrna-reads.fa
 
 rcompare2: mrna-errors.pos mrna-reads.mut.pos
-	./compare-pos.py mrna-errors.pos mrna-reads.mut.pos mrna-reads.fa
+	./compare-pos.py -V mrna-errors.pos mrna-reads.mut.pos mrna-reads.fa
 
 rcompare3: mrna-sam-mismatches.pos mrna-reads.mut.pos
 	./compare-pos.py mrna-sam-mismatches.pos mrna-reads.mut.pos mrna-reads.fa
