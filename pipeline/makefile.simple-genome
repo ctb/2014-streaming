@@ -5,10 +5,10 @@ simple-genome-reads.fa: simple-genome.fa
 	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 simple-genome.fa --mutation-details simple-genome-reads.mut > simple-genome-reads.fa
 
 simple-genome-kmers.hist: simple-genome.fa
-	$(KHMER)/scripts/abundance-dist-single.py -k 20 simple-genome-reads.fa simple-genome-kmers.hist
+	$(KHMER)/scripts/abundance-dist-single.py -s -k 20 simple-genome-reads.fa simple-genome-kmers.hist
 
 simple-genome-dn-kmers.hist: simple-genome-reads.dn.kh
-	$(KHMER)/scripts/abundance-dist-single.py -k 20 simple-genome-reads.fa.keep simple-genome-dn-kmers.hist
+	$(KHMER)/scripts/abundance-dist-single.py -s -k 20 simple-genome-reads.fa.keep simple-genome-dn-kmers.hist
 
 simple-genome-reads-even.fa: simple-genome.fa
 	$(NULLGRAPH)/make-reads.py -S 1 -e .01 -r 100 -C 100 simple-genome.fa --mutation-details simple-genome-reads-even.mut --even > simple-genome-reads-even.fa

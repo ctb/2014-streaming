@@ -15,6 +15,7 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	ecoli-errfree-report.txt \
 	simple-genome-kmers.hist \
 	simple-genome-dn-kmers.hist \
+	rseq
 
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 	mrna-reads.sorted.bam
@@ -22,6 +23,7 @@ bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 clean:
 	-rm -f simple-genome.fa simple-genome-reads.dn.kh simple-genome-reads.sam
 	-rm -f *-reads.fa
+	-rm -f rseq_compare*.txt
 	-rm -f *.abundtrim *.ebwt *.fai *.pos *.keep *.bam *.mut *.bai *.sam *.kh
 
 ##### simple genome
