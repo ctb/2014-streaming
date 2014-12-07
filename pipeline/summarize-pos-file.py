@@ -21,6 +21,7 @@ def main():
     parser.add_argument('reads')
     args = parser.parse_args()
 
+    print 'reading files...', args.posfile, args.reads
     posdict = dict(read_pos_file(args.posfile))
     all_reads = set([ record.name for record in screed.open(args.reads) ])
     sum_bp = sum([ len(record.sequence) for record in screed.open(args.reads) ])

@@ -28,16 +28,16 @@ def main():
 
         readname, _, refname, refpos, _, _, _, _, _, seq = samline.split()[:10]
         if refname == '*' or refpos == '*':
+            # (don't count these as skipped)
             continue
         
         refpos = int(refpos)
-
-        #assert record.name == readname, (record.name, readname)
         try:
             ref = genome_dict[refname][refpos-1:refpos+len(seq) - 1]
         except KeyError:
             print >>sys.stderr, "unknown refname: %s; ignoring (read %s)" % (refname, readname)
             n_skipped += 1
+            continue
 
         errors = []
         for pos, (a, b) in enumerate(zip(ref, seq)):
