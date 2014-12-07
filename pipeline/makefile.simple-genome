@@ -54,6 +54,9 @@ simple-genome-reads.sorted.bam: simple-genome-reads.sam
 simple-genome-sam-mismatches.pos: simple-genome-reads.sam
 	./sam-scan.py simple-genome.fa simple-genome-reads.sam > simple-genome-sam-mismatches.pos
 
+simple-genome-readcov.dict: simple-genome-reads.sam
+	./sam-scan-to-coverage-dict.py simple-genome.fa simple-genome-reads.sam simple-genome-readcov.dict simple-genome-readcov.hist
+
 simple-genome-reads.fa.abundtrim: simple-genome-reads.fa
 	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 20 -C 5 simple-genome-reads.fa
 
