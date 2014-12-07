@@ -22,7 +22,7 @@ simple-metagenome-reads.sorted.bam: simple-metagenome-reads.sam
 	samtools index simple-metagenome-reads.sorted.bam
 
 simple-metagenome-sam-mismatches.pos: simple-metagenome-reads.sam
-	./sam-scan.py simple-metagenome.fa simple-metagenome-reads.sam simple-metagenome-reads.fa > simple-metagenome-sam-mismatches.pos
+	./sam-scan.py simple-metagenome.fa simple-metagenome-reads.sam > simple-metagenome-sam-mismatches.pos
 
 simple-metagenome-reads.fa.abundtrim: simple-metagenome-reads.fa
 	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 simple-metagenome-reads.fa
@@ -32,7 +32,7 @@ simple-metagenome-abundtrim.sam: simple-metagenome-reads.fa.abundtrim \
 	bowtie simple-metagenome -f simple-metagenome-reads.fa.abundtrim -S simple-metagenome-abundtrim.sam
 
 simple-metagenome-abundtrim-sam-mismatches.pos: simple-metagenome-abundtrim.sam
-	./sam-scan.py simple-metagenome.fa simple-metagenome-abundtrim.sam simple-metagenome-reads.fa.abundtrim > simple-metagenome-abundtrim-sam-mismatches.pos
+	./sam-scan.py simple-metagenome.fa simple-metagenome-abundtrim.sam > simple-metagenome-abundtrim-sam-mismatches.pos
 
 mcompare: simple-metagenome-errors.pos simple-metagenome-sam-mismatches.pos
 	./compare-pos.py simple-metagenome-errors.pos simple-metagenome-sam-mismatches.pos simple-metagenome-reads.fa

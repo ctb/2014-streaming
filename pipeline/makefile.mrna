@@ -22,7 +22,7 @@ mrna-reads.sorted.bam: mrna-reads.sam
 	samtools index mrna-reads.sorted.bam
 
 mrna-sam-mismatches.pos: mrna-reads.sam
-	./sam-scan.py mrna.fa mrna-reads.sam mrna-reads.fa > mrna-sam-mismatches.pos
+	./sam-scan.py mrna.fa mrna-reads.sam > mrna-sam-mismatches.pos
 
 mrna-reads.fa.abundtrim: mrna-reads.fa
 	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 mrna-reads.fa
@@ -32,7 +32,7 @@ mrna-abundtrim.sam: mrna-reads.fa.abundtrim \
 	bowtie mrna -f mrna-reads.fa.abundtrim -S mrna-abundtrim.sam
 
 mrna-abundtrim-sam-mismatches.pos: mrna-abundtrim.sam
-	./sam-scan.py mrna.fa mrna-abundtrim.sam mrna-reads.fa.abundtrim > mrna-abundtrim-sam-mismatches.pos
+	./sam-scan.py mrna.fa mrna-abundtrim.sam > mrna-abundtrim-sam-mismatches.pos
 
 rcompare: mrna-errors.pos mrna-sam-mismatches.pos
 	./compare-pos.py mrna-errors.pos mrna-sam-mismatches.pos mrna-reads.fa

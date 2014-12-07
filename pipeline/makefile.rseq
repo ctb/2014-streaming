@@ -24,7 +24,7 @@ rseq-reads.sam: rseq-reads.fq.gz rseq.1.ebwt
 	gunzip -c rseq-reads.fq.gz | bowtie rseq -q - -S rseq-reads.sam
 
 rseq-sam-mismatches.pos: rseq-reads.sam
-	./sam-scan.py rna.fa rseq-reads.sam rseq-reads.fq.gz > rseq-sam-mismatches.pos
+	./sam-scan.py rna.fa rseq-reads.sam > rseq-sam-mismatches.pos
 
 rseq-stream-mismatches.pos: rseq-reads.fq.gz
 	./calc-errors-few-pass.py -V rseq-reads.fq.gz -x 1e8 -N 4 > rseq-stream-mismatches.pos
@@ -50,5 +50,5 @@ rseq-abundtrim.sam: rseq-reads.fq.gz.abundtrim \
 	bowtie rseq -q rseq-reads.fq.gz.abundtrim -S rseq-abundtrim.sam
 
 rseq-abundtrim-sam-mismatches.pos: rseq-abundtrim.sam
-	./sam-scan.py rna.fa rseq-abundtrim.sam rseq-reads.fq.gz.abundtrim > rseq-abundtrim-sam-mismatches.pos
+	./sam-scan.py rna.fa rseq-abundtrim.sam > rseq-abundtrim-sam-mismatches.pos
 
