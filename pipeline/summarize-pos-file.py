@@ -23,8 +23,18 @@ def main():
 
     print 'reading files...', args.posfile, args.reads
     posdict = dict(read_pos_file(args.posfile))
-    all_reads = set([ record.name for record in screed.open(args.reads) ])
-    sum_bp = sum([ len(record.sequence) for record in screed.open(args.reads) ])
+    
+    all_reads = 0
+    sum_bp = 0
+
+    print 'reading sequences...'
+    for n, record in enumerate(screed.open(args.reads)):
+        if n % 100000 == 0:
+            print >>sys.stderr, '...', n
+        all_reads += 1
+        sum_bp += len(record.sequence)
+
+    print 'done!'
 
     n = 0
     m = 0
@@ -36,7 +46,7 @@ def main():
         m += len(v)
 
     print 'posfile %s: %d mutated reads of %d; %d mutations total' % \
-          (args.posfile, n, len(all_reads), m)
+          (args.posfile, n, all_reads, m)
     print '%d bp total' % (sum_bp,)
     print 'overall error rate: %f%%' % (100. * m / float(sum_bp))
 

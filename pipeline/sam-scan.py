@@ -23,10 +23,10 @@ def main():
 
     for samline in ignore_at(open(args.samfile)):
         n += 1
-        if n % 10000 == 0:
+        if n % 100000 == 0:
             print >>sys.stderr, '...', n
 
-        readname, _, refname, refpos, _, _, _, _, _, seq = samline.split()[:10]
+        readname, _, refname, refpos, _, _, _, _, _, seq = samline.split('\t')[:10]
         if refname == '*' or refpos == '*':
             # (don't count these as skipped)
             continue

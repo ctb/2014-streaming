@@ -200,14 +200,16 @@ repgenome-compare.txt: repgenome-10-reads.calc.pos repgenome-10-reads.mut.pos
 
 ecoli_corr: ecoli_ref-5m.dn.cor.fastq.gz ecoli_ref-5m.raw.cor.fastq.gz
 
+# @CTB fix deps
 ecoli_ref-5m.dn.cor.fastq.gz:
 	echo ecoli_ref-5m.fastq.gz > quake_list.txt
 	ln -fs /usr/local/bin/jellyfish .
-	#cat ecoli_ref-5m.fastq.gz.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_dn_counts.out
+	cat ecoli_ref-5m.fastq.gz.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_dn_counts.out
 	$(QUAKE)/bin/cov_model.py ecoli_dn_counts.out > ecoli_dn_counts.cov
 	$(QUAKE)/bin/correct -f quake_list.txt -p 4 -k 14 -q 33 -c 7.94 -z -m ecoli_dn_counts.out
 	mv ecoli_ref-5m.cor.fastq.gz ecoli_ref-5m.dn.cor.fastq.gz
 
+# @CTB fix deps
 ecoli_ref-5m.raw.cor.fastq.gz:
 	echo ecoli_ref-5m.fastq.gz > quake_list.txt
 	ln -fs /usr/local/bin/jellyfish .

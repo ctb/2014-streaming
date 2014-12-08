@@ -65,8 +65,9 @@ def main():
         except KeyError:
             continue
 
-        slice = coord[refpos - 1:refpos - 1 + len(seq)]
-        coverage = sum(slice) / float(len(slice))
+        slice = list(coord[refpos - 1:refpos - 1 + len(seq)])
+        slice = sorted(slice)
+        coverage = slice[len(slice)/2]  # median
 
         assert readname not in coverage_d, readname
         coverage_d[readname] = coverage
@@ -75,20 +76,25 @@ def main():
         if n % 10000 == 0:
             print >>sys.stderr, '...', n
 
-    print 'average mapping coverage', total / float(n)
+    print 'average of the median mapping coverage', total / float(n)
     print 'min coverage by read', min(coverage_d.values())
     print 'max coverage by read', max(coverage_d.values())
 
     covhist_d = {}
+    sofar = 0
     for v in coverage_d.values():
         v = int(v + 0.5)
         covhist_d[v] = covhist_d.get(v, 0) + 1
 
     fp = open(args.covhist, 'w')
-    
-    for k in range(0, max(covhist_d.keys())):
+
+    total = sum(covhist_d.values())
+    sofar = 0
+    for k in range(0, max(covhist_d.keys()) + 1):
         v = covhist_d.get(k, 0)
-        print >>fp, k, v
+        sofar += v
+        print >>fp, k, v, sofar, sofar / float(total)
+        
     fp.close()
 
     fp = open(args.coverage_d_pickle, 'w')
