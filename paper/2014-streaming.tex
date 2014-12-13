@@ -153,14 +153,14 @@ to account for the shifted k-mer spectrum from diginorm.
 \hline
 (Simple genome) & Raw counts & Diginorm counts \\
 \hline
-Perfect detection (TP) & 440 & 443 \\
-No errors (TN) & 455 & 466 \\
-Miscalled errors (FP) & 91 & 88 \\
-Mispredicted errors (FP) & 14 & 3 \\
+Perfect detection (TP) & 474 & 485 \\
+No errors (TN) & 355 & 366 \\
+Miscalled errors (FP) & 159 & 148 \\
+Mispredicted errors (FP) & 12 & 1 \\
 Missed errors (FN) & 0 & 0 \\
 \hline
 Sensitivity & 100\% & 100\% \\
-Specificity & 80.7\% & 83.0\% \\
+Specificity & 73.5\% & 76.5\% \\
 \hline
 \end{tabular}
 \label{tab:a}
@@ -253,63 +253,137 @@ Quake, despite having many fewer distinct k-mers.
 coverage shotgun sequencing data}
 
 One of the drawbacks of spectral abundance analysis is that it cannot
-be applied to data with uneven coverage.  For example, metagenomic or
-transcriptomic data sets typically contain reads from both
-high-abundance and low-abundance molecules.  This variability in
+be directly applied to data with uneven coverage.  For example,
+metagenomic or transcriptomic data sets typically contain reads from
+both high-abundance and low-abundance molecules.  This variability in
 coverage confounds naive spectral analysis for two reasons: first,
 erroneous k-mers from very high abundance regions can accumulate and
 increase in abundance over the threshold for trusted k-mers, thus
 appearing to be correct; and second, correct reads from low coverage
 regions yield k-mers below the trusted k-mer threshold and appear to
-be incorrect.  In practice, therefore, error correction for
+be incorrect.  In practice, therefore, error analysis for
 metagenomic and transcriptome data uses other approaches.
 
-If we apply diginorm to variable coverage data and use the resulting
-k-mer counts to detect errors in the original reads, we can address
-the problem of accumulated errors from high-abundance regions: the
-errors do not accumulate in normalized data (cite diginorm).  For the
-purposes of error detection, we can also avoid examining reads that
-are low coverage, by using the median k-mer abundance to detect
-low-abundance reads (Figure XXX).
+Using digital normalization, we should be able to address both of these
+problems.  First, by applying digital normalization to variable
+coverage data and then working only with the k-mer counts from the
+normalized reads, we can avoid counting high abundance errors.
+And second, by ignoring reads with a low estimated coverage, we can
+avoid misclassifying true low-abundance k-mers (Figure XXX).
 
-@algorithm?
+% @algorithm?
 
-@graph with read abundance spectrum, showing which reads we will
-call errors in.
-
-% make mcompare2
-% make rcompare2
+% @graph with read abundance spectrum, showing which reads we will
+% call errors in.
 
 \paragraph{Simulated data:}
 To test this approach, we generated two more synthetic data sets,
 ``simple metagenome'' and ``simple mRNAseq,'' which contain both high-
 and low-abundance species (see Table~\ref{tab:data} for data set
 details).  After generating synthetic reads with a 1\% error rate and
-applying digital normalization to k=20/C=20, we again did spectral
-error detection using the normalized counts, but with the modification
-that only reads with a median k-mer abundance of 20 or greater were
-examined.
+applying digital normalization (k=20/C=20), we again did spectral
+error detection using the normalized counts.  However, this time we
+modified the algorithm so that only reads with a median k-mer
+abundance of 20 or greater were examined (see Methods).
+
+% make mcompare2
+% make rcompare2
+
+\begin{table}
+\begin{tabular}{|l|c||c|}
+\hline
+& simple metagenome & simple mRNAseq \\
+\hline
+Low coverage reads & 93 & 44 \\
+\hline
+Perfect detection (TP) & 978 & 228 \\
+No errors (TN) & 1098 & 235 \\
+Miscalled errors (FP) & 176 & 52 \\
+Mispredicted errors (FP) & 6 & 9 \\
+Missed errors (FN) & 2 & 0 \\
+\hline
+Sensitivity & 99.9\% & 100\% \\
+Specificity & 84.7\% & 78.9\% \\
+\hline
+\end{tabular}
+\label{tab:spectra_variable}
+\end{table}
 
 The results of running error detection on the synthetic metagenome and
-mRNAseq data sets are shown in Table ZZZ. For the simple metagenome
-data set, 2254 of 2347 reads (96.0\%) met the coverage criterion.  Of
-the 2347 reads total, the errors in 978 erroneous reads were called
-perfectly (TP) and 1125 of the reads with no errors were correctly
-called as error-free (TN).  68 reads were incorrectly determined to be
-error free (FN; including the reads that were too low coverage to be
-considered).  Of the remaining 176 reads, 170 were miscalled (errors
-existed but were not exactly called) and 6 were incorrectly called as
-erroneous when they were in fact correct.  We calculated the
-prediction sensitivity to be 93.5\% and the prediction specificity to
-be 84.7\%.  For the simple mRNAseq data set, 524 of 568 reads (92.3\%)
-met the coverage criterion, with 228 true positives, 250 true
-negatives, 29 false negatives (including the low coverage reads not
-examined), and 61 false positives, for a prediction sensitivity of
-88.7\% and prediction specificity of 78.9\%.
+mRNAseq data sets are shown in Table~\ref{spectra_variable}. For the
+simple metagenome data set, 2254 of 2347 reads (96.0\%) met the
+coverage criterion.  Of the 2254 reads analyzed, the errors in 978
+erroneous reads were called perfectly (TP) and 1098 of the reads with
+no errors were correctly called as error-free (TN).  2 reads were
+incorrectly determined to be error free (FN).  Of the remaining 176
+reads, 170 were miscalled (errors existed but were not exactly called)
+and 6 were incorrectly called as erroneous when they were in fact
+correct.  We calculated the prediction sensitivity to be 99.9\% and
+the prediction specificity to be 84.7\%.  For the simple mRNAseq data
+set, 524 of 568 reads (92.3\%) met the coverage criterion, with 228
+true positives, 235 true negatives, 0 false negatives, and 61 false
+positives, for a prediction sensitivity of 100.0\% and prediction
+specificity of 78.9\%.  In both cases low-coverage reads were not
+included in the statistics.
 
-@ real data / measurements - sherine, QP.
+The results of the variable coverage error detection approach on
+synthetic metagenomes and mRNAseq are comparable to the results
+on the synthetic genome (100.0\% sensitivity and 83.0\%
+specificity with the same parameters; Table~\ref{tab:a}).
 
-\subsection{A streaming algorithm for error detection}
+% make rseq_compare2
+
+\begin{table}
+\begin{tabular}{|l|c||c|}
+\hline
+& Mock metagenome & mouse mRNAseq \\
+\hline
+Low coverage reads & 93 & 658,814 \\
+\hline
+Perfect detection (TP) & 978 & 71,315 \\
+No errors (TN) & 1098 & 203,741 \\
+Miscalled errors (FP) & 176 & 23,391 \\
+Mispredicted errors (FP) & 6 & 24,464 \\
+Missed errors (FN) & 2 & 18,275 \\
+\hline
+Sensitivity & 99.9\% & 79.6\% \\
+Specificity & 84.7\% & 59.8\% \\
+\hline
+\end{tabular}
+\label{tab:spectra_variable_real}
+\end{table}
+
+\paragraph{Mock metagenome data:}
+
+\paragraph{mRNAseq data:}
+
+We next applied variable coverage spectral error analysis to 1m mouse
+mRNAseq reads (cite Trinity), with the same parameters as above.  Here
+errors were again calculated by mapping the reads to the known
+reference and finding mismatches. The results are shown in
+Table~\ref{tab:spectra_variable_real}, third column.  We achieve
+79.6\% sensitivity and 59.8\% specificity on the 340,000 high coverage
+reads in this data set.
+
+\paragraph{Error correcting variable coverage data with Quake:}
+
+There are many sophisticated error correction algorithms implemented
+for shotgun genome data, but relatively few work directly on
+variable coverage data such as mRNAseq.  However, it should be possible
+to apply genomic error correction to the high coverage components
+of data sets after digital normalization.
+
+To evaluate this, we applied Quake to the high coverage mRNAseq
+reads.  We first extracted the 340,140 reads with estimated
+high coverage (median k-mer coverage greater than or equal to 20)
+from the mouse mRNAseq data set, and then digitally normalized the
+data.  We next applied the Quake error corrector to the unnormalized
+reads using the k-mer counts from the normalized reads, as with the
+{\em E. coli} data set.
+
+ZZZ.
+
+\subsection{A streaming algorithm for error analysis}
 
 Even with digital normalization, the spectral error detection approach
 outlined above is a 2-pass offline algorithm for any given data set -
@@ -342,7 +416,15 @@ later.  This could result in significant runtime savings: for a
 genomic data set with 100x coverage, no more than 20\% of the reads
 would need to be examined twice.
 
-The conceptual idea is presented in Figure~\ref{fig:concept}.
+The conceptual idea is presented in Figure~\ref{fig:concept}.  On the
+first pass, low-coverage reads would be incorporated into the k-mer
+database and set aside for later analysis, while high-coverage reads
+would be analyzed for errors. On the second pass, the set aside reads
+would be checked for coverage and either ignored or analyzed for
+errors.  Crucially, this second pass will involve {\em at most}
+another full pass across the data, but only if no reads were high
+coverage in the first pass; the larger the high coverage component
+of the data, the smaller the fraction of the data that is examined twice.
 
 \begin{figure}[!ht]
  \centerline{\includegraphics[width=4in]{./figures/graph-saturation}}
@@ -373,11 +455,33 @@ sequencing depth of $>$ 20 and are rejected.}
 \end{figure}
 
 % make compare4
+% make mcompare4
+% make rcompare4
+
+\begin{table}
+\begin{tabular}{|l|c||c||c|}
+\hline
+& simple genome & simple metagenome & simple mRNAseq \\
+\hline
+Number of passes & 1.32 & 1.16 & 1.33 \\
+\hline
+Perfect detection (TP) & 485 & 977 (-1) & 228 \\
+No errors (TN) & 365 (-1) & 1095 (-3) & 235 \\
+Miscalled errors (FP) & 148 & 171 (+1) & 52 \\
+Mispredicted errors (FP) & 2 (+1) & 9 (+3) & 9 \\
+Missed errors (FN) & 0 & 2 & 0 \\
+\hline
+Sensitivity & 100.0\% & 99.9\% & 100.0\% \\
+Specificity & 76.4\% & 84.4\% & 78.9\% \\
+\hline
+\end{tabular}
+\label{tab:spectra_streaming}
+\end{table}
 
 When we apply this streaming approach to the simulated reads from the
-``simple genome'', we find identical numbers to the full two-pass
-approach: 443 TP, 466 TN, 91 FP, and 0 FN, for a sensitivity of 100\%
-and a specificity of 83.0\%.  However, only 320 of the 1000 reads are
+``simple genome'', we obtain nearly identical numbers to the full two-pass
+approach: 485 TP, 365 TN, 150 FP, and 0 FN, for a sensitivity of 100\%
+and a specificity of 76.3\%.  However, only 320 of the 1000 reads are
 examined twice - hence, it is a 1.32x pass algorithm on this data set.
 Likewise, for the ``simple metagenome''
 and ``simple mRNAseq'' data sets, we obtain nearly identical and
@@ -387,8 +491,6 @@ metagenome fails to detect one true positive and erroneously finds
 errrors in three extra reads.  On the metagenome, 380 of 2347 (16.2\%) of
 the reads are examined twice, and on the mRNAseq data set, 33.1\% of the
 reads are examined twice.
-
-@ do we put these numbers into a table? They're basically identical. Yes, and show deltas.
 
 @ apply to E. coli?
 

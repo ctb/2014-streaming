@@ -33,7 +33,7 @@ include makefile.simple-genome
 include makefile.simple-metagenome
 
 ##### simple mrna molecule with three isoforms (1234, 124, 134)
-include makefile.mrna
+include makefile.simple-mrna
 
 ##### mouse 1m rnaseq data set (real)
 include makefile.rseq
@@ -179,8 +179,8 @@ podar:  podar.1.ebwt \
 	podar-reads.sam \
 	podar-reads.sam.pos \
 	podar.dn.kh \
-	podar-reads.erros.pos \
-	podar.fastq.gz.abundtrim \
+	podar-reads.errors.pos \
+	podar-1.fastq.gz.abundtrim \
 	podar-abundtrim.sam \
 	podar-abundtrim.sam.pos \
 	podar-report-untrim.txt \
@@ -201,22 +201,22 @@ podar-reads.sam: podar-1.fastq.gz podar.1.ebwt
 	gunzip -c podar-1.fastq.gz | bowtie podar -q - -S podar-reads.sam
 
 podar-reads.sam.pos: podar-reads.sam
-	./sam-scan.py podar-ref.fa podar-reads.sam podar-1.fastq.gz > podar-reads.sam.pos
+	./sam-scan.py podar-ref.fa podar-reads.sam > podar-reads.sam.pos
 
 podar.dn.kh: podar-1.fastq.gz
-	 normalize-by-median.py -x 1e8 -N 4 -k 20 -C 10 -s podar.dn.kh podar-1.fastq.gz -R podar-dn-report.txt
+	 normalize-by-median.py -x 4e8 -N 4 -k 20 -C 10 -s podar.dn.kh podar-1.fastq.gz -R podar-dn-report.txt
 
 podar-reads.errors.pos: podar-1.fastq.gz podar.dn.kh
 	 ./report-errors-by-read.py -V --coverage 10 podar.dn.kh podar-1.fastq.gz > podar-reads.errors.pos 	
 
 podar-1.fastq.gz.abundtrim: podar-1.fastq.gz
-	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 10 -C 5 -x 1e9 -N 4 podar-1.fastq.gz
+	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 10 -C 3 -x 4e8 -N 4 podar-1.fastq.gz
 
 podar-abundtrim.sam: podar-1.fastq.gz.abundtrim
 	bowtie podar -q podar-1.fastq.gz.abundtrim -S podar-abundtrim.sam
 
 podar-abundtrim.sam.pos: podar-abundtrim.sam
-	./sam-scan.py podar-ref.fa podar-abundtrim.sam podar-1.fastq.gz.abundtrim > podar-abundtrim.sam.pos
+	./sam-scan.py podar-ref.fa podar-abundtrim.sam > podar-abundtrim.sam.pos
 
 podar-report-untrim.txt:podar-reads.sam.pos podar-1.fastq.gz
 	./summarize-pos-file.py podar-reads.sam.pos podar-1.fastq.gz > podar-report-untrim.txt

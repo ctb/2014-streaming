@@ -38,7 +38,7 @@ mcompare: simple-metagenome-errors.pos simple-metagenome-sam-mismatches.pos
 	./compare-pos.py simple-metagenome-errors.pos simple-metagenome-sam-mismatches.pos simple-metagenome-reads.fa
 
 mcompare2: simple-metagenome-errors.pos simple-metagenome-reads.mut.pos
-	./compare-pos.py simple-metagenome-errors.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa
+	./compare-pos.py -V simple-metagenome-errors.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa
 
 mcompare3: simple-metagenome-sam-mismatches.pos simple-metagenome-reads.mut.pos
 	./compare-pos.py simple-metagenome-sam-mismatches.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa
@@ -47,7 +47,7 @@ simple-metagenome-stream-mismatches.pos: simple-metagenome-reads.fa
 	./calc-errors-few-pass.py -V simple-metagenome-reads.fa > simple-metagenome-stream-mismatches.pos
 
 mcompare4: simple-metagenome-stream-mismatches.pos simple-metagenome-reads.mut.pos
-	./compare-pos.py simple-metagenome-stream-mismatches.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa
+	./compare-pos.py -V simple-metagenome-stream-mismatches.pos simple-metagenome-reads.mut.pos simple-metagenome-reads.fa
 
 mcompare5: simple-metagenome-sam-mismatches.pos simple-metagenome-abundtrim-sam-mismatches.pos
 	./summarize-pos-file.py simple-metagenome-sam-mismatches.pos simple-metagenome-reads.fa
