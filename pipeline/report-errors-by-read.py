@@ -5,7 +5,7 @@ import khmer
 import argparse
 
 # NOT USED
-def find_low_abund_kmers(kh, sequence, cutoff):
+def find_spectral_error_positions(kh, sequence, cutoff):
     K = kh.ksize()
 
     start = 0
@@ -82,8 +82,8 @@ def main():
         if varskip:
             print record.name, 'V'
         else:
-            #posns = find_low_abund_kmers(kh, seq, args.cutoff)
-            posns = kh.find_low_abund_kmers(seq, args.cutoff)
+            #posns = find_spectral_error_positions(kh, seq, args.cutoff)
+            posns = kh.find_spectral_error_positions(seq, args.cutoff)
             if posns is not None and len(posns) > 0 and posns[0] != -1:
                 print record.name, ",".join(map(str, posns))
             else:

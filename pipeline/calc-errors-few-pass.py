@@ -127,7 +127,7 @@ def main():
                 pass2fp.write(output_single(read))
                 save_pass2 += 1
             else:
-                posns = ht.find_low_abund_kmers(seq, CUTOFF)
+                posns = ht.find_spectral_error_positions(seq, CUTOFF)
                 print read.name, ",".join(map(str, posns))
                 
         pass2fp.close()
@@ -148,7 +148,7 @@ def main():
             med, _, _ = ht.get_median_count(seq)
 
             if med >= NORMALIZE_LIMIT or not args.variable_coverage:
-                posns = ht.find_low_abund_kmers(seq, CUTOFF)
+                posns = ht.find_spectral_error_positions(seq, CUTOFF)
                 print read.name, ",".join(map(str, posns))
 
             if args.variable_coverage and med < NORMALIZE_LIMIT:
