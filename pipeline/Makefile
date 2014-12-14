@@ -191,7 +191,7 @@ podar:  podar.1.ebwt \
 podar1: podar-report.txt podar-report-trim.txt podar-report-untrim.txt
 
 podar-report.txt: podar-reads.errors.pos podar-reads.sam.pos
-	./compare-pos.py podar-reads.errors.pos podar-reads.sam.pos podar-1.fastq.gz >podar-report.txt
+	./compare-pos.py -V podar-reads.errors.pos podar-reads.sam.pos podar-1.fastq.gz >podar-report.txt
 
 podar.1.ebwt: podar-ref.fa
 	bowtie-build podar-ref.fa podar
