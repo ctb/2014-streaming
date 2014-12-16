@@ -2,6 +2,7 @@
 import sys
 import argparse
 import screed
+import math
 
 
 MAX_SEQ_LEN = 5000
@@ -26,27 +27,32 @@ def main():
     lengths = []
 
     n = 0
+    n_rev = n_fwd = 0
     for samline in ignore_at(open(args.samfile)):
         n += 1
         if n % 100000 == 0:
             print >>sys.stderr, '...', n
 
-        readname, _, refname, refpos, _, _, _, _, _, seq = samline.split()[:10]
+        readname, flags, refname, refpos, _, _, _, _, _, seq = \
+                  samline.split('\t')[:10]
+
         if refname == '*' or refpos == '*':
+            # (don't count these as skipped)
             continue
         
         refpos = int(refpos)
 
-        #assert record.name == readname, (record.name, readname)
         ref = genome_dict[refname][refpos-1:refpos+len(seq) - 1]
-        #print ref
-        #print seq
 
         errors = []
         for pos, (a, b) in enumerate(zip(ref, seq)):
             if a != b:
-                if readname.endswith('r'):
+                # see http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#sam-output - '16' is the revcomp flag.
+                if int(flags) & 16:
                     pos = len(seq) - pos - 1
+                    n_rev += 1
+                else:
+                    n_fwd += 1
                 positions[pos] += 1
         lengths.append(len(seq))
 
@@ -64,6 +70,7 @@ def main():
 
     print >>sys.stderr, "error rate: %.2f%%" % \
           (100.0 * sum(positions) / float(sum(lengths)))
+    print >>sys.stderr, 'logratio of fwd to rev: %.2f' % (math.log(n_fwd / float(n_rev), 2))
 
 if __name__ == '__main__':
     main()
