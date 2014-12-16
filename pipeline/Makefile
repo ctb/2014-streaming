@@ -17,6 +17,9 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	simple-genome-dn-kmers.hist \
 	rseq
 
+# delete the targets of rules on an error
+.DELETE_ON_ERROR:
+
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 	mrna-reads.sorted.bam
 

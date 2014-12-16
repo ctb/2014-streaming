@@ -17,7 +17,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('genome')
     parser.add_argument('samfile')
-    parser.add_argument('readfile')
     args = parser.parse_args()
 
     genome_dict = dict([ (record.name, record.sequence) for record in \
@@ -29,7 +28,7 @@ def main():
     n = 0
     for samline in ignore_at(open(args.samfile)):
         n += 1
-        if n % 1000 == 0:
+        if n % 100000 == 0:
             print >>sys.stderr, '...', n
 
         readname, _, refname, refpos, _, _, _, _, _, seq = samline.split()[:10]

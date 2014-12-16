@@ -44,7 +44,7 @@ simple-genome-reads-even.sam: simple-genome-reads-even.fa
 	bowtie simple-genome -f simple-genome-reads-even.fa -S simple-genome-reads-even.sam
 
 simple-genome-reads-even.sam.errhist: simple-genome-reads-even.sam
-	./sam-scan-errhist.py simple-genome.fa simple-genome-reads-even.sam simple-genome-reads-even.fa > simple-genome-reads-even.sam.errhist
+	./sam-scan-errhist.py simple-genome.fa simple-genome-reads-even.sam > simple-genome-reads-even.sam.errhist
 
 simple-genome-reads.sorted.bam: simple-genome-reads.sam
 	samtools import simple-genome.fa.fai simple-genome-reads.sam simple-genome-reads.bam

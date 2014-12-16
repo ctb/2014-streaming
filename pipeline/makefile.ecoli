@@ -1,6 +1,6 @@
 ECOLI_K=32
 
-ecoli1: ecoli-report.txt ecoli-report-nodn.txt
+ecoli1: ecoli-report.txt ecoli-report-nodn.txt ecoli_ref-5m.fastq.gz.errhist
 
 # bowtie index for ecoliMG1655.fa
 ecoli.1.ebwt: ecoliMG1655.fa
@@ -14,7 +14,7 @@ ecoli-reads.sam: ecoli_ref-5m.fastq.gz ecoli.1.ebwt
 # ecoli-reads.sam.pos is the 'pos' file containing the locations of mismatches,
 # i.e. errors, determined from mapping.
 ecoli-reads.sam.pos: ecoli-reads.sam
-	./sam-scan.py ecoliMG1655.fa ecoli-reads.sam ecoli_ref-5m.fastq.gz > ecoli-reads.sam.pos
+	./sam-scan.py ecoliMG1655.fa ecoli-reads.sam > ecoli-reads.sam.pos
 
 # ecoli_ref.kh contains the counting table of k-mers in the raw read data set.
 ecoli_ref.kh: ecoli_ref-5m.fastq.gz
@@ -54,7 +54,7 @@ ecoli-abundtrim.sam: ecoli_ref-5m.fastq.gz.abundtrim
 # ecoli-abundtrim.sam.pos is the 'pos' file containing the locations of
 # mismatches to the reference genome in the reads, based on mapping.
 ecoli-abundtrim.sam.pos: ecoli-abundtrim.sam
-	./sam-scan.py ecoliMG1655.fa ecoli-abundtrim.sam ecoli_ref-5m.fastq.gz.abundtrim > ecoli-abundtrim.sam.pos
+	./sam-scan.py ecoliMG1655.fa ecoli-abundtrim.sam > ecoli-abundtrim.sam.pos
 
 # ecoli-report-untrim.txt - a report on the error rate of the untrimmed reads,
 # based on mapping to the reference.
@@ -72,3 +72,8 @@ ecoli-errfree-reads.fa: ecoliMG1655.fa
 ecoli-errfree-report.txt: ecoli-errfree-reads.fa
 	normalize-by-median.py -x 1e8 -N 4 -k $(ECOLI_K) -C 20 ecoli-errfree-reads.fa -R ecoli-errfree-report.txt
 
+ecoli_ref-5m.fastq.gz.errhist: ecoli_ref-5m.fastq.gz
+	-$(KHMER)/sandbox/calc-error-profile.py ecoli_ref-5m.fastq.gz
+
+ecoli-reads.sam.errhist: ecoli-reads.sam ecoliMG1655.fa
+	./sam-scan-errhist.py ecoliMG1655.fa ecoli-reads.sam > ecoli-reads.sam.errhist
