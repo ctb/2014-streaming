@@ -1,6 +1,7 @@
 rseq: rseq_compare2 rseq_compare4 rseq_compare5 \
 	rseq-dn-cor-sam-mismatches-report.txt \
-	rseq-reads-hicov-sam-mismatches-report.txt
+	rseq-reads-hicov-sam-mismatches-report.txt \
+	rseq-reads.fq.gz.errhist rseq-reads.sam.errhist
 
 rseq_compare2: rseq_compare2.txt
 	cat rseq_compare2.txt
@@ -109,3 +110,8 @@ rseq_compare6.txt: rseq-reads.hicov.cor.sam.pos rseq-reads.hicov.fq.sam.pos
 rseq_compare6: rseq_compare6.txt
 	cat rseq_compare5.txt
 
+rseq-reads.fq.gz.errhist: rseq-reads.fq.gz
+	$(KHMER)/sandbox/calc-error-profile.py rseq-reads.fq.gz
+
+rseq-reads.sam.errhist: rseq-reads.sam
+	./sam-scan-errhist.py rna.fa rseq-reads.sam -o rseq-reads.sam.errhist

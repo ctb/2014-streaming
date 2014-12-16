@@ -4,12 +4,12 @@ ecoli1: ecoli-report.txt ecoli-report-nodn.txt ecoli_ref-5m.fastq.gz.errhist
 
 # bowtie index for ecoliMG1655.fa
 ecoli.1.ebwt: ecoliMG1655.fa
-	bowtie-build ecoliMG1655.fa ecoli
+	bowtie2-build ecoliMG1655.fa ecoli
 	samtools faidx ecoliMG1655.fa
 
 # ecoli-reads.sam is the bowtie mapping of the reads to the reference genome.
 ecoli-reads.sam: ecoli_ref-5m.fastq.gz ecoli.1.ebwt
-	gunzip -c ecoli_ref-5m.fastq.gz | bowtie ecoli -q - -S ecoli-reads.sam
+	gunzip -c ecoli_ref-5m.fastq.gz | bowtie2 -p 4 -x ecoli -U - -S ecoli-reads.sam
 
 # ecoli-reads.sam.pos is the 'pos' file containing the locations of mismatches,
 # i.e. errors, determined from mapping.

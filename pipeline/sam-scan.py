@@ -13,6 +13,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('genome')
     parser.add_argument('samfile')
+    parser.add_argument('-o', '--outfile', type=argparse.FileType('w'),
+                        default=sys.stdout)
+
     args = parser.parse_args()
 
     genome_dict = dict([ (record.name, record.sequence) for record in \
@@ -44,7 +47,7 @@ def main():
             if a != b:
                 errors.append(pos)
 
-        print readname, ",".join(map(str, errors))
+        print >>args.outfile, readname, ",".join(map(str, errors))
 
     if n_skipped / float(n) > .01:
         raise Exception, "Error: too many reads ignored! %d of %d" % \

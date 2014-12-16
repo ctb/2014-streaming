@@ -52,7 +52,7 @@ simple-genome-reads.sorted.bam: simple-genome-reads.sam
 	samtools index simple-genome-reads.sorted.bam
 
 simple-genome-sam-mismatches.pos: simple-genome-reads.sam
-	./sam-scan.py simple-genome.fa simple-genome-reads.sam > simple-genome-sam-mismatches.pos
+	./sam-scan.py simple-genome.fa simple-genome-reads.sam -o simple-genome-sam-mismatches.pos
 
 simple-genome-reads.covdict: simple-genome-reads.sam
 	./sam-scan-to-coverage-dict.py simple-genome.fa simple-genome-reads.sam simple-genome-reads.covdict simple-genome-reads.covhist
@@ -65,7 +65,7 @@ simple-genome-abundtrim.sam: simple-genome-reads.fa.abundtrim \
 	bowtie simple-genome -f simple-genome-reads.fa.abundtrim -S simple-genome-abundtrim.sam
 
 simple-genome-abundtrim-sam-mismatches.pos: simple-genome-abundtrim.sam
-	./sam-scan.py simple-genome.fa simple-genome-abundtrim.sam > simple-genome-abundtrim-sam-mismatches.pos
+	./sam-scan.py simple-genome.fa simple-genome-abundtrim.sam -o simple-genome-abundtrim-sam-mismatches.pos
 
 compare: simple-genome-errors.pos simple-genome-sam-mismatches.pos
 	./compare-pos.py simple-genome-errors.pos simple-genome-sam-mismatches.pos simple-genome-reads.fa

@@ -14,10 +14,14 @@ def ignore_at(iter):
             continue
         yield item
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('genome')
     parser.add_argument('samfile')
+    parser.add_argument('-o', '--outfile', type=argparse.FileType('w'),
+                        default=sys.stdout)
+    
     args = parser.parse_args()
 
     genome_dict = dict([ (record.name, record.sequence) for record in \
@@ -66,7 +70,7 @@ def main():
 
     # write!
     for n, i in enumerate(positions[:max_length]):
-        print n, i, float(i) / float(length_count[n])
+        print >>args.outfile, n, i, float(i) / float(length_count[n])
 
     print >>sys.stderr, "error rate: %.2f%%" % \
           (100.0 * sum(positions) / float(sum(lengths)))
