@@ -193,7 +193,8 @@ podar:  podar.1.bt2 \
 	podar-report-untrim.txt \
 	podar-report-trim.txt \
 	podar-report.txt \
-	podar1
+	podar1 \
+	podar-stream-report.txt
 
 podar1: podar-report.txt podar-report-trim.txt podar-report-untrim.txt
 
@@ -218,6 +219,12 @@ podar.dn.kh: podar-mapped.fq.gz
 
 podar-reads.errors.pos: podar-mapped.fq.gz podar.dn.kh
 	 ./report-errors-by-read.py -V --coverage 10 podar.dn.kh podar-mapped.fq.gz > podar-reads.errors.pos 	
+
+podar-stream-mismatches.pos: podar-mapped.fq.gz
+	./calc-errors-few-pass.py -V -x 4e8 -N 4 -k 20 -Z 10 podar-mapped.fq.gz > podar-stream-mismatches.pos
+
+podar-stream-report.txt: podar-stream-mismatches.pos podar-reads.sam.pos
+	./compare-pos.py -V podar-stream-mismatches.pos podar-reads.sam.pos podar-mapped.fq.gz > podar-stream-report.txt
 
 podar-mapped.fq.gz.abundtrim: podar-mapped.fq.gz
 	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 10 -C 3 -x 4e8 -N 4 podar-mapped.fq.gz

@@ -121,7 +121,7 @@ def main():
         pass2fp = open(pass2filename, 'w')
 
         for n, read in enumerate(screed.open(filename)):
-            if n % 10000 == 0:
+            if n % 100000 == 0:
                 print >>sys.stderr, '...', n, filename, save_pass2, \
                       read_reads, read_bp
                 
@@ -152,7 +152,7 @@ def main():
         print >>sys.stderr,'second pass: looking at ' + \
               'sequences kept aside in %s' % pass2filename
         for n, read in enumerate(screed.open(pass2filename)):
-            if n % 10000 == 0:
+            if n % 100000 == 0:
                 print >>sys.stderr, '... x 2', n, pass2filename, read_reads, \
                       read_bp
 

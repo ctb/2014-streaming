@@ -82,3 +82,4 @@ ecoli-mapped.fq.gz
 podar-mapped.fq.gz
 rseq-mapped.fq.gz
 rseq-reads.hicov.cor.fq.gz
+*.txt
