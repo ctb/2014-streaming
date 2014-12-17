@@ -38,6 +38,17 @@ def output_single(read):
         return ">%s\n%s\n" % (name, sequence)
 
 
+def add_n_posns(posns, sequence):
+    loc = sequence.find('N')
+    p = set(posns)
+
+    while loc > -1:
+        p.add(loc)
+        loc = sequence.find('N', loc + 1)
+            
+    return list(sorted(p))
+
+
 def main():
     parser = argparse.ArgumentParser(description='XXX')
 
@@ -116,7 +127,7 @@ def main():
                 
             read_reads += 1
             read_bp += len(read.sequence)
-            
+
             seq = read.sequence.replace('N', 'A')
             med, _, _ = ht.get_median_count(seq)
 
@@ -128,6 +139,7 @@ def main():
                 save_pass2 += 1
             else:
                 posns = ht.find_spectral_error_positions(seq, CUTOFF)
+                posns = add_n_posns(posns, read.sequence)
                 print read.name, ",".join(map(str, posns))
                 
         pass2fp.close()
@@ -149,6 +161,7 @@ def main():
 
             if med >= NORMALIZE_LIMIT or not args.variable_coverage:
                 posns = ht.find_spectral_error_positions(seq, CUTOFF)
+                posns = add_n_posns(posns, read.sequence)
                 print read.name, ",".join(map(str, posns))
 
             if args.variable_coverage and med < NORMALIZE_LIMIT:

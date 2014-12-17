@@ -23,28 +23,28 @@ simple-genome-reads.kh: simple-genome-reads.fa
 	load-into-counting.py simple-genome-reads.kh -k 20 -x 2e6 -N 4 simple-genome-reads.fa --report-total-kmers
 
 simple-genome-errors-nodn.pos: simple-genome-reads.kh
-	./report-errors-by-read.py -C 15 simple-genome-reads.kh simple-genome-reads.fa > simple-genome-errors-nodn.pos
+	./report-errors-by-read.py -C 15 simple-genome-reads.kh simple-genome-reads.fa -o simple-genome-errors-nodn.pos
 
 simple-genome-reads.dn.kh: simple-genome-reads.fa
 	normalize-by-median.py -k 20 -C 20 simple-genome-reads.fa -s simple-genome-reads.dn.kh -x 2e6 -N 4 -R simple-genome.report
 
 simple-genome-errors.pos: simple-genome-reads.dn.kh
-	./report-errors-by-read.py simple-genome-reads.dn.kh simple-genome-reads.fa > simple-genome-errors.pos
+	./report-errors-by-read.py simple-genome-reads.dn.kh simple-genome-reads.fa -o simple-genome-errors.pos
 
 simple-genome-reads.sam: simple-genome-reads.fa
-	bowtie-build simple-genome.fa simple-genome > /dev/null
+	bowtie2-build simple-genome.fa simple-genome > /dev/null
 	samtools faidx simple-genome.fa
 
-	bowtie simple-genome -f simple-genome-reads.fa -S simple-genome-reads.sam
+	bowtie2 -f -x simple-genome -U simple-genome-reads.fa -S simple-genome-reads.sam
 
 simple-genome-reads-even.sam: simple-genome-reads-even.fa
-	bowtie-build simple-genome.fa simple-genome > /dev/null
+	bowtie2-build simple-genome.fa simple-genome > /dev/null
 	samtools faidx simple-genome.fa
 
-	bowtie simple-genome -f simple-genome-reads-even.fa -S simple-genome-reads-even.sam
+	bowtie2 -f -x simple-genome -U simple-genome-reads-even.fa -S simple-genome-reads-even.sam
 
 simple-genome-reads-even.sam.errhist: simple-genome-reads-even.sam
-	./sam-scan-errhist.py simple-genome.fa simple-genome-reads-even.sam > simple-genome-reads-even.sam.errhist
+	./sam-scan-errhist.py simple-genome.fa simple-genome-reads-even.sam -o simple-genome-reads-even.sam.errhist
 
 simple-genome-reads.sorted.bam: simple-genome-reads.sam
 	samtools import simple-genome.fa.fai simple-genome-reads.sam simple-genome-reads.bam
@@ -62,7 +62,7 @@ simple-genome-reads.fa.abundtrim: simple-genome-reads.fa
 
 simple-genome-abundtrim.sam: simple-genome-reads.fa.abundtrim \
 	simple-genome-reads.sam
-	bowtie simple-genome -f simple-genome-reads.fa.abundtrim -S simple-genome-abundtrim.sam
+	bowtie2 -f -x simple-genome -U simple-genome-reads.fa.abundtrim -S simple-genome-abundtrim.sam
 
 simple-genome-abundtrim-sam-mismatches.pos: simple-genome-abundtrim.sam
 	./sam-scan.py simple-genome.fa simple-genome-abundtrim.sam -o simple-genome-abundtrim-sam-mismatches.pos
@@ -91,13 +91,3 @@ simple-genome-reads-even.fa.errhist: simple-genome-reads-even.fa
 
 compare6: simple-genome-reads.mut.pos simple-genome-errors-nodn.pos
 	./compare-pos.py simple-genome-errors-nodn.pos simple-genome-reads.mut.pos simple-genome-reads.fa
-
-simple-genome-reads.cor.sam: simple-genome-reads.cor.fq
-	bowtie-build simple-genome.fa simple-genome > /dev/null
-	samtools faidx simple-genome.fa
-
-	bowtie simple-genome -q simple-genome-reads.cor.fq -S simple-genome-reads.cor.sam
-
-simple-genome-sam-cor-mismatches.pos: simple-genome-reads.cor.sam
-	./sam-scan.py simple-genome.fa simple-genome-reads.cor.sam > simple-genome-sam-cor-mismatches.pos
-	./compare-pos.py simple-genome-errors.pos simple-genome-sam-cor-mismatches.pos simple-genome-reads.fa

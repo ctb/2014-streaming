@@ -8,13 +8,13 @@ simple-metagenome-reads.dn.kh: simple-metagenome-reads.fa
 	normalize-by-median.py -k 20 -C 20 simple-metagenome-reads.fa -s simple-metagenome-reads.dn.kh -x 2e6 -N 4
 
 simple-metagenome-errors.pos: simple-metagenome-reads.dn.kh
-	./report-errors-by-read.py -V --coverage 20 simple-metagenome-reads.dn.kh simple-metagenome-reads.fa > simple-metagenome-errors.pos
+	./report-errors-by-read.py -V --coverage 20 simple-metagenome-reads.dn.kh simple-metagenome-reads.fa -o simple-metagenome-errors.pos
 
 simple-metagenome-reads.sam: simple-metagenome-reads.fa
-	bowtie-build simple-metagenome.fa simple-metagenome > /dev/null
+	bowtie2-build simple-metagenome.fa simple-metagenome > /dev/null
 	samtools faidx simple-metagenome.fa
 
-	bowtie simple-metagenome -f simple-metagenome-reads.fa -S simple-metagenome-reads.sam
+	bowtie2 -f -x simple-metagenome -U simple-metagenome-reads.fa -S simple-metagenome-reads.sam
 
 simple-metagenome-reads.sorted.bam: simple-metagenome-reads.sam
 	samtools import simple-metagenome.fa.fai simple-metagenome-reads.sam simple-metagenome-reads.bam
@@ -22,17 +22,17 @@ simple-metagenome-reads.sorted.bam: simple-metagenome-reads.sam
 	samtools index simple-metagenome-reads.sorted.bam
 
 simple-metagenome-sam-mismatches.pos: simple-metagenome-reads.sam
-	./sam-scan.py simple-metagenome.fa simple-metagenome-reads.sam > simple-metagenome-sam-mismatches.pos
+	./sam-scan.py simple-metagenome.fa simple-metagenome-reads.sam -o simple-metagenome-sam-mismatches.pos
 
 simple-metagenome-reads.fa.abundtrim: simple-metagenome-reads.fa
 	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 simple-metagenome-reads.fa
 
 simple-metagenome-abundtrim.sam: simple-metagenome-reads.fa.abundtrim \
 	simple-metagenome-reads.sam
-	bowtie simple-metagenome -f simple-metagenome-reads.fa.abundtrim -S simple-metagenome-abundtrim.sam
+	bowtie2 -f -x simple-metagenome -U simple-metagenome-reads.fa.abundtrim -S simple-metagenome-abundtrim.sam
 
 simple-metagenome-abundtrim-sam-mismatches.pos: simple-metagenome-abundtrim.sam
-	./sam-scan.py simple-metagenome.fa simple-metagenome-abundtrim.sam > simple-metagenome-abundtrim-sam-mismatches.pos
+	./sam-scan.py simple-metagenome.fa simple-metagenome-abundtrim.sam -o simple-metagenome-abundtrim-sam-mismatches.pos
 
 mcompare: simple-metagenome-errors.pos simple-metagenome-sam-mismatches.pos
 	./compare-pos.py simple-metagenome-errors.pos simple-metagenome-sam-mismatches.pos simple-metagenome-reads.fa

@@ -8,13 +8,13 @@ simple-mrna-reads.dn.kh: simple-mrna-reads.fa
 	normalize-by-median.py -k 20 -C 20 simple-mrna-reads.fa -s simple-mrna-reads.dn.kh -x 2e6 -N 4
 
 simple-mrna-errors.pos: simple-mrna-reads.dn.kh
-	./report-errors-by-read.py -V --coverage 20 simple-mrna-reads.dn.kh simple-mrna-reads.fa > simple-mrna-errors.pos
+	./report-errors-by-read.py -V --coverage 20 simple-mrna-reads.dn.kh simple-mrna-reads.fa -o simple-mrna-errors.pos
 
 simple-mrna-reads.sam: simple-mrna-reads.fa
-	bowtie-build simple-mrna.fa simple-mrna > /dev/null
+	bowtie2-build simple-mrna.fa simple-mrna > /dev/null
 	samtools faidx simple-mrna.fa
 
-	bowtie simple-mrna -f simple-mrna-reads.fa -S simple-mrna-reads.sam
+	bowtie2 -f -x simple-mrna -U simple-mrna-reads.fa -S simple-mrna-reads.sam
 
 simple-mrna-reads.sorted.bam: simple-mrna-reads.sam
 	samtools import simple-mrna.fa.fai simple-mrna-reads.sam simple-mrna-reads.bam
@@ -22,17 +22,17 @@ simple-mrna-reads.sorted.bam: simple-mrna-reads.sam
 	samtools index simple-mrna-reads.sorted.bam
 
 simple-mrna-sam-mismatches.pos: simple-mrna-reads.sam
-	./sam-scan.py simple-mrna.fa simple-mrna-reads.sam > simple-mrna-sam-mismatches.pos
+	./sam-scan.py simple-mrna.fa simple-mrna-reads.sam -o simple-mrna-sam-mismatches.pos
 
 simple-mrna-reads.fa.abundtrim: simple-mrna-reads.fa
 	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 simple-mrna-reads.fa
 
 simple-mrna-abundtrim.sam: simple-mrna-reads.fa.abundtrim \
 	simple-mrna-reads.sam
-	bowtie simple-mrna -f simple-mrna-reads.fa.abundtrim -S simple-mrna-abundtrim.sam
+	bowtie2 -f -x simple-mrna -U simple-mrna-reads.fa.abundtrim -S simple-mrna-abundtrim.sam
 
 simple-mrna-abundtrim-sam-mismatches.pos: simple-mrna-abundtrim.sam
-	./sam-scan.py simple-mrna.fa simple-mrna-abundtrim.sam > simple-mrna-abundtrim-sam-mismatches.pos
+	./sam-scan.py simple-mrna.fa simple-mrna-abundtrim.sam -o simple-mrna-abundtrim-sam-mismatches.pos
 
 rcompare: simple-mrna-errors.pos simple-mrna-sam-mismatches.pos
 	./compare-pos.py simple-mrna-errors.pos simple-mrna-sam-mismatches.pos simple-mrna-reads.fa

@@ -9,25 +9,28 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	compare4 mcompare4 rcompare4 compare5 compare6 \
 	simple-genome-reads-even.sam.errhist \
 	simple-genome-reads-even.fa.errhist \
-	ecoli1 \
+	simple-genome-kmers.hist \
+	simple-genome-dn-kmers.hist \
+	ecoli \
 	ecoli-report-untrim.txt \
 	ecoli-report-trim.txt \
 	ecoli-errfree-report.txt \
-	simple-genome-kmers.hist \
-	simple-genome-dn-kmers.hist \
-	rseq
+	rseq podar
 
 # delete the targets of rules on an error
 .DELETE_ON_ERROR:
 
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
-	mrna-reads.sorted.bam
+	simple-mrna-reads.sorted.bam
 
 clean:
 	-rm -f simple-genome.fa simple-genome-reads.dn.kh simple-genome-reads.sam
 	-rm -f *-reads.fa
 	-rm -f rseq_compare*.txt
 	-rm -f *.abundtrim *.ebwt *.fai *.pos *.keep *.bam *.mut *.bai *.sam *.kh
+	-rm -f *.errhist *.abundfilt *.hicov.fq *.lowcov.fq *.report
+	-rm -f *.txt repgenome* repeat* *.out *.cov
+	-rm -f *.bt2 *.hist *.info *.dict *.covhist *.covdict
 
 ##### simple genome
 include makefile.simple-genome
@@ -166,7 +169,7 @@ quake-ecoli-dn-cor.txt: ecoli-reads.dn.cor.sam.pos
 
 # ecoli-reads.raw.cor.sam is the bowtie mapping of the Quake-corrected reads to the reference genome.
 ecoli-reads.raw.cor.sam: ecoli_ref-5m.raw.cor.fastq.gz ecoli.1.ebwt
-	gunzip -c ecoli_ref-5m.raw.cor.fastq.gz | bowtie ecoli -q - -S ecoli-reads.raw.cor.sam
+	gunzip -c ecoli_ref-5m.raw.cor.fastq.gz | bowtie2 -p 4 -x ecoli -U - -S ecoli-reads.raw.cor.sam
 
 # ecoli-reads.raw.cor.sam.pos is the 'pos' file containing the locations
 # of mismatches from the raw quake-corrected reads.
@@ -196,33 +199,36 @@ podar1: podar-report.txt podar-report-trim.txt podar-report-untrim.txt
 podar-report.txt: podar-reads.errors.pos podar-reads.sam.pos
 	./compare-pos.py -V podar-reads.errors.pos podar-reads.sam.pos podar-1.fastq.gz >podar-report.txt
 
-podar.1.ebwt: podar-ref.fa
-	bowtie-build podar-ref.fa podar
+podar.1.bt2: podar-ref.fa
+	bowtie2-build podar-ref.fa podar
 	samtools faidx podar-ref.fa
 
-podar-reads.sam: podar-1.fastq.gz podar.1.ebwt
-	gunzip -c podar-1.fastq.gz | bowtie podar -q - -S podar-reads.sam
+podar-reads.sam: podar-1.fastq.gz podar.1.bt2
+	gunzip -c podar-1.fastq.gz | bowtie2 -p 4 -x podar -U - -S podar-reads.sam
+
+podar-mapped.fq.gz: podar-reads.sam
+	./extract-sam-seqs-to-fq.py podar-reads.sam podar-1.fastq.gz | gzip > podar-mapped.fq.gz
 
 podar-reads.sam.pos: podar-reads.sam
 	./sam-scan.py podar-ref.fa podar-reads.sam > podar-reads.sam.pos
 
-podar.dn.kh: podar-1.fastq.gz
-	 normalize-by-median.py -x 4e8 -N 4 -k 20 -C 10 -s podar.dn.kh podar-1.fastq.gz -R podar-dn-report.txt
+podar.dn.kh: podar-mapped.fq.gz
+	 normalize-by-median.py -x 4e8 -N 4 -k 20 -C 10 -s podar.dn.kh podar-mapped.fq.gz -R podar-dn-report.txt
 
-podar-reads.errors.pos: podar-1.fastq.gz podar.dn.kh
-	 ./report-errors-by-read.py -V --coverage 10 podar.dn.kh podar-1.fastq.gz > podar-reads.errors.pos 	
+podar-reads.errors.pos: podar-mapped.fq.gz podar.dn.kh
+	 ./report-errors-by-read.py -V --coverage 10 podar.dn.kh podar-mapped.fq.gz > podar-reads.errors.pos 	
 
-podar-1.fastq.gz.abundtrim: podar-1.fastq.gz
-	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 10 -C 3 -x 4e8 -N 4 podar-1.fastq.gz
+podar-mapped.fq.gz.abundtrim: podar-mapped.fq.gz
+	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 10 -C 3 -x 4e8 -N 4 podar-mapped.fq.gz
 
-podar-abundtrim.sam: podar-1.fastq.gz.abundtrim
-	bowtie podar -q podar-1.fastq.gz.abundtrim -S podar-abundtrim.sam
+podar-abundtrim.sam: podar-mapped.fq.gz.abundtrim
+	bowtie2 -p 4 -x podar -U podar-mapped.fq.gz.abundtrim -S podar-abundtrim.sam
 
 podar-abundtrim.sam.pos: podar-abundtrim.sam
 	./sam-scan.py podar-ref.fa podar-abundtrim.sam > podar-abundtrim.sam.pos
 
-podar-report-untrim.txt:podar-reads.sam.pos podar-1.fastq.gz
-	./summarize-pos-file.py podar-reads.sam.pos podar-1.fastq.gz > podar-report-untrim.txt
+podar-report-untrim.txt:podar-reads.sam.pos podar-mapped.fq.gz
+	./summarize-pos-file.py podar-reads.sam.pos podar-mapped.fq.gz > podar-report-untrim.txt
 
-podar-report-trim.txt: podar-abundtrim.sam.pos podar-1.fastq.gz.abundtrim
-	./summarize-pos-file.py podar-abundtrim.sam.pos podar-1.fastq.gz.abundtrim > podar-report-trim.txt
+podar-report-trim.txt: podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim
+	./summarize-pos-file.py podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim > podar-report-trim.txt

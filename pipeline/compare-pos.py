@@ -18,7 +18,7 @@ def read_pos_file(filename, ignore_set):
                 ignore_set.add(read)
                 posns = []
             else:
-                posns = map(int, posns.split(','))
+                posns = list(sorted(map(int, posns.split(','))))
 
         yield read, posns
 
