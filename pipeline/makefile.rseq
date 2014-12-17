@@ -1,5 +1,4 @@
 rseq: rseq_compare2 rseq_compare4 rseq_compare5 \
-	rseq-dn-cor-sam-mismatches-report.txt \
 	rseq-reads-hicov-sam-mismatches-report.txt \
 	rseq-mapped.fq.gz.errhist rseq-reads.sam.errhist
 
@@ -12,11 +11,11 @@ rseq_compare2.txt: rseq-errors.pos rseq-sam-mismatches.pos
 rseq-reads.fq.gz: mouse-5m.fq.gz
 	gunzip -c mouse-5m.fq.gz | head -4000000 | gzip -9c > rseq-reads.fq.gz
 
-rseq.1.ebwt: rna.fa
+rseq.1.bt2: rna.fa
 	bowtie2-build rna.fa rseq > /dev/null
 	samtools faidx rna.fa
 
-rseq-reads.sam: rseq-reads.fq.gz rseq.1.ebwt
+rseq-reads.sam: rseq-reads.fq.gz rseq.1.bt2
 	gunzip -c rseq-reads.fq.gz | bowtie2 -p 4 -x rseq -U - -S rseq-reads.sam
 
 rseq-sam-mismatches.pos: rseq-reads.sam
@@ -37,7 +36,7 @@ rseq-reads.hicov.fq: rseq-mapped.fq.gz rseq-reads.dn.kh
 rseq-reads.hicov.fq.keep: rseq-reads.hicov.fq
 	normalize-by-median.py -k 20 -C 20 -x 1e8 -N 4 rseq-reads.hicov.fq
 
-rseq-reads.hicov.fq.sam: rseq-reads.hicov.fq rseq.1.ebwt
+rseq-reads.hicov.fq.sam: rseq-reads.hicov.fq rseq.1.bt2
 	bowtie2 -p 4 -x rseq -U rseq-reads.hicov.fq -S rseq-reads.hicov.fq.sam
 
 rseq-reads-hicov-sam-mismatches.pos: rseq-reads.hicov.fq.sam
@@ -52,7 +51,7 @@ rseq-reads.hicov.fq.sam.covdict: rseq-reads.hicov.fq.sam
 rseq-reads.lowcov.fq: rseq-mapped.fq.gz rseq-reads.dn.kh
 	$(KHMER)/sandbox/slice-reads-by-coverage.py -M 19 rseq-reads.dn.kh rseq-mapped.fq.gz rseq-reads.lowcov.fq
 
-rseq-reads.lowcov.fq.sam: rseq-reads.lowcov.fq rseq.1.ebwt
+rseq-reads.lowcov.fq.sam: rseq-reads.lowcov.fq rseq.1.bt2
 	bowtie2 -x rseq -U rseq-reads.lowcov.fq -S rseq-reads.lowcov.fq.sam
 
 rseq-reads.lowcov.fq.sam.covdict: rseq-reads.lowcov.fq.sam
@@ -93,12 +92,6 @@ rseq-reads.dn.cor.fq.gz: rseq-reads.hicov.fq rseq-reads.hicov.fq.keep
 
 rseq-reads.hicov.cor.sam: rseq-reads.hicov.cor.fq.gz
 	gunzip -c rseq-reads.hicov.cor.fq.gz | bowtie2 -p 4 -x rseq -U - -S rseq-reads.hicov.cor.sam
-
-rseq-dn-cor-sam-mismatches.pos: rseq-reads.dn.cor.sam
-	./sam-scan.py rna.fa rseq-reads.dn.cor.sam -o rseq-dn-cor-sam-mismatches.pos
-
-rseq-dn-cor-sam-mismatches-report.txt: rseq-dn-cor-sam-mismatches.pos
-	./summarize-pos-file.py rseq-dn-cor-sam-mismatches.pos rseq-reads.dn.cor.fq.gz > rseq-dn-cor-sam-mismatches-report.txt
 
 rseq-reads.hicov.cor.sam.pos: rseq-reads.hicov.cor.sam
 	./sam-scan.py rna.fa rseq-reads.hicov.cor.sam -o rseq-reads.hicov.cor.sam.pos

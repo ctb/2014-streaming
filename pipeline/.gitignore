@@ -77,3 +77,8 @@ rseq_dn_counts.out
 simple-genome-readcov.dict
 simple-genome-reads.covdict
 simple-genome-reads.covhist
+*.bt2
+ecoli-mapped.fq.gz
+podar-mapped.fq.gz
+rseq-mapped.fq.gz
+rseq-reads.hicov.cor.fq.gz

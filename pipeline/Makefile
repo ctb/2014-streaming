@@ -135,6 +135,7 @@ repgenome-compare.txt: repgenome-10-reads.calc.pos repgenome-10-reads.mut.pos
 
 ####
 
+# @CTB
 ecoli_corr: ecoli_ref-5m.dn.cor.fastq.gz ecoli_ref-5m.raw.cor.fastq.gz
 
 # @CTB fix deps
@@ -181,12 +182,12 @@ quake-ecoli-raw-cor.txt: ecoli-reads.raw.cor.sam.pos
 
 ###
 
-podar:  podar.1.ebwt \
+podar:  podar.1.bt2 \
 	podar-reads.sam \
 	podar-reads.sam.pos \
 	podar.dn.kh \
 	podar-reads.errors.pos \
-	podar-1.fastq.gz.abundtrim \
+	podar-mapped.fq.gz.abundtrim \
 	podar-abundtrim.sam \
 	podar-abundtrim.sam.pos \
 	podar-report-untrim.txt \
@@ -197,7 +198,7 @@ podar:  podar.1.ebwt \
 podar1: podar-report.txt podar-report-trim.txt podar-report-untrim.txt
 
 podar-report.txt: podar-reads.errors.pos podar-reads.sam.pos
-	./compare-pos.py -V podar-reads.errors.pos podar-reads.sam.pos podar-1.fastq.gz >podar-report.txt
+	./compare-pos.py -V podar-reads.errors.pos podar-reads.sam.pos podar-mapped.fq.gz >podar-report.txt
 
 podar.1.bt2: podar-ref.fa
 	bowtie2-build podar-ref.fa podar
