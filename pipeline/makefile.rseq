@@ -1,6 +1,8 @@
 rseq: rseq_compare2 rseq_compare4 rseq_compare5 \
 	rseq-reads-hicov-sam-mismatches-report.txt \
-	rseq-mapped.fq.gz.errhist rseq-reads.sam.errhist
+	rseq-mapped.fq.gz.errhist rseq-reads.sam.errhist \
+	rseq-reads.hicov.cor.fq.gz \
+	rseq_compare6
 
 rseq_compare2: rseq_compare2.txt
 	cat rseq_compare2.txt
@@ -73,6 +75,22 @@ rseq_compare5.txt: rseq-sam-mismatches.pos rseq-abundtrim-sam-mismatches.pos
 rseq_compare5: rseq_compare5.txt
 	cat rseq_compare5.txt
 
+rseq-reads.hicov.fq.abundtrim: rseq-reads.hicov.fq
+	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 -x 1e8 -N 4 rseq-reads.hicov.fq
+
+rseq-hicov-abundtrim.sam: rseq-reads.hicov.fq.abundtrim
+	bowtie2 -p 4 -x rseq -U rseq-reads.hicov.fq.abundtrim -S rseq-hicov-abundtrim.sam
+
+rseq-hicov-abundtrim.sam.pos: rseq-hicov-abundtrim.sam
+	./sam-scan.py rna.fa rseq-hicov-abundtrim.sam -o rseq-hicov-abundtrim.sam.pos
+
+rseq_compare5b.txt: rseq-reads-hicov-sam-mismatches-report.txt rseq-hicov-abundtrim.sam.pos
+	cat rseq-reads-hicov-sam-mismatches-report.txt > rseq_compare5b.txt
+	./summarize-pos-file.py rseq-hicov-abundtrim.sam.pos rseq-reads.hicov.fq >> rseq_compare5b.txt
+
+rseq_compare5b: rseq_compare5b.txt
+	cat rseq_comprae5b.txt
+
 rseq-mapped.fq.gz.abundtrim: rseq-mapped.fq.gz
 	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 -x 1e8 -N 4 rseq-mapped.fq.gz
 
@@ -83,7 +101,7 @@ rseq-abundtrim.sam: rseq-mapped.fq.gz.abundtrim \
 rseq-abundtrim-sam-mismatches.pos: rseq-abundtrim.sam
 	./sam-scan.py rna.fa rseq-abundtrim.sam -o rseq-abundtrim-sam-mismatches.pos
 
-rseq-reads.dn.cor.fq.gz: rseq-reads.hicov.fq rseq-reads.hicov.fq.keep
+rseq-reads.hicov.cor.fq.gz: rseq-reads.hicov.fq rseq-reads.hicov.fq.keep
 	echo rseq-reads.hicov.fq > quake_list.txt
 	ln -fs /usr/local/bin/jellyfish .
 	cat rseq-reads.hicov.fq.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > rseq_dn_counts.out
@@ -100,11 +118,11 @@ rseq-reads.hicov.fq.sam.pos: rseq-reads.hicov.fq.sam
 	./sam-scan.py rna.fa rseq-reads.hicov.fq.sam -o rseq-reads.hicov.fq.sam.pos
 
 rseq_compare6.txt: rseq-reads.hicov.cor.sam.pos rseq-reads.hicov.fq.sam.pos
-	./summarize-pos-file.py rseq-reads.hicov.fq.sam.pos rseq-reads.hicov.fq > rseq_compare5.txt
-	./summarize-pos-file.py rseq-reads.hicov.cor.sam.pos rseq-reads.hicov.cor.fq.gz >> rseq_compare5.txt
+	./summarize-pos-file.py rseq-reads.hicov.fq.sam.pos rseq-reads.hicov.fq > rseq_compare6.txt
+	./summarize-pos-file.py rseq-reads.hicov.cor.sam.pos rseq-reads.hicov.cor.fq.gz >> rseq_compare6.txt
 
 rseq_compare6: rseq_compare6.txt
-	cat rseq_compare5.txt
+	cat rseq_compare6.txt
 
 rseq-mapped.fq.gz.errhist: rseq-mapped.fq.gz
 	$(KHMER)/sandbox/calc-error-profile.py rseq-mapped.fq.gz
