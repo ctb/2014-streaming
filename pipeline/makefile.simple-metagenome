@@ -25,7 +25,7 @@ simple-metagenome-sam-mismatches.pos: simple-metagenome-reads.sam
 	./sam-scan.py simple-metagenome.fa simple-metagenome-reads.sam -o simple-metagenome-sam-mismatches.pos
 
 simple-metagenome-reads.fa.abundtrim: simple-metagenome-reads.fa
-	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 5 simple-metagenome-reads.fa
+	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 simple-metagenome-reads.fa
 
 simple-metagenome-abundtrim.sam: simple-metagenome-reads.fa.abundtrim \
 	simple-metagenome-reads.sam

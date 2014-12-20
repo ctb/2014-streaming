@@ -58,7 +58,7 @@ simple-genome-reads.covdict: simple-genome-reads.sam
 	./sam-scan-to-coverage-dict.py simple-genome.fa simple-genome-reads.sam simple-genome-reads.covdict simple-genome-reads.covhist
 
 simple-genome-reads.fa.abundtrim: simple-genome-reads.fa
-	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 20 -C 5 simple-genome-reads.fa
+	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 20 -C 3 simple-genome-reads.fa
 
 simple-genome-abundtrim.sam: simple-genome-reads.fa.abundtrim \
 	simple-genome-reads.sam

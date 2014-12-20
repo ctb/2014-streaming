@@ -648,33 +648,64 @@ Mbp of the original 500 Mbp (12.4\%).
 % output of 'make rseq-mapped.fq.gz.abundtrim'
 %
 % read 791687 reads, 60168212 bp
-% wrote 763468 reads, 18611587 bp
+% wrote 763468 reads, 56846899 bp
 % removed 28219 reads and trimmed 70260 reads
-% trimmed or removed 69.07% of bases (41556625 total)
-% skipped 531046 reads/2124184 bases because of low coverage
+% looked at 617297 reads twice
+% trimmed or removed 5.52% of bases (3321313 total)
+% skipped 531046 reads/40359496 bases because of low coverage
 
 % rseq_compare5.txt
 % rseq_compare5b.txt
 
-@ mrna
-
 % output of 'make podar-mapped.fq.gz.abundtrim'
 % 
 % read 4667491 reads, 471416591 bp
-% wrote 4661668 reads, 56712761 bp
+% wrote 4661668 reads, 470184476 bp
 % removed 5823 reads and trimmed 21231 reads
-% trimmed or removed 87.97% of bases (414703830 total)
-% skipped 4262595 reads/17050380 bases because of low coverage
-% output in *.abundtrim
-% fp rate estimated to be 0.007
+% looked at 4565119 reads twice
+% trimmed or removed 0.26% of bases (1232115 total)
+% skipped 4262595 reads/430522095 bases because of low coverage
 
 % podar-report-untrim.txt
 % podar-report-trim.txt
 
-@ real metagenome
+
+On the mouse mRNAseq data set, streaming error trimming removed 28,219
+reads and trimmed 70,260 reads, removing 5.52\% of the total bases,
+bringing the overall error rate from 2.1\% to 1.8\%.  When we measured
+only the error rates in the high-coverage reads that were subject to
+trimming, trimming brought the error rate from 1.6\% to 0.66\%.
+On the mock metagenome data set, 5823 reads were removed and 21,231
+reads were trimmed, removing 0.26\% of bases; this low percentage is
+because of the very low coverage of most of the reads in this data set.
+XXX
 
 \subsection{Illumina error rates and error profiles can be determined from a
 small sample of sequencing data}
+
+\begin{figure}[!ht]
+ \centerline{\includegraphics[width=4in]{./figures/ecoli-errhist}}
+\caption{Error spectrum of reads in the {\em E. coli} data set. The
+  k-mer spectrum based analysis is calculated based on saturation of a
+  fraction of the data set, while bowtie2 mismatches are based on all
+  mapped reads.  The y values for the k-mer spectral analysis are
+  scaled by a factor of four for ease of comparison.}
+\label{fig:ecoli_err}
+\end{figure}
+
+\begin{figure}[!ht]
+ \centerline{\includegraphics[width=4in]{./figures/rseq-errhist}}
+\caption{Error spectrum of reads in the mouse RNAseq data set. The
+  k-mer spectrum based analysis is calculated based on saturation of a
+  fraction of the data set, while bowtie2 mismatches are based on all
+  mapped reads. The peak of errors at position 34 in the bowtie2
+  mapping reflects Ns that are ignored by the spectral error analysis;
+  the peak at 69 is a mixture of Ns and random errors, so is detected
+  by both mismatch analysis and spectral error analysis.  See text for
+  details.  Note, the y values for the k-mer spectral analysis are
+  scaled by a factor of four for ease of comparison.  }
+\label{fig:rseq_err}
+\end{figure}
 
 With Illumina sequencing, average and per-position error rates may
 vary between sequencing runs, but are typically systematic within a

@@ -1,6 +1,7 @@
 ECOLI_K=20
 
-ecoli: ecoli-report.txt ecoli-report-nodn.txt ecoli-mapped.fq.gz.errhist
+ecoli: ecoli-report.txt ecoli-report-nodn.txt ecoli-mapped.fq.gz.errhist \
+	ecoli-reads.sam.errhist
 
 # bowtie index for ecoliMG1655.fa
 ecoli.1.bt2: ecoliMG1655.fa
@@ -53,7 +54,7 @@ ecoli-stream-report.txt: ecoli-stream-mismatches.pos ecoli-reads.sam.pos
 # ecoli-mapped.fq.gz.abundtrim contains the k-mer abundance trimmed
 # reads, produced by trim-low-abund (streaming k-mer abundance trimming)
 ecoli-mapped.fq.gz.abundtrim: ecoli-mapped.fq.gz
-	$(KHMER)/sandbox/trim-low-abund.py -k $(ECOLI_K) -Z 20 -C 5 -x 1e8 -N 4 ecoli-mapped.fq.gz
+	$(KHMER)/sandbox/trim-low-abund.py -k $(ECOLI_K) -Z 20 -C 3 -x 1e8 -N 4 ecoli-mapped.fq.gz
 
 # ecoli-abundtrim.sam is the mapping of the abundance-trimmed reads to the
 # reference genome.
