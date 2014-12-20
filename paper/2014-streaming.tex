@@ -193,21 +193,24 @@ digitally normalized reads.  The specificities were also comparable --
 43.5\% using the raw counts, and 42.9\% using the digitally normalized
 counts.
 
+% make ecoli-report.txt
+% make ecoli-nodn-report.txt
+
 \begin{table}
 \begin{tabular}{|l|c|c|}
 \hline
 (E. coli) & Raw counts & Diginorm counts \\
 \hline
-Distinct k-mers & XXX & YYY \\
+Distinct k-mers         & 39,677,503 & 26,296,651 (66\%) \\
 \hline
-Perfect detection (TP) & 818,503 & 807,367 \\
-No errors (TN) & 2,797,925 & 2,797,254 \\
-Miscalled errors (FP) & 1,039,052 & 1,046,402 \\
-Mispredicted errors (FP) & 25,499 & 26,170 \\
-Missed errors (FN) & 319,021 & 322,807 \\
+Perfect detection (TP)  & 1,042,325 & 1,030,787 \\
+No errors (TN)          & 2,782,265 & 2,782,413 \\
+Miscalled errors (FP)   & 1,133,049 & 1,140,148 \\
+Mispredicted errors (FP)& 474       & 326       \\
+Missed errors (FN)      & 2,135     & 6,574     \\
 \hline
-Sensitivity & 72.0\% & 71.4\% \\
-Specificity & 43.5\% & 42.9\% \\
+Sensitivity & 99.8\% & 99.4\% \\
+Specificity & 47.9\% & 47.5\% \\
 \hline
 \end{tabular}
 \label{tab:ecoli_dn_counts}
@@ -223,15 +226,15 @@ Specificity & 43.5\% & 42.9\% \\
 While the results above suggest that simple spectral error detection
 works equally well both before and after digital normalization, we
 wanted to see if we could successfully perform a full error {\em
-  correction} after digital normalization.  To evaluate this, we applied
-the Quake error corrector to the data.  Because Quake permits the use
-of a different k-mer counting table from the data being corrected,
-we separately used the counts from the raw reads and the counts from
-the digitally normalized reads to correct the raw reads (see Methods
-for details).
+  correction} after digital normalization.  To evaluate this, we
+applied the Quake error corrector to the data.  Because Quake permits
+the use of a different k-mer counting table from the data being
+corrected, we separately used the counts from the raw reads and the
+digitally normalized reads to correct the raw reads, and compared the
+results (see Methods for details).
 
 The results of running Quake on the raw data using counts from the raw
-or digitally normalized data are shown in Table~\ref{tab:quake_ecoli}.
+and digitally normalized data are shown in Table~\ref{tab:quake_ecoli}.
 The performance was essentially the same: Quake brought the overall
 error rate in the data set from 1.60\% (8.0m errors) to
 0.005\%-0.006\% (23,000 - 29,000 errors).
@@ -294,19 +297,28 @@ abundance of 20 or greater were examined (see Methods).
 \hline
 & simple metagenome & simple mRNAseq \\
 \hline
-Low coverage reads & 93 & 44 \\
+K-mer coverage threshold & 20 & 20 \\
+Total reads & 2347 & 568 \\
+High coverage reads & 2254 (96.0\%) & 524 (92.3\%) \\
 \hline
 Perfect detection (TP) & 978 & 228 \\
 No errors (TN) & 1098 & 235 \\
-Miscalled errors (FP) & 176 & 52 \\
+Miscalled errors (FP) & 170 & 52 \\
 Mispredicted errors (FP) & 6 & 9 \\
 Missed errors (FN) & 2 & 0 \\
 \hline
-Sensitivity & 99.9\% & 100\% \\
+Sensitivity & 99.8\% & 100\% \\
 Specificity & 84.7\% & 78.9\% \\
 \hline
 \end{tabular}
 \label{tab:spectra_variable}
+
+\caption{Variable coverage spectral error detection on two synthetic
+  data sets, a simple metagenome and a simple mRNAseq data set.
+  Per-read coverage was estimated by median k-mer abundance within the
+  read, and only the reads with estimated coverage at or above the
+  specified threshold were analyzed.  Digitally normalized counts were
+  used for the spectral error analysis.}
 \end{table}
 
 The results of running error detection on the synthetic metagenome and
@@ -338,24 +350,48 @@ specificity with the same parameters; Table~\ref{tab:a}).
 \hline
 & Mock metagenome & mouse mRNAseq \\
 \hline
-Low coverage reads & 93 & 658,814 \\
+K-mer coverage threshold   & 10              & 20 \\
+Total reads                & 4,667,491       & 791,687 \\
+High coverage reads        & 404,896 (8.7\%) & 260,641 (32.9\%) \\
 \hline
-Perfect detection (TP) & 978 & 71,315 \\
-No errors (TN) & 1098 & 203,741 \\
-Miscalled errors (FP) & 176 & 23,391 \\
-Mispredicted errors (FP) & 6 & 24,464 \\
-Missed errors (FN) & 2 & 18,275 \\
+Perfect detection (TP)     & 11,743          & 71,315 \\
+No errors (TN)             & 366,253         & 203,741 \\
+Miscalled errors (FP)      & 3,911           & 23,391 \\
+Mispredicted errors (FP)   & 21,750          & 24,464 \\
+Missed errors (FN)         & 1239            & 18,275 \\
 \hline
-Sensitivity & 99.9\% & 79.6\% \\
-Specificity & 84.7\% & 59.8\% \\
+Sensitivity & 90.5\% & 79.6\% \\
+Specificity & 31.4\% & 59.8\% \\
 \hline
 \end{tabular}
 \label{tab:spectra_variable_real}
+
+\caption{The results of variable coverage spectral error correction on
+  two real variable coverage data sets, a mock shotgun metagenome and
+  a mouse mRNAseq data set. Per-read coverage was estimated by median
+  k-mer abundance within the read, and only the reads with estimated
+  coverage at or above the specified threshold were analyzed.
+  Digitally normalized counts were used for the spectral error analysis.}
+
 \end{table}
 
 \paragraph{Mock metagenome data:}
 
+% podar-report.txt
+
+To evaluate variable coverage spectral error analysis on real data, we
+applied our approach to 5m reads from a diverse mock community data
+set (Shakya et al., 2013). We used a coverage threshold of 10 for
+digital normalization, and found that of the 5m reads, 404,896 were at
+or above this coverage threshold.  After calling errors in the reads
+by mapping them back to the known genomes, we used spectral analysis
+to identify putative errors.  The results are shown in
+Table~\ref{tab:spectra_variable_real}, second column.  We achieve
+90.5\% sensitivity and 41.4\% specificity on the 404,896 reads.
+
 \paragraph{mRNAseq data:}
+
+% rseq_compare2.txt
 
 We next applied variable coverage spectral error analysis to 1m mouse
 mRNAseq reads (cite Trinity), with the same parameters as above.  Here
@@ -367,21 +403,27 @@ reads in this data set.
 
 \paragraph{Error correcting variable coverage data with Quake:}
 
+% rseq_compare6.txt
+
 There are many sophisticated error correction algorithms implemented
-for shotgun genome data, but relatively few work directly on
-variable coverage data such as mRNAseq.  However, it should be possible
-to apply genomic error correction to the high coverage components
-of data sets after digital normalization.
+for shotgun genome data, but relatively few work directly on variable
+coverage data such as mRNAseq.  It should be possible to apply {\em
+  any} genomic error correction to the high coverage components of
+data sets after digital normalization.
 
-To evaluate this, we applied Quake to the high coverage mRNAseq
-reads.  We first extracted the 340,140 reads with estimated
-high coverage (median k-mer coverage greater than or equal to 20)
-from the mouse mRNAseq data set, and then digitally normalized the
-data.  We next applied the Quake error corrector to the unnormalized
-reads using the k-mer counts from the normalized reads, as with the
-{\em E. coli} data set.
+To evaluate this, we used Quake to error correct the high coverage
+mRNAseq reads.  We first extracted the 260,641 reads with estimated
+coverage greater than or equal to 20 from the mouse mRNAseq data set,
+and then digitally normalized the data.  We next applied the Quake
+error corrector to the unnormalized high-coverage reads using the
+k-mer counts from the normalized reads, as with the {\em E. coli} data
+set.  Quake discarded 23,606 reads and corrected the remainder.
 
-ZZZ.
+We evaluated the corrected reads by mapping them against the mouse
+transcriptome, and found that, for the reads that Quake did not discard,
+Quake had reduced the overall
+error rate from 1.28\% (230,125 mismatches in 18,012,456 bp total) to
+0.43% (74,797 in 17,254,585 total).
 
 \subsection{A streaming algorithm for error analysis}
 
@@ -476,6 +518,13 @@ Specificity & 76.4\% & 84.4\% & 78.9\% \\
 \hline
 \end{tabular}
 \label{tab:spectra_streaming}
+
+\caption{Results from applying streaming error detection to the same
+  synthetic data sets as in Table~\ref{tab:a} and
+  Table~\ref{tab:spectra_variable}.  Number of passes is the average
+  number of times each read in the data set was examined; numbers in
+  parentheses give the difference between these numbers and the
+  previous results.}
 \end{table}
 
 When we apply this streaming approach to the simulated reads from the
@@ -488,7 +537,7 @@ and ``simple mRNAseq'' data sets, we obtain nearly identical and
 identical results, respectively, with the streaming approach; due to
 differences in the order in which reads are examined, the simple
 metagenome fails to detect one true positive and erroneously finds
-errrors in three extra reads.  On the metagenome, 380 of 2347 (16.2\%) of
+errors in three extra reads.  On the metagenome, 380 of 2347 (16.2\%) of
 the reads are examined twice, and on the mRNAseq data set, 33.1\% of the
 reads are examined twice.
 
@@ -498,19 +547,40 @@ reads are examined twice.
 
 % podar-stream-report.txt
 
+\begin{table}
+\begin{tabular}{|l|c||c||c|}
+\hline
+& {\em E. coli} & mock metagenome & mouse mRNAseq \\
+\hline
+Number of passes & xx & yy & zz \\
+\hline
+Perfect detection (TP)   & 1,033,261 & 11,726  & 91,133 \\
+No errors (TN)           & 2,781,961 & 364,627 & 140,461 \\
+Miscalled errors (FP)    & 1,138,940 & 3,951   & 20,742 \\
+Mispredicted errors (FP) & 778       & 23,376  & 1721 \\
+Missed errors (FN)       & 5308      & 1216    & 6584 \\
+\hline
+Sensitivity            & 99.5\%      & 90.6\%  & 93.3\% \\
+Specificity            & 47.6\%      & 30.0\%  &  80.2\% \\
+\hline
+\end{tabular}
+\label{tab:spectra_streaming_real}
 
+\caption{Results from applying streaming error detection to the same
+  real data sets as in Table~\ref{tab:ecoli_dn_counts} and
+  Table~\ref{tab:spectra_variable_real}.  Number of passes is the average
+  number of times each read in the data set was examined; unless noted in
+  parantheses, numbers were within 1\% of non-streaming results.}
+\end{table}
 
-@@ apply to E. coli?
-
-% rseq_compare6.txt - error correction.
-
-@mrna error correction
+\subsection{A streaming algorithm for error trimming}
 
 \begin{table}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
 Sample & raw read M & normalized read M & first pass N & second pass N \\
 simple genome & 11,857 & 5,972 (50.4\%) & 1000 & 320 (32.0\%) \\
+{\em E. coli} & & & 4,960,248 & 1,623,010 (32.7\%) \\
 \hline
 \end{tabular}
 \label{tab:streaming_counts}
@@ -521,9 +591,6 @@ of 20 and a coverage cutoff of 20.  Digital normalization reduces the
 total number of k-mers being tracked, while the streaming algorithm
 looks at the majority of reads only once.}
 \end{table}
-
-
-\subsection{A streaming algorithm for error trimming}
 
 Once errors can be {\em detected} with a streaming algorithm, it is
 simple to extend the algorithm to {\em remove} errors from reads,
@@ -555,32 +622,51 @@ were eliminated, bringing the overall per-base error rate from 0.62\% to
 final error rate was 0.07\%.
 
 % ecoli-report-untrim.txt ('make ecoli-report-untrim.txt')
-%posfile ecoli-reads.sam.pos: 2176576 mutated reads of 5000000; 7952048 mutations total
-%500000000 bp total
-%overall error rate: 1.590410%
+%posfile ecoli-reads.sam.pos: 2177509 mutated reads of 4960248; 7990149 mutations total
+%496024800 bp total
+%overall error rate: 1.610837%
 
 % ecoli-report-trim.txt ('make ecoli-report-trim.txt')
-%posfile ecoli-abundtrim.sam.pos: 171582 mutated reads of 4878226; 198192 mutations total
-%435223632 bp total
-%overall error rate: 0.045538%
+%posfile ecoli-abundtrim.sam.pos: 164655 mutated reads of 4861345; 203345 mutations total
+%434621201 bp total
+%overall error rate: 0.046787%
 
-% output of make ecoli_ref-5m.fastq.gz.abundtrim
-%read 5000000 reads, 500000000 bp
-%wrote 4878226 reads, 435223632 bp
-%removed 121774 reads and trimmed 2046584 reads
-%trimmed or removed 12.96% of bases (64776368 total)
-%output in *.abundtrim
+% output of 'make ecoli-mapped.fq.gz.abundtrim'
+%
+% read 4960248 reads, 496024800 bp
+% wrote 4861345 reads, 434621201 bp
+% removed 98903 reads and trimmed 2030456 reads
+% trimmed or removed 12.38% of bases (61403599 total)
+% fp rate estimated to be 0.004
 
 Applying the streaming error trimming to the E. coli MG1655 data set
-used in section XXX, we trimmed 2.0m reads and removed nearly 122,000
-reads entirely.  Of 7.6m errors, all but 198,000 were removed,
-bringing the error rate from 1.60\% to 0.5\%.  Trimming discarded 64
-Mbp of the original 500 Mbp (13.0\%).
+used in section XXX, we trimmed 2.0m reads and removed 98,903
+reads entirely.  Of 8.0m errors, all but 203,345 were removed,
+bringing the error rate from 1.60\% to 0.05\%.  Trimming discarded 61
+Mbp of the original 500 Mbp (12.4\%).
+
+% output of 'make rseq-mapped.fq.gz.abundtrim'
+%
+% read 791687 reads, 60168212 bp
+% wrote 763468 reads, 18611587 bp
+% removed 28219 reads and trimmed 70260 reads
+% trimmed or removed 69.07% of bases (41556625 total)
+% skipped 531046 reads/2124184 bases because of low coverage
 
 % rseq_compare5.txt
 % rseq_compare5b.txt
 
 @ mrna
+
+% output of 'make podar-mapped.fq.gz.abundtrim'
+% 
+% read 4667491 reads, 471416591 bp
+% wrote 4661668 reads, 56712761 bp
+% removed 5823 reads and trimmed 21231 reads
+% trimmed or removed 87.97% of bases (414703830 total)
+% skipped 4262595 reads/17050380 bases because of low coverage
+% output in *.abundtrim
+% fp rate estimated to be 0.007
 
 % podar-report-untrim.txt
 % podar-report-trim.txt

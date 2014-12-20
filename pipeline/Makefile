@@ -198,9 +198,6 @@ podar:  podar.1.bt2 \
 
 podar1: podar-report.txt podar-report-trim.txt podar-report-untrim.txt
 
-podar-report.txt: podar-reads.errors.pos podar-reads.sam.pos
-	./compare-pos.py -V podar-reads.errors.pos podar-reads.sam.pos podar-mapped.fq.gz >podar-report.txt
-
 podar.1.bt2: podar-ref.fa
 	bowtie2-build podar-ref.fa podar
 	samtools faidx podar-ref.fa
@@ -218,7 +215,10 @@ podar.dn.kh: podar-mapped.fq.gz
 	 normalize-by-median.py -x 4e8 -N 4 -k 20 -C 10 -s podar.dn.kh podar-mapped.fq.gz -R podar-dn-report.txt
 
 podar-reads.errors.pos: podar-mapped.fq.gz podar.dn.kh
-	 ./report-errors-by-read.py -V --coverage 10 podar.dn.kh podar-mapped.fq.gz > podar-reads.errors.pos 	
+	 ./report-errors-by-read.py -V --coverage 10 podar.dn.kh podar-mapped.fq.gz > podar-reads.errors.pos
+
+podar-report.txt: podar-reads.errors.pos podar-reads.sam.pos
+	./compare-pos.py -V podar-reads.errors.pos podar-reads.sam.pos podar-mapped.fq.gz >podar-report.txt
 
 podar-stream-mismatches.pos: podar-mapped.fq.gz
 	./calc-errors-few-pass.py -V -x 4e8 -N 4 -k 20 -Z 10 podar-mapped.fq.gz > podar-stream-mismatches.pos
@@ -227,7 +227,7 @@ podar-stream-report.txt: podar-stream-mismatches.pos podar-reads.sam.pos
 	./compare-pos.py -V podar-stream-mismatches.pos podar-reads.sam.pos podar-mapped.fq.gz > podar-stream-report.txt
 
 podar-mapped.fq.gz.abundtrim: podar-mapped.fq.gz
-	$(KHMER)/sandbox/trim-low-abund.py -k 20 -Z 10 -C 3 -x 4e8 -N 4 podar-mapped.fq.gz
+	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 10 -C 3 -x 4e8 -N 4 podar-mapped.fq.gz
 
 podar-abundtrim.sam: podar-mapped.fq.gz.abundtrim
 	bowtie2 -p 4 -x podar -U podar-mapped.fq.gz.abundtrim -S podar-abundtrim.sam

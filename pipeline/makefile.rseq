@@ -2,13 +2,7 @@ rseq: rseq_compare2 rseq_compare4 rseq_compare5 \
 	rseq-reads-hicov-sam-mismatches-report.txt \
 	rseq-mapped.fq.gz.errhist rseq-reads.sam.errhist \
 	rseq-reads.hicov.cor.fq.gz \
-	rseq_compare6
-
-rseq_compare2: rseq_compare2.txt
-	cat rseq_compare2.txt
-
-rseq_compare2.txt: rseq-errors.pos rseq-sam-mismatches.pos
-	./compare-pos.py -V rseq-errors.pos rseq-sam-mismatches.pos rseq-mapped.fq.gz > rseq_compare2.txt
+	rseq_compare6 rseq-reads.hicov.fq.keep.hist
 
 rseq-reads.fq.gz: mouse-5m.fq.gz
 	gunzip -c mouse-5m.fq.gz | head -4000000 | gzip -9c > rseq-reads.fq.gz
@@ -26,17 +20,26 @@ rseq-sam-mismatches.pos: rseq-reads.sam
 rseq-mapped.fq.gz: rseq-reads.sam
 	./extract-sam-seqs-to-fq.py rseq-reads.sam rseq-reads.fq.gz | gzip > rseq-mapped.fq.gz
 
-rseq-errors.pos: rseq-reads.dn.kh
-	./report-errors-by-read.py -V --coverage 20 rseq-reads.dn.kh rseq-mapped.fq.gz -o rseq-errors.pos
-
 rseq-reads.dn.kh: rseq-mapped.fq.gz
 	normalize-by-median.py -k 20 -C 20 rseq-mapped.fq.gz -s rseq-reads.dn.kh -x 1e8 -N 4
+
+rseq-errors.pos: rseq-reads.dn.kh rseq-mapped.fq.gz
+	./report-errors-by-read.py -V --coverage 20 rseq-reads.dn.kh rseq-mapped.fq.gz -o rseq-errors.pos
+
+rseq_compare2: rseq_compare2.txt
+	cat rseq_compare2.txt
+
+rseq_compare2.txt: rseq-errors.pos rseq-sam-mismatches.pos
+	./compare-pos.py -V rseq-errors.pos rseq-sam-mismatches.pos rseq-mapped.fq.gz > rseq_compare2.txt
 
 rseq-reads.hicov.fq: rseq-mapped.fq.gz rseq-reads.dn.kh
 	$(KHMER)/sandbox/slice-reads-by-coverage.py -m 20 rseq-reads.dn.kh rseq-mapped.fq.gz rseq-reads.hicov.fq
 
 rseq-reads.hicov.fq.keep: rseq-reads.hicov.fq
-	normalize-by-median.py -k 20 -C 20 -x 1e8 -N 4 rseq-reads.hicov.fq
+	normalize-by-median.py -k 20 -C 20 -x 1e8 -N 4 rseq-reads.hicov.fq -s rseq-reads.hicov.fq.dn.kh
+
+rseq-reads.hicov.fq.keep.hist: rseq-reads.hicov.fq.keep
+	abundance-dist.py -s rseq-reads.hicov.fq.dn.kh rseq-reads.hicov.fq.keep rseq-reads.hicov.fq.keep.hist
 
 rseq-reads.hicov.fq.sam: rseq-reads.hicov.fq rseq.1.bt2
 	bowtie2 -p 4 -x rseq -U rseq-reads.hicov.fq -S rseq-reads.hicov.fq.sam
@@ -102,11 +105,11 @@ rseq-abundtrim-sam-mismatches.pos: rseq-abundtrim.sam
 	./sam-scan.py rna.fa rseq-abundtrim.sam -o rseq-abundtrim-sam-mismatches.pos
 
 rseq-reads.hicov.cor.fq.gz: rseq-reads.hicov.fq rseq-reads.hicov.fq.keep
-	echo rseq-reads.hicov.fq > quake_list.txt
+	echo rseq-reads.hicov.fq > rseq_quake_list.txt
 	ln -fs /usr/local/bin/jellyfish .
 	cat rseq-reads.hicov.fq.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > rseq_dn_counts.out
 	$(QUAKE)/bin/cov_model.py rseq_dn_counts.out > rseq_dn_counts.cov
-	$(QUAKE)/bin/correct -f quake_list.txt -p 4 -k 14 -q 33 -c 6.26 -z -m rseq_dn_counts.out
+	$(QUAKE)/bin/correct -f rseq_quake_list.txt -p 4 -k 14 -q 33 -c 6.26 -z -m rseq_dn_counts.out
 
 rseq-reads.hicov.cor.sam: rseq-reads.hicov.cor.fq.gz
 	gunzip -c rseq-reads.hicov.cor.fq.gz | bowtie2 -p 4 -x rseq -U - -S rseq-reads.hicov.cor.sam
@@ -117,8 +120,13 @@ rseq-reads.hicov.cor.sam.pos: rseq-reads.hicov.cor.sam
 rseq-reads.hicov.fq.sam.pos: rseq-reads.hicov.fq.sam
 	./sam-scan.py rna.fa rseq-reads.hicov.fq.sam -o rseq-reads.hicov.fq.sam.pos
 
+rseq-reads.hicov.cor.sorted.bam: rseq-reads.hicov.cor.sam
+	samtools import rna.fa.fai rseq-reads.hicov.cor.sam rseq-reads.hicov.cor.bam
+	samtools sort rseq-reads.hicov.cor.bam rseq-reads.hicov.cor.sorted
+	samtools index rseq-reads.hicov.cor.sorted.bam
+
 rseq_compare6.txt: rseq-reads.hicov.cor.sam.pos rseq-reads.hicov.fq.sam.pos
-	./summarize-pos-file.py rseq-reads.hicov.fq.sam.pos rseq-reads.hicov.fq > rseq_compare6.txt
+	./summarize-pos-file.py rseq-reads.hicov.fq.sam.pos rseq-reads.hicov.fq > rseq_compare6.txt --limitreads rseq-reads.hicov.cor.sam.pos
 	./summarize-pos-file.py rseq-reads.hicov.cor.sam.pos rseq-reads.hicov.cor.fq.gz >> rseq_compare6.txt
 
 rseq_compare6: rseq_compare6.txt

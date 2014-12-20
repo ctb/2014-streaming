@@ -86,3 +86,7 @@ ecoli-mapped.fq.gz.errhist: ecoli-mapped.fq.gz
 
 ecoli-reads.sam.errhist: ecoli-reads.sam ecoliMG1655.fa
 	./sam-scan-errhist.py ecoliMG1655.fa ecoli-reads.sam -o ecoli-reads.sam.errhist
+
+ecoli-counts.txt: ecoli-mapped.fq.gz ecoli_ref.dn.kh ecoli-mapped.fq.gz.keep
+	$(KHMER)/sandbox/unique_kmers.py ecoli-mapped.fq.gz $(ECOLI_K) > ecoli-counts.txt
+	$(KHMER)/sandbox/unique_kmers.py ecoli-mapped.fq.gz.keep $(ECOLI_K) >> ecoli-counts.txt

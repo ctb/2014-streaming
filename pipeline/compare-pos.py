@@ -82,7 +82,8 @@ def main():
             o += 1
 
     print 'total # of reads analyzed: %d' % (len(a),)
-    print 'IGNORED due to -V:', n_ignored
+    print 'IGNORED due to -V: %d (%d, %.2f%%)' % (n_ignored, len(a) - n_ignored,
+               float(len(a) - n_ignored) / float(len(a)) * 100.)
     print '%d erroneous reads in %s' % (n, args.pos_a)
     print '%d erroneous reads in %s' % (o, args.pos_b)
     print '%d reads in common => all error positions AGREE' % (m,)
