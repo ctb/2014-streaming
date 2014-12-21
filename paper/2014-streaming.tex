@@ -57,8 +57,8 @@ and amplified genomic DNA.
 \subsection{Coverage-normalized data can be used to locate
 and correct errors in high-coverage shotgun sequencing data}
 
-Our initial question was whether spectral error analysis could be
-applied to genomic short read data after digital normalization.  We
+Our initial question was whether we could apply spectral error analysis
+to genomic short read data after digital normalization.  We
 tested this on a synthetic data set and an {\em E. coli} data set.  We
 then compared the performance of Quake on the raw and digitally
 normalized counts from the {\em E. coli data}.
@@ -255,26 +255,45 @@ Quake, despite having many fewer distinct k-mers.
 \subsection{Coverage-normalized data can be used to locate errors in variable
 coverage shotgun sequencing data}
 
-One of the drawbacks of spectral abundance analysis is that it cannot
-be directly applied to data with uneven coverage.  For example,
-metagenomic or transcriptomic data sets typically contain reads from
-both high-abundance and low-abundance molecules.  This variability in
-coverage confounds naive spectral analysis for two reasons: first,
-erroneous k-mers from very high abundance regions can accumulate and
-increase in abundance over the threshold for trusted k-mers, thus
-appearing to be correct; and second, correct reads from low coverage
-regions yield k-mers below the trusted k-mer threshold and appear to
-be incorrect.  In practice, therefore, error analysis for
-metagenomic and transcriptome data uses other approaches.
+Digital normalization works on both genomic data, with even coverage,
+and variable coverage data such as transcriptome and metagenome data
+(cite diginorm, elijah).  However, one of the drawbacks of spectral
+abundance analysis is that it cannot be directly applied to data with
+uneven coverage.  For example, metagenomic or transcriptomic data sets
+typically contain reads from both high-abundance and low-abundance
+molecules.  This in turn leads to high coverage and low coverage
+reads. Variability in coverage confounds naive spectral analysis
+for two reasons: first, erroneous k-mers from very high abundance
+regions can accumulate and increase in abundance over the threshold
+for trusted k-mers, thus appearing to be correct; and second, correct
+reads from low coverage regions yield k-mers below the trusted k-mer
+threshold that appear to be incorrect.  In practice, therefore, error
+analysis for metagenomic and transcriptome data uses other approaches
+than direct spectral error analysis.
+
+Using digital normalization, we developed a general approach that
+enables spectral error analysis to be used for variable coverage
+data.  We then applied this to two synthetic data sets as well as two
+real data sets, a mock shotgun metagenome and mRNAseq data from
+mouse.
+
+\begin{figure}[!ht]
+ \centerline{\includegraphics[width=3in]{./figures/coverage-aware-spectrum}}
+\caption{Coverage-normalized spectral error analysis.  Reads are normalized,
+and high-coverage reads are subjected to spectral error analysis with the
+normalized counts, while low-coverage reads are ignored.}
+\label{fig:covaware}
+\end{figure}
+
+\paragraph{Coverage-normalized spectral error analysis:}
 
 Using digital normalization, we should be able to address both of these
 problems.  First, by applying digital normalization to variable
 coverage data and then working only with the k-mer counts from the
 normalized reads, we can avoid counting high abundance errors.
 And second, by ignoring reads with a low estimated coverage, we can
-avoid misclassifying true low-abundance k-mers (Figure XXX).
-
-% @algorithm?
+avoid misclassifying true low-abundance k-mers.  The process
+is shown in  Figure~\ref{fig:covaware}.
 
 % @graph with read abundance spectrum, showing which reads we will
 % call errors in.
@@ -377,17 +396,18 @@ Specificity & 31.4\% & 59.8\% \\
 
 \paragraph{Mock metagenome data:}
 
-% podar-report.txt
+% podar_compare2.txt
 
-To evaluate variable coverage spectral error analysis on real data, we
-applied our approach to 5m reads from a diverse mock community data
-set (Shakya et al., 2013). We used a coverage threshold of 10 for
-digital normalization, and found that of the 5m reads, 404,896 were at
-or above this coverage threshold.  After calling errors in the reads
-by mapping them back to the known genomes, we used spectral analysis
-to identify putative errors.  The results are shown in
+To evaluate variable coverage spectral error analysis on real data
+(albeit from a synthetic community), we applied our approach to 5m
+reads from a diverse mock community data set (Shakya et al., 2013). We
+used a coverage threshold of 10 for digital normalization, and found
+that of the 5m reads, 404,896 were at or above this coverage
+threshold.  After calling errors in the reads by mapping them back to
+the known genomes, we used spectral analysis to identify putative
+errors.  The results are shown in
 Table~\ref{tab:spectra_variable_real}, second column.  We achieve
-90.5\% sensitivity and 41.4\% specificity on the 404,896 reads.
+90.5\% sensitivity and 41.4\% specificity on the high coverage reads.
 
 \paragraph{mRNAseq data:}
 
@@ -398,7 +418,7 @@ mRNAseq reads (cite Trinity), with the same parameters as above.  Here
 errors were again calculated by mapping the reads to the known
 reference and finding mismatches. The results are shown in
 Table~\ref{tab:spectra_variable_real}, third column.  We achieve
-79.6\% sensitivity and 59.8\% specificity on the 340,000 high coverage
+92.9\% sensitivity and 80.7\% specificity on the 340,000 high coverage
 reads in this data set.
 
 \paragraph{Error correcting variable coverage data with Quake:}
@@ -408,65 +428,70 @@ reads in this data set.
 There are many sophisticated error correction algorithms implemented
 for shotgun genome data, but relatively few work directly on variable
 coverage data such as mRNAseq.  It should be possible to apply {\em
-  any} genomic error correction to the high coverage components of
-data sets after digital normalization.
+  any} genomic error correction algorithm to the high coverage
+components of data sets after digital normalization.
 
-To evaluate this, we used Quake to error correct the high coverage
-mRNAseq reads.  We first extracted the 260,641 reads with estimated
-coverage greater than or equal to 20 from the mouse mRNAseq data set,
-and then digitally normalized the data.  We next applied the Quake
-error corrector to the unnormalized high-coverage reads using the
-k-mer counts from the normalized reads, as with the {\em E. coli} data
-set.  Quake discarded 23,606 reads and corrected the remainder.
+To evaluate this, we tried using Quake, a genomic error corrector, to
+correct the high coverage mRNAseq reads.  We first extracted the
+260,641 reads with estimated coverage greater than or equal to 20 from
+the mouse mRNAseq data set, and then digitally normalized the data.
+We next applied the Quake error corrector to the unnormalized
+high-coverage reads using the k-mer counts from the normalized reads,
+as with the {\em E. coli} data set.  Quake discarded 23,606 reads and
+corrected the remainder.
 
 We evaluated the corrected reads by mapping them against the mouse
 transcriptome, and found that, for the reads that Quake did not discard,
 Quake had reduced the overall
 error rate from 1.28\% (230,125 mismatches in 18,012,456 bp total) to
-0.43% (74,797 in 17,254,585 total).
+0.43\% (74,797 in 17,254,585 total).  As with the {\em E. coli} correction
+above, this suggests that sufficient information remains in the digitally
+normalized data to do error correction.
 
 \subsection{A streaming algorithm for error analysis}
 
-Even with digital normalization, the spectral error detection approach
-outlined above is a 2-pass offline algorithm for any given data set -
-the first pass normalizes the read set and records the k-mer
-abundances, while the second pass examines the reads.  A streaming
-approach could avoid some or all of a second pass, leading to
-greater efficiency.
+The spectral error detection approach outlined above is a 2-pass
+offline algorithm for any given data set - the first pass normalizes
+the read set and records the k-mer abundances, while the second pass
+analyzes the reads for low-abundance k-mers.  Even with digital
+normalization reducing the number of k-mers under consideration, this
+2-pass approach is time consuming on large data sets.  We therefore
+developed a general streaming approach that considers many of the
+reads only once, by making use of the redundancy of shotgun
+sequencing.
 
-Here we can make use of the redundancy of shotgun sequencing to avoid
-examining much of the data twice. Shotgun
-sequencing oversamples most regions -- for example, for a 100x
-coverage genomic data set, we would expect 50\% or more of the genome
-to be represented in more than 100 reads.  This is a consequence of
-the Poisson-random sampling that underlies shotgun sequencing
-(cite... Waterman?)  This oversampling provides an opportunity,
-however; if we regard the read data set as a stream of incoming data,
-some portions of the reference will more highly sampled earlier in the
-stream than others.  For example, in mRNAseq, highly expressed
-transcripts will on average be highly sampled much earlier than
-low-expressed transcripts.
+\paragraph{Streaming analysis of coverage-saturated regions:}
 
-If highly sampled regions could be detected during iteration over the
-read data set, we could apply the same approaches used above to do
-error detection in a streaming fashion.  Digital normalization
-provides such a method: by measuring coverage for each read against an
-online De Bruijn graph, reads that reach a specified coverage
-threshold can be examined for errors immediately.  Those reads that
-had not yet reached high coverage could be set aside and re-examined
-later.  This could result in significant runtime savings: for a
-genomic data set with 100x coverage, no more than 20\% of the reads
-would need to be examined twice.
+Shotgun sequencing oversamples most regions --
+for example, for a 100x coverage genomic data set, we would expect
+50\% or more of the genome to be represented by more than 100 reads.
+This is a consequence of the Poisson-random sampling that underlies
+shotgun sequencing (cite... Waterman?)  This oversampling provides an
+opportunity, however: if we regard the read data set as a stream of
+incoming data, some portions of the reference will more highly sampled
+earlier in the stream than others.  For example, in mRNAseq, highly
+expressed transcripts will on average be highly sampled much earlier
+than low-expressed transcripts.
+
+We can adapt the same approaches used in previous sections to do error
+detection in a streaming fashion, by detecting high-coverage reads
+during a first pass.  Low coverage reads would be loaded into the
+normalized De Bruijn graph and saved for later inspection, while high
+coverage reads could be immediately analyzed.  This could result in
+significant runtime savings: for a genomic data set with 100x coverage
+in error-free reads, at a coverage threshold of 20x, no more than 20\%
+of the reads would need to be examined twice.
 
 The conceptual idea is presented in Figure~\ref{fig:concept}.  On the
 first pass, low-coverage reads would be incorporated into the k-mer
 database and set aside for later analysis, while high-coverage reads
 would be analyzed for errors. On the second pass, the set aside reads
-would be checked for coverage and either ignored or analyzed for
-errors.  Crucially, this second pass will involve {\em at most}
-another full pass across the data, but only if no reads were high
-coverage in the first pass; the larger the high coverage component
-of the data, the smaller the fraction of the data that is examined twice.
+would be checked for coverage again, and either ignored or analyzed
+for errors.  Crucially, this second pass involves {\em at most}
+another full pass across the data, but only when the entire data set
+is below the coverage threshold; the larger the high coverage
+component of the data, the smaller the fraction of the data that is
+examined twice.
 
 \begin{figure}[!ht]
  \centerline{\includegraphics[width=4in]{./figures/graph-saturation}}
@@ -527,6 +552,11 @@ Specificity & 76.4\% & 84.4\% & 78.9\% \\
   previous results.}
 \end{table}
 
+We first apply this streaming error detection approach to the three
+synthetic data sets used earlier, and then to the three real data sets.
+
+\paragraph{Streaming error analysis of synthetic data:}
+
 When we apply this streaming approach to the simulated reads from the
 ``simple genome'', we obtain nearly identical numbers to the full two-pass
 approach: 485 TP, 365 TN, 150 FP, and 0 FN, for a sensitivity of 100\%
@@ -540,6 +570,10 @@ metagenome fails to detect one true positive and erroneously finds
 errors in three extra reads.  On the metagenome, 380 of 2347 (16.2\%) of
 the reads are examined twice, and on the mRNAseq data set, 33.1\% of the
 reads are examined twice.
+
+\paragraph{Streaming error analysis of real data:}
+
+foo
 
 % ecoli-stream-report.txt
 
@@ -579,6 +613,7 @@ Specificity            & 47.6\%      & 30.0\%  &  80.2\% \\
 \begin{tabular}{|l|c|c|c|c|}
 \hline
 Sample & raw read M & normalized read M & first pass N & second pass N \\
+\hline
 simple genome & 11,857 & 5,972 (50.4\%) & 1000 & 320 (32.0\%) \\
 {\em E. coli} & & & 4,960,248 & 1,623,010 (32.7\%) \\
 \hline

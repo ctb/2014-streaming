@@ -136,25 +136,25 @@ repgenome-compare.txt: repgenome-10-reads.calc.pos repgenome-10-reads.mut.pos
 ####
 
 # @CTB
-ecoli_corr: ecoli_ref-5m.dn.cor.fastq.gz ecoli_ref-5m.raw.cor.fastq.gz
+ecoli_corr: ecoli-mapped.raw.cor.fq.gz ecoli-mapped.dn.cor.fq.gz
 
 # @CTB fix deps
-ecoli_ref-5m.dn.cor.fastq.gz:
-	echo ecoli_ref-5m.fastq.gz > quake_list.txt
+ecoli-mapped.dn.cor.fq.gz: ecoli-mapped.fq.gz ecoli-mapped.fq.gz.keep
+	echo ecoli-mapped.fq.gz > ecoli_quake_list.txt
 	ln -fs /usr/local/bin/jellyfish .
-	cat ecoli_ref-5m.fastq.gz.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_dn_counts.out
+	cat ecoli-mapped.fq.gz.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_dn_counts.out
 	$(QUAKE)/bin/cov_model.py ecoli_dn_counts.out > ecoli_dn_counts.cov
-	$(QUAKE)/bin/correct -f quake_list.txt -p 4 -k 14 -q 33 -c 7.94 -z -m ecoli_dn_counts.out
-	mv ecoli_ref-5m.cor.fastq.gz ecoli_ref-5m.dn.cor.fastq.gz
+	$(QUAKE)/bin/correct -f ecoli_quake_list.txt -p 4 -k 14 -q 33 -c 7.94 -z -m ecoli_dn_counts.out
+	mv ecoli-mapped.cor.fq.gz ecoli-mapped.dn.cor.fq.gz
 
 # @CTB fix deps
-ecoli_ref-5m.raw.cor.fastq.gz:
-	echo ecoli_ref-5m.fastq.gz > quake_list.txt
+ecoli-mapped.raw.cor.fq.gz: ecoli-mapped.fq.gz
+	echo ecoli-mapped.fq.gz > ecoli_quake_list.txt
 	ln -fs /usr/local/bin/jellyfish .
-	gunzip -c ecoli_ref-5m.fastq.gz | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_raw_counts.out
+	gunzip -c ecoli-mapped.fq.gz | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_raw_counts.out
 	$(QUAKE)/bin/cov_model.py ecoli_raw_counts.out
-	$(QUAKE)/bin/correct -f quake_list.txt -p 4 -k 14 -q 33 -c 7.2 -z -m ecoli_raw_counts.out
-	mv ecoli_ref-5m.cor.fastq.gz ecoli_ref-5m.raw.cor.fastq.gz
+	$(QUAKE)/bin/correct -f ecoli_quake_list.txt -p 4 -k 14 -q 33 -c 7.2 -z -m ecoli_raw_counts.out
+	mv ecoli-mapped.cor.fq.gz ecoli-mapped.raw.cor.fq.gz
 
 # ecoli-reads.dn.cor.sam is the bowtie mapping of the DN-Quake-corrected reads to the reference genome.
 ecoli-reads.dn.cor.sam: ecoli_ref-5m.dn.cor.fastq.gz ecoli.1.ebwt
@@ -217,14 +217,14 @@ podar.dn.kh: podar-mapped.fq.gz
 podar-reads.errors.pos: podar-mapped.fq.gz podar.dn.kh
 	 ./report-errors-by-read.py -V --coverage 10 podar.dn.kh podar-mapped.fq.gz > podar-reads.errors.pos
 
-podar-report.txt: podar-reads.errors.pos podar-reads.sam.pos
-	./compare-pos.py -V podar-reads.errors.pos podar-reads.sam.pos podar-mapped.fq.gz >podar-report.txt
+podar_compare2.txt: podar-reads.errors.pos podar-reads.sam.pos
+	./compare-pos.py -V podar-reads.errors.pos podar-reads.sam.pos podar-mapped.fq.gz > podar_compare2.txt
 
 podar-stream-mismatches.pos: podar-mapped.fq.gz
 	./calc-errors-few-pass.py -V -x 4e8 -N 4 -k 20 -Z 10 podar-mapped.fq.gz > podar-stream-mismatches.pos
 
-podar-stream-report.txt: podar-stream-mismatches.pos podar-reads.sam.pos
-	./compare-pos.py -V podar-stream-mismatches.pos podar-reads.sam.pos podar-mapped.fq.gz > podar-stream-report.txt
+podar_compare4.txt: podar-stream-mismatches.pos podar-reads.sam.pos
+	./compare-pos.py -V podar-stream-mismatches.pos podar-reads.sam.pos podar-mapped.fq.gz > podar_compare4.txt
 
 podar-mapped.fq.gz.abundtrim: podar-mapped.fq.gz
 	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 10 -C 3 -x 4e8 -N 4 podar-mapped.fq.gz
