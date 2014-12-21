@@ -1,7 +1,7 @@
 ECOLI_K=20
 
-ecoli: ecoli-report.txt ecoli-report-nodn.txt ecoli-mapped.fq.gz.errhist \
-	ecoli-reads.sam.errhist
+ecoli: ecoli_compare2.txt ecoli-report-nodn.txt ecoli-mapped.fq.gz.errhist \
+	ecoli-reads.sam.errhist ecoli_compare4.txt
 
 # bowtie index for ecoliMG1655.fa
 ecoli.1.bt2: ecoliMG1655.fa
@@ -42,14 +42,14 @@ ecoli-reads.errors.pos: ecoli-mapped.fq.gz ecoli_ref.dn.kh
 
 # ecoli-report.txt: a comparison of the errors found by mapping and 
 # those found by our k-mer spectral error detection implementation.
-ecoli-report.txt: ecoli-reads.errors.pos ecoli-reads.sam.pos
-	./compare-pos.py ecoli-reads.errors.pos ecoli-reads.sam.pos ecoli-mapped.fq.gz > ecoli-report.txt
+ecoli_compare2.txt: ecoli-reads.errors.pos ecoli-reads.sam.pos
+	./compare-pos.py ecoli-reads.errors.pos ecoli-reads.sam.pos ecoli-mapped.fq.gz > ecoli_compare2.txt
 
 ecoli-stream-mismatches.pos: ecoli-mapped.fq.gz
 	./calc-errors-few-pass.py -x 1e8 -N 4 -k $(ECOLI_K) -Z 20 ecoli-mapped.fq.gz > ecoli-stream-mismatches.pos
 
-ecoli-stream-report.txt: ecoli-stream-mismatches.pos ecoli-reads.sam.pos
-	./compare-pos.py ecoli-stream-mismatches.pos ecoli-reads.sam.pos ecoli-mapped.fq.gz > ecoli-stream-report.txt
+ecoli_compare4.txt: ecoli-stream-mismatches.pos ecoli-reads.sam.pos
+	./compare-pos.py ecoli-stream-mismatches.pos ecoli-reads.sam.pos ecoli-mapped.fq.gz > ecoli_compare4.txt
 
 # ecoli-mapped.fq.gz.abundtrim contains the k-mer abundance trimmed
 # reads, produced by trim-low-abund (streaming k-mer abundance trimming)

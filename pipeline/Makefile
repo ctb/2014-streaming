@@ -12,8 +12,6 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	simple-genome-kmers.hist \
 	simple-genome-dn-kmers.hist \
 	ecoli \
-	ecoli-report-untrim.txt \
-	ecoli-report-trim.txt \
 	ecoli-errfree-report.txt \
 	rseq podar
 
@@ -183,20 +181,7 @@ quake-ecoli-raw-cor.txt: ecoli-reads.raw.cor.sam.pos
 ###
 
 podar:  podar.1.bt2 \
-	podar-reads.sam \
-	podar-reads.sam.pos \
-	podar.dn.kh \
-	podar-reads.errors.pos \
-	podar-mapped.fq.gz.abundtrim \
-	podar-abundtrim.sam \
-	podar-abundtrim.sam.pos \
-	podar-report-untrim.txt \
-	podar-report-trim.txt \
-	podar-report.txt \
-	podar1 \
-	podar-stream-report.txt
-
-podar1: podar-report.txt podar-report-trim.txt podar-report-untrim.txt
+	podar_compare2.txt podar_compare4.txt podar_compare5
 
 podar.1.bt2: podar-ref.fa
 	bowtie2-build podar-ref.fa podar
@@ -235,8 +220,11 @@ podar-abundtrim.sam: podar-mapped.fq.gz.abundtrim
 podar-abundtrim.sam.pos: podar-abundtrim.sam
 	./sam-scan.py podar-ref.fa podar-abundtrim.sam > podar-abundtrim.sam.pos
 
-podar-report-untrim.txt:podar-reads.sam.pos podar-mapped.fq.gz
-	./summarize-pos-file.py podar-reads.sam.pos podar-mapped.fq.gz > podar-report-untrim.txt
+podar_compare5_pre.txt:podar-reads.sam.pos podar-mapped.fq.gz
+	./summarize-pos-file.py podar-reads.sam.pos podar-mapped.fq.gz > podar_compare5-pre.txt
 
-podar-report-trim.txt: podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim
-	./summarize-pos-file.py podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim > podar-report-trim.txt
+podar_compare5_post.txt: podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim
+	./summarize-pos-file.py podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim > podar_compare5_post.txt
+
+podar_compare5: podar_compare5_pre.txt podar_compare5_post.txt
+	cat podar_compare5_pre.txt podar_compare5_post.txt

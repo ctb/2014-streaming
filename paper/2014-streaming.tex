@@ -1,5 +1,12 @@
 % reviewers: Zam, Jared?
 
+% TODO:
+% apply to larger data sets - ask Sherine to configure, run, write.
+% examine lousy specificity
+% verify that compare-pos scripts etc are looking at same things
+% are Ns responsible for error profile ratio??
+% makefile => save details of streaming error trimming to file
+
 \documentclass{article}
 \usepackage{graphicx}
 
@@ -67,7 +74,7 @@ normalized counts from the {\em E. coli data}.
 We first applied digital normalization to a simulated data set with
 known errors.  We generated the synthetic data set from a simulated
 low-complexity genome (``simple genome''; see Methods for generation
-and Table~\label{tab:data} for data set details). We then applied
+and Table~\ref{tab:data} for data set details). We then applied
 digital normalization to these synthetic reads, normalizing to a
 median 20-mer coverage of 20 (k=20, C=20).
 
@@ -104,9 +111,9 @@ simple metagenome & 2,347 & Dynamic range of YYY \\
 simple transcriptome & 568 & Dynamic range of ZZZ; multiple exons\\
 \hline
 \end{tabular}
-\label{tab:data}
 
 \caption{Data sets used}
+\label{tab:data}
 \end{table}
 
 We next used k-mer counts from the downsampled read set to detect
@@ -163,15 +170,15 @@ Sensitivity & 100\% & 100\% \\
 Specificity & 73.5\% & 76.5\% \\
 \hline
 \end{tabular}
-\label{tab:a}
 
 \caption{Spectral error detection on 1000 synthetic reads from a
   simulated 10kb genome, using raw and digitally normalized
   counts.  The counts are the number of reads where all errors were
   detected perfectly (TP), no errors were present (TN), one or more errors were miscalled (one type of FP), errors were mistakenly called in an error-free read (the other type of FP), and errors present in a read were missed (FN). }
+\label{tab:a}
 \end{table}
 
-% make ecoli-report.txt
+% make ecoli_compare2.txt
 
 \paragraph{{\em E. coli} reads:}
 We next applied digital normalization and k-mer spectral error
@@ -213,13 +220,44 @@ Sensitivity & 99.8\% & 99.4\% \\
 Specificity & 47.9\% & 47.5\% \\
 \hline
 \end{tabular}
-\label{tab:ecoli_dn_counts}
 
 \caption{Spectral error detection on 5m {\em E. coli} reads, using raw and
   digitally normalized counts.}
+\label{tab:ecoli_dn_counts}
 \end{table}
 
-% why such poor results on E. coli? repeats, or what?
+\begin{table}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+Sample              & raw read M & normalized read M \\
+\hline
+{\em E. coli}       &            & \\
+\hline
+\end{tabular}
+
+\caption{Unique k-mer counts (M) for raw and normalized data sets using a k-mer size
+of 20 and the specified coverage cutoff.  Digital normalization reduces the
+total number of k-mers being tracked.}
+\label{tab:kmer_counts}
+\end{table}
+
+\begin{table}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+Sample              & raw read M & normalized read M \\
+\hline
+{\em E. coli}       &            & \\
+\hline
+\end{tabular}
+
+\caption{Unique k-mer counts for raw and normalized data sets using a
+  k-mer size of 20 and the specified coverage cutoff.  Digital
+  normalization reduces the total number of reads considered informative.}
+
+\label{tab:streaming_counts}
+\end{table}
+
+% @@why such poor results on E. coli? repeats, or what?
 
 \paragraph{{\em E. coli} error correction with Quake:}
 
@@ -330,7 +368,6 @@ Sensitivity & 99.8\% & 100\% \\
 Specificity & 84.7\% & 78.9\% \\
 \hline
 \end{tabular}
-\label{tab:spectra_variable}
 
 \caption{Variable coverage spectral error detection on two synthetic
   data sets, a simple metagenome and a simple mRNAseq data set.
@@ -338,10 +375,11 @@ Specificity & 84.7\% & 78.9\% \\
   read, and only the reads with estimated coverage at or above the
   specified threshold were analyzed.  Digitally normalized counts were
   used for the spectral error analysis.}
+\label{tab:spectra_variable}
 \end{table}
 
 The results of running error detection on the synthetic metagenome and
-mRNAseq data sets are shown in Table~\ref{spectra_variable}. For the
+mRNAseq data sets are shown in Table~\ref{tab:spectra_variable}. For the
 simple metagenome data set, 2254 of 2347 reads (96.0\%) met the
 coverage criterion.  Of the 2254 reads analyzed, the errors in 978
 erroneous reads were called perfectly (TP) and 1098 of the reads with
@@ -373,24 +411,24 @@ K-mer coverage threshold   & 10              & 20 \\
 Total reads                & 4,667,491       & 791,687 \\
 High coverage reads        & 404,896 (8.7\%) & 260,641 (32.9\%) \\
 \hline
-Perfect detection (TP)     & 11,743          & 71,315 \\
-No errors (TN)             & 366,253         & 203,741 \\
-Miscalled errors (FP)      & 3,911           & 23,391 \\
-Mispredicted errors (FP)   & 21,750          & 24,464 \\
-Missed errors (FN)         & 1239            & 18,275 \\
+Perfect detection (TP)     & 11,743          & 90,954 \\
+No errors (TN)             & 366,253         & 141,009 \\
+Miscalled errors (FP)      & 3,911           & 20,547 \\
+Mispredicted errors (FP)   & 21,750          & 1173 \\
+Missed errors (FN)         & 1239            & 6931 \\
 \hline
-Sensitivity & 90.5\% & 79.6\% \\
-Specificity & 31.4\% & 59.8\% \\
+Sensitivity                & 90.5\%          & 92.9\% \\
+Specificity                & 31.4\%          & 80.7\% \\
 \hline
 \end{tabular}
-\label{tab:spectra_variable_real}
 
-\caption{The results of variable coverage spectral error correction on
+\caption{The results of variable coverage spectral error detection on
   two real variable coverage data sets, a mock shotgun metagenome and
   a mouse mRNAseq data set. Per-read coverage was estimated by median
   k-mer abundance within the read, and only the reads with estimated
   coverage at or above the specified threshold were analyzed.
   Digitally normalized counts were used for the spectral error analysis.}
+\label{tab:spectra_variable_real}
 
 \end{table}
 
@@ -474,24 +512,17 @@ expressed transcripts will on average be highly sampled much earlier
 than low-expressed transcripts.
 
 We can adapt the same approaches used in previous sections to do error
-detection in a streaming fashion, by detecting high-coverage reads
-during a first pass.  Low coverage reads would be loaded into the
-normalized De Bruijn graph and saved for later inspection, while high
-coverage reads could be immediately analyzed.  This could result in
-significant runtime savings: for a genomic data set with 100x coverage
-in error-free reads, at a coverage threshold of 20x, no more than 20\%
-of the reads would need to be examined twice.
-
-The conceptual idea is presented in Figure~\ref{fig:concept}.  On the
-first pass, low-coverage reads would be incorporated into the k-mer
-database and set aside for later analysis, while high-coverage reads
-would be analyzed for errors. On the second pass, the set aside reads
-would be checked for coverage again, and either ignored or analyzed
-for errors.  Crucially, this second pass involves {\em at most}
-another full pass across the data, but only when the entire data set
-is below the coverage threshold; the larger the high coverage
-component of the data, the smaller the fraction of the data that is
-examined twice.
+analysis in a streaming fashion, by detecting high-coverage reads {\em
+  during} the first pass.  The conceptual idea is presented in
+Figure~\ref{fig:concept}.  On the first pass, low-coverage reads would
+be incorporated into the k-mer database and set aside for later
+analysis, while high-coverage reads would be analyzed for errors. On
+the second pass, the set aside reads would be checked for coverage
+again, and either ignored or analyzed for errors.  Crucially, this
+second pass involves {\em at most} another full pass across the data,
+but only when the entire data set is below the coverage threshold; the
+larger the high coverage component of the data, the smaller the
+fraction of the data that is examined twice.
 
 \begin{figure}[!ht]
  \centerline{\includegraphics[width=4in]{./figures/graph-saturation}}
@@ -513,11 +544,12 @@ pass need to be examined again.
 
 \begin{figure}[!ht]
  \centerline{\includegraphics[width=4in]{./figures/saturation}}
-\caption{\bf Saturation curve of a real and a simulated {\em E. coli} read data
-set.  Reads are collected when they have an estimated coverage of less
-than 20; in the early phase ($<$ 1m reads), almost all reads are
-collected, but soon the majority of reads come from loci with an estimated
-sequencing depth of $>$ 20 and are rejected.}
+\caption{\bf Saturation curve of a real and a simulated {\em E. coli}
+  read data set.  Reads are collected when they have an estimated
+  coverage of less than 20; in the early phase ($<$ 1m reads), almost
+  all reads are collected, but by 2m reads into the data set, the
+  majority of reads come from loci with an estimated sequencing depth
+  of $>$ 20 and are rejected.}
 \label{fig:saturation}
 \end{figure}
 
@@ -542,14 +574,14 @@ Sensitivity & 100.0\% & 99.9\% & 100.0\% \\
 Specificity & 76.4\% & 84.4\% & 78.9\% \\
 \hline
 \end{tabular}
-\label{tab:spectra_streaming}
-
 \caption{Results from applying streaming error detection to the same
   synthetic data sets as in Table~\ref{tab:a} and
   Table~\ref{tab:spectra_variable}.  Number of passes is the average
   number of times each read in the data set was examined; numbers in
   parentheses give the difference between these numbers and the
   previous results.}
+\label{tab:spectra_streaming}
+
 \end{table}
 
 We first apply this streaming error detection approach to the three
@@ -558,28 +590,27 @@ synthetic data sets used earlier, and then to the three real data sets.
 \paragraph{Streaming error analysis of synthetic data:}
 
 When we apply this streaming approach to the simulated reads from the
-``simple genome'', we obtain nearly identical numbers to the full two-pass
-approach: 485 TP, 365 TN, 150 FP, and 0 FN, for a sensitivity of 100\%
-and a specificity of 76.3\%.  However, only 320 of the 1000 reads are
-examined twice - hence, it is a 1.32x pass algorithm on this data set.
-Likewise, for the ``simple metagenome''
-and ``simple mRNAseq'' data sets, we obtain nearly identical and
-identical results, respectively, with the streaming approach; due to
-differences in the order in which reads are examined, the simple
-metagenome fails to detect one true positive and erroneously finds
-errors in three extra reads.  On the metagenome, 380 of 2347 (16.2\%) of
-the reads are examined twice, and on the mRNAseq data set, 33.1\% of the
-reads are examined twice.
+``simple genome'', we obtain nearly identical numbers to the full
+two-pass approach: 485 TP, 365 TN, 150 FP, and 0 FN, for a sensitivity
+of 100\% and a specificity of 76.3\%
+(Table~\ref{tab:spectra_streaming}.  However, only 320 of the 1000
+reads are examined twice - hence, it is a 1.32x pass algorithm on this
+data set.  Likewise, for the ``simple metagenome'' and ``simple
+mRNAseq'' data sets, we obtain nearly identical and identical results,
+respectively, with the streaming approach; due to differences in the
+order in which reads are examined, the simple metagenome fails to
+detect one true positive and erroneously finds errors in three extra
+reads.  On the metagenome, 380 of 2347 (16.2\%) of the reads are
+examined twice, and on the mRNAseq data set, 33.1\% of the reads are
+examined twice.
 
 \paragraph{Streaming error analysis of real data:}
 
-foo
-
-% ecoli-stream-report.txt
+% ecoli_compare4.txt
 
 % rseq_compare4.txt
 
-% podar-stream-report.txt
+% podar_compare4.txt
 
 \begin{table}
 \begin{tabular}{|l|c||c||c|}
@@ -598,42 +629,45 @@ Sensitivity            & 99.5\%      & 90.6\%  & 93.3\% \\
 Specificity            & 47.6\%      & 30.0\%  &  80.2\% \\
 \hline
 \end{tabular}
-\label{tab:spectra_streaming_real}
-
 \caption{Results from applying streaming error detection to the same
   real data sets as in Table~\ref{tab:ecoli_dn_counts} and
   Table~\ref{tab:spectra_variable_real}.  Number of passes is the average
   number of times each read in the data set was examined; unless noted in
-  parantheses, numbers were within 1\% of non-streaming results.}
+  parentheses, numbers were within 1\% of non-streaming results.}
+\label{tab:spectra_streaming_real}
+
 \end{table}
+
+We also get similar quality results on the real data sets when
+comparing two-pass error detection with streaming error detection
+(Table~\ref{tab:spectra_streaming_real}).  For {\em E. coli}, with
+streaming error detection we obtain a sensitivity of 99.5\% and a
+specificity of 47.6\%, compared to 99.8\% and 47.9\% with the two-pass
+approach (Table~\ref{tab:ecoli_dn_counts}).  For the mock metagenome,
+we get a sensitivity of 90.6\% with streaming, vs 90.5\% with the
+two-pass approach; and a specificity of 30.0\% with streaming, vs
+31.4\% with the two pass approach (compare
+Table~\ref{tab:spectra_streaming_real} and
+Table~\ref{tab:spectra_variable_real}).  And for the mRNAseq data set,
+we see a sensitivity of 93.3\% with streaming vs 92.9\% with two-pass,
+and a specificity of 80.2\% vs 80.7\% for streaming vs two-pass,
+respectively (Table~\ref{tab:spectra_streaming_real} and
+Table~\ref{tab:spectra_variable_real}).  However, the streaming
+approach examined the {\em E. coli} reads only XX times, the
+metagenome reads YY times, and the mRNAseq reads ZZ times on average --
+a significant speedup for the high-coverage data sets.
 
 \subsection{A streaming algorithm for error trimming}
 
-\begin{table}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-Sample & raw read M & normalized read M & first pass N & second pass N \\
-\hline
-simple genome & 11,857 & 5,972 (50.4\%) & 1000 & 320 (32.0\%) \\
-{\em E. coli} & & & 4,960,248 & 1,623,010 (32.7\%) \\
-\hline
-\end{tabular}
-\label{tab:streaming_counts}
-
-\caption{Unique k-mer counts (M) for raw and normalized data sets, and
-read counts (N) for first- and second-pass streaming, using a k-mer size
-of 20 and a coverage cutoff of 20.  Digital normalization reduces the
-total number of k-mers being tracked, while the streaming algorithm
-looks at the majority of reads only once.}
-\end{table}
-
-Once errors can be {\em detected} with a streaming algorithm, it is
-simple to extend the algorithm to {\em remove} errors from reads,
-e.g. by trimming the read at the first error.  (While it is possible
-to split reads around errors rather than truncating them, this
-introduces complications in downstream read processing.)
+Once errors can be {\em detected} with a streaming algorithm, errors
+can also be {\em removed} reads by trimming the read at the first
+detected error.  (While it is possible to split reads around errors
+rather than truncating them, this introduces complications in
+downstream read processing.)
 
 % make compare5
+
+\paragraph{Streaming error trimming on synthetic data:}
 
 On the ``simple genome'' with counts from the digitally normalized
 reads, this trimming approach eliminates 149 reads entirely due to a
@@ -655,6 +689,26 @@ were eliminated, bringing the overall per-base error rate from 0.62\% to
 568 reads were removed, and 208 were trimmed, removing 19,507 of
 56,800 bases (34.34\%).  The initial error rate was 0.65\% and the
 final error rate was 0.07\%.
+
+\begin{table}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+Data set        & pre-trim error & \% bp trim & \% reads trim & post-trim error \\
+\hline
+{\em E. coli}   &                &                  &             & \\
+Mock metagenome & 0.32\%         &                  &             & 0.30\% \\
+mouse mRNAseq   & 2.07\%         &                  &             & 1.84\% \\
+(high coverage only) & 1.61\%    &                  &             & 0.66\% \\
+
+\hline
+\end{tabular}
+
+\caption{A summary of trimming statistics for streaming error trimming.
+Error rates before and after trimming was estimated by mapping mismatches.}
+\label{tab:trimming}
+\end{table}
+
+\paragraph{Streaming error trimming on real data:}
 
 % ecoli-report-untrim.txt ('make ecoli-report-untrim.txt')
 %posfile ecoli-reads.sam.pos: 2177509 mutated reads of 4960248; 7990149 mutations total
@@ -709,7 +763,7 @@ On the mouse mRNAseq data set, streaming error trimming removed 28,219
 reads and trimmed 70,260 reads, removing 5.52\% of the total bases,
 bringing the overall error rate from 2.1\% to 1.8\%.  When we measured
 only the error rates in the high-coverage reads that were subject to
-trimming, trimming brought the error rate from 1.6\% to 0.66\%.
+trimming, trimming brought the error rate from 1.61\% to 0.66\%.
 On the mock metagenome data set, 5823 reads were removed and 21,231
 reads were trimmed, removing 0.26\% of bases; this low percentage is
 because of the very low coverage of most of the reads in this data set.
