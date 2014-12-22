@@ -350,8 +350,9 @@ normalized counts, while low-coverage reads are ignored.}
 
 \paragraph{Coverage-normalized spectral error analysis:}
 
-Using digital normalization, we should be able to address both of these
-problems.  First, by applying digital normalization to variable
+Using digital normalization, we should be able to address both the
+problem of {\em too high} coverage and {\em too low} coverage.
+First, by applying digital normalization to variable
 coverage data and then working only with the k-mer counts from the
 normalized reads, we can avoid counting high abundance errors.
 And second, by ignoring reads with a low estimated coverage, we can
@@ -851,6 +852,8 @@ errors in them that present as too low-coverage to assess.
 We next applied to ecoli data.@@
 
 @@error rates? apply regression?
+
+@@subsampling
 
 \section{Discussion}
 

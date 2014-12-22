@@ -181,3 +181,8 @@ podar_compare5_post.txt: podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim
 
 podar_compare5: podar_compare5_pre.txt podar_compare5_post.txt
 	cat podar_compare5_pre.txt podar_compare5_post.txt
+
+#####
+
+xxx:
+	sample-reads-randomly.py -R 1 -S 5 -N 1e6 ecoli-mapped.fq.gz
