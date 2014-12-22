@@ -1,6 +1,6 @@
 ECOLI_K=20
 
-ecoli: ecoli_compare2.txt ecoli-report-nodn.txt ecoli-mapped.fq.gz.errhist \
+ecoli: ecoli_compare2.txt ecoli_compare2_nodn.txt ecoli-mapped.fq.gz.errhist \
 	ecoli-reads.sam.errhist ecoli_compare4.txt
 
 # bowtie index for ecoliMG1655.fa
@@ -27,8 +27,8 @@ ecoli_ref.kh: ecoli-mapped.fq.gz
 ecoli-reads-nodn.errors.pos: ecoli_ref.kh
 	./report-errors-by-read.py -C 15 ecoli_ref.kh ecoli-mapped.fq.gz -o ecoli-reads-nodn.errors.pos
 
-ecoli-report-nodn.txt: ecoli-reads-nodn.errors.pos
-	./compare-pos.py ecoli-reads-nodn.errors.pos ecoli-reads.sam.pos ecoli-mapped.fq.gz > ecoli-report-nodn.txt
+ecoli_compare2_nodn.txt: ecoli-reads-nodn.errors.pos
+	./compare-pos.py ecoli-reads-nodn.errors.pos ecoli-reads.sam.pos ecoli-mapped.fq.gz > ecoli_compare2_nodn.txt
 
 # ecoli_ref.dn.kh contains the counting table output by digital normalization
 # of the raw E. coli reads.
@@ -40,7 +40,7 @@ ecoli_ref.dn.kh: ecoli-mapped.fq.gz
 ecoli-reads.errors.pos: ecoli-mapped.fq.gz ecoli_ref.dn.kh
 	./report-errors-by-read.py ecoli_ref.dn.kh ecoli-mapped.fq.gz -o ecoli-reads.errors.pos
 
-# ecoli-report.txt: a comparison of the errors found by mapping and 
+# ecoli_compare2.txt: a comparison of the errors found by mapping and 
 # those found by our k-mer spectral error detection implementation.
 ecoli_compare2.txt: ecoli-reads.errors.pos ecoli-reads.sam.pos
 	./compare-pos.py ecoli-reads.errors.pos ecoli-reads.sam.pos ecoli-mapped.fq.gz > ecoli_compare2.txt
@@ -91,3 +91,48 @@ ecoli-reads.sam.errhist: ecoli-reads.sam ecoliMG1655.fa
 ecoli-counts.txt: ecoli-mapped.fq.gz ecoli_ref.dn.kh ecoli-mapped.fq.gz.keep
 	$(KHMER)/sandbox/unique_kmers.py ecoli-mapped.fq.gz $(ECOLI_K) > ecoli-counts.txt
 	$(KHMER)/sandbox/unique_kmers.py ecoli-mapped.fq.gz.keep $(ECOLI_K) >> ecoli-counts.txt
+
+####
+
+ecoli_corr: ecoli-mapped.raw.cor.fq.gz ecoli-mapped.dn.cor.fq.gz \
+	quake-ecoli-raw-cor.txt quake-ecoli-dn-cor.txt
+
+ecoli-mapped.dn.cor.fq.gz: ecoli-mapped.fq.gz ecoli-mapped.fq.gz.keep
+	echo ecoli-mapped.fq.gz > ecoli_quake_list.txt
+	ln -fs /usr/local/bin/jellyfish .
+	cat ecoli-mapped.fq.gz.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_dn_counts.out
+	$(QUAKE)/bin/cov_model.py ecoli_dn_counts.out > ecoli_dn_counts.cov
+	$(QUAKE)/bin/correct -f ecoli_quake_list.txt -p 4 -k 14 -q 33 -c 7.94 -z -m ecoli_dn_counts.out
+	mv ecoli-mapped.cor.fq.gz ecoli-mapped.dn.cor.fq.gz
+
+ecoli-mapped.raw.cor.fq.gz: ecoli-mapped.fq.gz
+	echo ecoli-mapped.fq.gz > ecoli_quake_list.txt
+	ln -fs /usr/local/bin/jellyfish .
+	gunzip -c ecoli-mapped.fq.gz | $(QUAKE)/bin/count-qmers -q 33 -k 14 > ecoli_raw_counts.out
+	$(QUAKE)/bin/cov_model.py ecoli_raw_counts.out
+	$(QUAKE)/bin/correct -f ecoli_quake_list.txt -p 4 -k 14 -q 33 -c 7.2 -z -m ecoli_raw_counts.out
+	mv ecoli-mapped.cor.fq.gz ecoli-mapped.raw.cor.fq.gz
+
+# ecoli-reads.dn.cor.sam is the bowtie mapping of the DN-Quake-corrected reads to the reference genome.
+ecoli-reads.dn.cor.sam: ecoli_ref-5m.dn.cor.fastq.gz ecoli.1.bt2
+	gunzip -c ecoli_ref-5m.dn.cor.fastq.gz | bowtie2 -p 4 -x ecoli -U - -S ecoli-reads.dn.cor.sam
+
+# ecoli-reads.dn.cor.sam.pos is the 'pos' file containing the locations
+# of mismatches from the dn quake-corrected reads.
+ecoli-reads.dn.cor.sam.pos: ecoli-reads.dn.cor.sam
+	./sam-scan.py ecoliMG1655.fa ecoli-reads.dn.cor.sam -o ecoli-reads.dn.cor.sam.pos
+
+quake-ecoli-dn-cor.txt: ecoli-reads.dn.cor.sam.pos
+	./summarize-pos-file.py ecoli-reads.dn.cor.sam.pos ecoli_ref-5m.dn.cor.fastq.gz > quake-ecoli-dn-cor.txt
+
+# ecoli-reads.raw.cor.sam is the bowtie mapping of the Quake-corrected reads to the reference genome.
+ecoli-reads.raw.cor.sam: ecoli_ref-5m.raw.cor.fastq.gz ecoli.1.bt2
+	gunzip -c ecoli_ref-5m.raw.cor.fastq.gz | bowtie2 -p 4 -x ecoli -U - -S ecoli-reads.raw.cor.sam
+
+# ecoli-reads.raw.cor.sam.pos is the 'pos' file containing the locations
+# of mismatches from the raw quake-corrected reads.
+ecoli-reads.raw.cor.sam.pos: ecoli-reads.raw.cor.sam
+	./sam-scan.py ecoliMG1655.fa ecoli-reads.raw.cor.sam -o ecoli-reads.raw.cor.sam.pos
+
+quake-ecoli-raw-cor.txt: ecoli-reads.raw.cor.sam.pos
+	./summarize-pos-file.py ecoli-reads.raw.cor.sam.pos ecoli_ref-5m.raw.cor.fastq.gz > quake-ecoli-raw-cor.txt

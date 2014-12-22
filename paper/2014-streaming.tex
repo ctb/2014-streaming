@@ -185,7 +185,7 @@ We next applied digital normalization and k-mer spectral error
 detection to an Illumina data set from {\em E. coli} MG1655 (cite
 Chitsaz).  In real reads, we do not know the location of errors; to
 calculate them, we mapped 5m untrimmed reads to the known {\em
-  E. coli} MG1655 genome with bowtie1 (cite) and recorded mismatches
+  E. coli} MG1655 genome with bowtie2 (cite) and recorded mismatches
 between the reads and the genome.  These mismatches were taken as
 errors in the reads.  We found 8.0m errors in 2.2m reads, for an
 overall error rate of 1.60\%.
@@ -195,13 +195,13 @@ and without digital normalization.  We used the same parameters as on
 the simulated genome.  The results are presented in
 Table~\ref{tab:ecoli_dn_counts}. Using the raw counts, the
 sensitivities were close -- using the raw counts, we achieved a
-sensitivity of 72.0\%, versus 71.4\% using the counts from the
+sensitivity of 99.8\%, versus 99.4\% using the counts from the
 digitally normalized reads.  The specificities were also comparable --
-43.5\% using the raw counts, and 42.9\% using the digitally normalized
+47.9\% using the raw counts, and 47.5\% using the digitally normalized
 counts.
 
-% make ecoli-report.txt
-% make ecoli-nodn-report.txt
+% make ecoli_compare2.txt
+% make ecoli_compare2_nodn.txt
 
 \begin{table}
 \begin{tabular}{|l|c|c|}
@@ -229,15 +229,16 @@ Specificity & 47.9\% & 47.5\% \\
 \begin{table}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-Sample              & raw read M & normalized read M \\
+Sample              & N raw reads & N normalized reads \\
 \hline
 {\em E. coli}       &            & \\
 \hline
 \end{tabular}
 
-\caption{Unique k-mer counts (M) for raw and normalized data sets using a k-mer size
-of 20 and the specified coverage cutoff.  Digital normalization reduces the
-total number of k-mers being tracked.}
+\caption{Read counts (N) for raw and normalized data sets using a
+  k-mer size of 20 and the specified coverage cutoff. Digital
+  normalization reduces the total number of reads considered
+  informative.}
 \label{tab:kmer_counts}
 \end{table}
 
@@ -252,7 +253,7 @@ Sample              & raw read M & normalized read M \\
 
 \caption{Unique k-mer counts for raw and normalized data sets using a
   k-mer size of 20 and the specified coverage cutoff.  Digital
-  normalization reduces the total number of reads considered informative.}
+  normalization reduces the total number of k-mers being tracked.}
 
 \label{tab:streaming_counts}
 \end{table}
@@ -260,6 +261,30 @@ Sample              & raw read M & normalized read M \\
 % @@why such poor results on E. coli? repeats, or what?
 
 \paragraph{{\em E. coli} error correction with Quake:}
+
+% quake-ecoli-raw-cor.txt
+% quake-ecoli-dn-cor.txt
+
+\begin{table}
+\begin{tabular}{|l|c|c|}
+\hline
+Sample              & raw    & diginorm \\
+\hline
+Erroneous reads        & 22,902      & 17,609 \\
+Total reads            & 4,906,469   & 4,905,853 \\
+Total errors remaining & 49,823      & 43,238 \\
+Total bp               & 450,687,634 & 450,630,551 \\
+Per-base error rate    & 0.011\%     & 0.010\% \\
+\hline
+\end{tabular}
+
+\caption{Comparison of Quake results when run on the same {\em E. coli} data
+set, using k-mers from either the entire data set (raw) or just the digitally
+normalized reads (diginorm).  All numbers are post-error correction; the
+pre-correction error rate was 1.60\%.}
+
+\label{tab:quake_ecoli}
+\end{table}
 
 While the results above suggest that simple spectral error detection
 works equally well both before and after digital normalization, we
@@ -695,7 +720,7 @@ final error rate was 0.07\%.
 \hline
 Data set        & pre-trim error & \% bp trim & \% reads trim & post-trim error \\
 \hline
-{\em E. coli}   &                &                  &             & \\
+{\em E. coli}   & 1.60\%         &                  &             & 0.05\% \\
 Mock metagenome & 0.32\%         &                  &             & 0.30\% \\
 mouse mRNAseq   & 2.07\%         &                  &             & 1.84\% \\
 (high coverage only) & 1.61\%    &                  &             & 0.66\% \\
@@ -704,7 +729,7 @@ mouse mRNAseq   & 2.07\%         &                  &             & 1.84\% \\
 \end{tabular}
 
 \caption{A summary of trimming statistics for streaming error trimming.
-Error rates before and after trimming was estimated by mapping mismatches.}
+Error rates before and after trimming were estimated by mapping mismatches.}
 \label{tab:trimming}
 \end{table}
 
@@ -755,9 +780,7 @@ Mbp of the original 500 Mbp (12.4\%).
 % trimmed or removed 0.26% of bases (1232115 total)
 % skipped 4262595 reads/430522095 bases because of low coverage
 
-% podar-report-untrim.txt
-% podar-report-trim.txt
-
+% make podar_compare5
 
 On the mouse mRNAseq data set, streaming error trimming removed 28,219
 reads and trimmed 70,260 reads, removing 5.52\% of the total bases,
