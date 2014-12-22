@@ -3,6 +3,43 @@ import argparse
 import sys
 import screed
 
+def do_counting(a, b, all_lengths, ignore_set):
+    n = 0                               # in a
+    m = 0                               # number of matches
+    unexplained = 0
+    n_ignored = 0
+
+    for k, va in a.iteritems():
+        if k in ignore_set:
+            n_ignored += 1
+            continue
+
+        if not va:
+            continue
+        
+        n += 1
+        vb = b.get(k)
+        if not vb:
+            continue
+        
+        if va == vb:                # match
+            m += 1
+        else:
+            READLEN = all_lengths[k]
+            rva = list(sorted([ READLEN - x - 1 for x in va ]))
+            if rva == vb:           # match (reverse complement)
+                m += 1
+            else:
+#                    print k, va, rva, vb # not a match
+                unexplained += 1
+
+    o = 0                               # in b
+    for k, vb in b.iteritems():
+        if len(vb):
+            o += 1
+
+    return m, n, unexplained, n_ignored, o
+
 # read in list of error positions per read
 def read_pos_file(filename, ignore_set):
     for line in open(filename):
@@ -47,40 +84,8 @@ def main():
         all_names.add(record.name)
         all_lengths[record.name] = len(record.sequence)
 
-    n = 0                               # in a
-    m = 0                               # number of matches
-    unexplained = 0
-    n_ignored = 0
+    m, n, unexplained, n_ignored, o =do_counting(a, b, all_lengths, ignore_set)
     
-    for k, va in a.iteritems():
-        if k in ignore_set:
-            n_ignored += 1
-            continue
-
-        if not va:
-            continue
-        
-        n += 1
-        vb = b.get(k)
-        if not vb:
-            continue
-        
-        if va == vb:                # match
-            m += 1
-        else:
-            READLEN = all_lengths[k]
-            rva = list(sorted([ READLEN - x - 1 for x in va ]))
-            if rva == vb:           # match (reverse complement)
-                m += 1
-            else:
-#                    print k, va, rva, vb # not a match
-                unexplained += 1
-
-    o = 0                               # in b
-    for k, vb in b.iteritems():
-        if len(vb):
-            o += 1
-
     print 'total # of reads analyzed: %d' % (len(a),)
     print 'IGNORED due to -V: %d (%d, %.2f%%)' % (n_ignored, len(a) - n_ignored,
                float(len(a) - n_ignored) / float(len(a)) * 100.)
