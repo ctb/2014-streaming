@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+"""
+Compare two lists of error positions ('pos files').
+
+first file is assumed to be prediction, second file is assumed to be "truth."
+"""
 import argparse
 import sys
 import screed
@@ -7,39 +12,39 @@ def do_counting(first, second, ignore_set):
     n = 0                               # reads w/errors in first
     o = 0                               # reads w/errors in second
     
-    m = 0                               # number of matches
-    unexplained = 0
-    n_ignored = 0
+    matches = 0                         # exact matches
+    mismatches = 0                      # 
+    n_ignored = 0                       # intentionally ignored
 
     for k, va in first.iteritems():
         if k in ignore_set:             # ignoreme
             n_ignored += 1
             continue
 
-        if not va:                      # no errors
+        vb = second.get(k)
+        if not va and not vb:           # no errors! TN.
+            continue
+
+        # these conditions are handled elsewhere
+        if va and not vb: # part of fp; see incorr_in_a intersect corr_in_b
+            continue
+        if vb and not va: # fn; see corr_in_a intersect incorr in b
             continue
         
         n += 1
-        vb = second.get(k)
-        if not vb:
-            continue
-        
-        if va == vb:                # match, forward.
-            m += 1
-            continue
-        
-        unexplained += 1    # no match.
+        if va == vb:                    # exact match!
+            matches += 1
+        else:
+            mismatches += 1             # no match :(
 
-    o = 0                               # in second
     for k, vb in second.iteritems():
-        if k in ignore_set and 0:             # ignoreme - WHY NEEDED??@@
-            n_ignored += 1
+        if k in ignore_set:             # ignoreme
             continue
         
         if len(vb):
             o += 1
 
-    return m, n, unexplained, n_ignored, o
+    return n, o, matches, mismatches, n_ignored
 
 
 # read in list of error positions per read
@@ -52,7 +57,9 @@ def read_pos_file(filename, ignore_set):
             read = line
             posns = []
 
-        if posns:
+        if read in ignore_set:
+            posns = []
+        elif posns:
             if posns is 'V':            # ignore variable coverage foo
                 ignore_set.add(read)
                 posns = []
@@ -65,6 +72,7 @@ def read_pos_file(filename, ignore_set):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-V', '--variable', default=False, action='store_true')
+    parser.add_argument('-d', '--debug', default=False, action='store_true')
     parser.add_argument('pos_a')
     parser.add_argument('pos_b')
     parser.add_argument('reads')
@@ -73,6 +81,7 @@ def main():
     ignore_set = set() # reads to ignore because of low coverage
 
     # read in two lists of positions & errors
+    print >>sys.stderr, 'loading posfiles'
     a = dict(read_pos_file(args.pos_a, ignore_set))
     b = dict(read_pos_file(args.pos_b, ignore_set))
 
@@ -82,19 +91,35 @@ def main():
     # get list of all reads
     print >>sys.stderr, 'loading reads from', args.reads
     all_names = set()
-    for record in screed.open(args.reads):
-        all_names.add(record.name)
 
-    m, n, unexplained, n_ignored, o =do_counting(a, b, ignore_set)
+    total_reads = 0
+    for record in screed.open(args.reads):
+        total_reads += 1
+        if record.name not in ignore_set:
+            all_names.add(record.name)
+
+    print >>sys.stderr, 'done!'
     
-    print 'total # of reads analyzed: %d' % (len(a),)
-    print 'IGNORED due to -V: %d (%d, %.2f%%)' % (n_ignored, len(a) - n_ignored,
-               float(len(a) - n_ignored) / float(len(a)) * 100.)
+    # reads we pay attention to
+    tracked_reads = len(all_names)
+    n_ignored = total_reads - tracked_reads
+
+    n, o, matches, mismatches, n_ignoredXX = do_counting(a, b, ignore_set)
+
+    assert n <= total_reads
+    assert o <= total_reads
+    assert n_ignored == n_ignoredXX
+    
+    print 'total # of reads: %d' % (total_reads,)
+    print 'IGNORED due to -V: %d (%d, %.2f%%)' % (n_ignored,
+                                                  tracked_reads,
+               tracked_reads / float(total_reads) * 100.)
+    print 'total # of tracked reads:', tracked_reads
+    
     print '%d erroneous reads in %s' % (n, args.pos_a)
     print '%d erroneous reads in %s' % (o, args.pos_b)
-    print '%d reads in common => all error positions AGREE' % (m,)
-    print '%d DISAGREE' % (unexplained,)
-    print 'total # of reads:', len(all_names)
+    print '%d reads in common => all error positions AGREE' % (matches,)
+    print '%d DISAGREE' % (mismatches,)
 
     # assume a is prediction, b is correct
     
@@ -103,15 +128,24 @@ def main():
     correct_in_a = all_names - set([ k for k in a if a[k] ])
     correct_in_b = all_names - set([ k for k in b if b[k] ])
     
-    # m is reads thought to be erroneous by a, agree with b
-    tp = m
+    if args.debug:
+        print 'DDD incorrect in a:', len(incorrect_in_a)
+        print 'DDD incorrect in b:', len(incorrect_in_b)
+        print 'DDD correct in a:', len(correct_in_a)
+        print 'DDD correct in b:', len(correct_in_b)
+    
+    # m is reads thought to be erroneous by a, agree exactly with b
+    tp = matches
 
-    # fp: reads thought to be erroneous by a, but not in b
+    # fp: reads thought to be erroneous by a, but actually correct (in b)
     #     + places where a called errors that were incorrect
-    fp = len(incorrect_in_a.intersection(correct_in_b)) + unexplained
+    fp = mismatches + len(incorrect_in_a.intersection(correct_in_b))
+
+    if args.debug:
+        print 'DDD incorrect in a, correct in b:', \
+              incorrect_in_a.intersection(correct_in_b)
 
     # fn: reads through to be correct by a, but actually erroneous (in b)
-    correct_in_a = all_names - ignore_set - incorrect_in_a
     fn = len(correct_in_a.intersection(incorrect_in_b))
 
     # tn: reads thought to be correct in both a and b
@@ -119,14 +153,21 @@ def main():
 
     print 'TP:', tp
     print 'TN:', tn
-    print 'FP: %d (%d + %d)' % (fp, unexplained, fp-unexplained)
+    print 'FP: %d (%d + %d)' % (fp,
+                                mismatches,
+                                len(incorrect_in_a.intersection(correct_in_b)))
     print 'FN:', fn
 
     print 'sensitivity:', tp / float(tp + fn)
-    print 'specificity:', tp / float(tp + fp)
+    print 'specificity:', tp / float(tn + fp)
 
-    assert len(all_names) - n_ignored == \
-           tp+tn+fp+fn, len(all_names) - (tp+tn+fp+fn)
+    assert len(all_names) == tp + tn + fp + fn, \
+           (len(all_names) - (tp+tn+fp+fn),
+            len(all_names),
+            tp,
+            tn,
+            fp,
+            fn)
     
 if __name__ == '__main__':
     main()
