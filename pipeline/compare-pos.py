@@ -3,42 +3,44 @@ import argparse
 import sys
 import screed
 
-def do_counting(a, b, all_lengths, ignore_set):
-    n = 0                               # in a
+def do_counting(first, second, ignore_set):
+    n = 0                               # reads w/errors in first
+    o = 0                               # reads w/errors in second
+    
     m = 0                               # number of matches
     unexplained = 0
     n_ignored = 0
 
-    for k, va in a.iteritems():
-        if k in ignore_set:
+    for k, va in first.iteritems():
+        if k in ignore_set:             # ignoreme
             n_ignored += 1
             continue
 
-        if not va:
+        if not va:                      # no errors
             continue
         
         n += 1
-        vb = b.get(k)
+        vb = second.get(k)
         if not vb:
             continue
         
-        if va == vb:                # match
+        if va == vb:                # match, forward.
             m += 1
-        else:
-            READLEN = all_lengths[k]
-            rva = list(sorted([ READLEN - x - 1 for x in va ]))
-            if rva == vb:           # match (reverse complement)
-                m += 1
-            else:
-#                    print k, va, rva, vb # not a match
-                unexplained += 1
+            continue
+        
+        unexplained += 1    # no match.
 
-    o = 0                               # in b
-    for k, vb in b.iteritems():
+    o = 0                               # in second
+    for k, vb in second.iteritems():
+        if k in ignore_set and 0:             # ignoreme - WHY NEEDED??@@
+            n_ignored += 1
+            continue
+        
         if len(vb):
             o += 1
 
     return m, n, unexplained, n_ignored, o
+
 
 # read in list of error positions per read
 def read_pos_file(filename, ignore_set):
@@ -51,13 +53,14 @@ def read_pos_file(filename, ignore_set):
             posns = []
 
         if posns:
-            if posns is 'V':
+            if posns is 'V':            # ignore variable coverage foo
                 ignore_set.add(read)
                 posns = []
             else:
                 posns = list(sorted(map(int, posns.split(','))))
 
         yield read, posns
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -79,12 +82,10 @@ def main():
     # get list of all reads
     print >>sys.stderr, 'loading reads from', args.reads
     all_names = set()
-    all_lengths = {}
     for record in screed.open(args.reads):
         all_names.add(record.name)
-        all_lengths[record.name] = len(record.sequence)
 
-    m, n, unexplained, n_ignored, o =do_counting(a, b, all_lengths, ignore_set)
+    m, n, unexplained, n_ignored, o =do_counting(a, b, ignore_set)
     
     print 'total # of reads analyzed: %d' % (len(a),)
     print 'IGNORED due to -V: %d (%d, %.2f%%)' % (n_ignored, len(a) - n_ignored,
