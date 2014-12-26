@@ -2,7 +2,7 @@
 
 % TODO:
 % apply to larger data sets - ask Sherine to configure, run, write.
-% examine lousy specificity
+%% examine lousy specificity
 % verify that compare-pos scripts etc are looking at same things
 % are Ns responsible for error profile ratio??
 % makefile => save details of streaming error trimming to file
@@ -857,90 +857,96 @@ We next applied to ecoli data.@@
 
 \section{Discussion}
 
-\subsection{Digital normalization enables k-mer spectral error detection in variable abundance shotgun data}
+\subsection{Digital normalization can be applied effectively to short reads prior to error detection and correction.}
 
-Reference-free error detection and correction in shotgun data from
-metagenomic, transcriptomic, and amplified samples typically requires
-specialized approaches (cite, discuss).  Here we demonstrate that
-after digital normalization, k-mer abundance spectral approaches can
-be applied to reads with high estimated coverage.  This should
-generalize to any approaches that rely on k-mer abundance, including
-error detection, trimming, correction.
+Tracking k-mer abundances in large short-read data sets is part of
+many error detection and correction algorithms, but this process can
+be time and memory intensive.  Our results demonstrate that digital
+normalization can be used to reduce the total number of k-mers under
+consideration, without strongly affecting performance.  We showed
+this in both simulated and real data.
 
-One significant disadvantage of the variable abundance approach is
-that low-coverage reads cannot be trimmed because we do not know
-whether they are from low-abundance molecules or are highly erroneous.
-This must be taken into account for downstream analysis; for example,
-while assemblers must already ignore or correct these erroneous reads,
-quantitation approaches using e.g. mapping should be not be applied
-to the trimmed data.
+With a real {\em E. coli} data set, digital normalization reduced the
+number of k-mers by a third (Table~\ref{tab:ecoli_dn_counts}, Distinct
+k-mers) yielding essentially the same sensitivity and specificity of
+error predictions.  Moreover, when we ran the Quake error corrector on
+the reads using unnormalized and normalized counts
+(Table~\ref{tab:quake_ecoli}, we achieved nearly identical results,
+demonstrating that digital normalization does not remove information
+critical for error correction.
 
-Another disadvantage of the variable abundance approach is that we cannot
-distinguish between low abundance and highly erroneous reads because the
-median k-mer abundance is an underestimate of coverage for highly erroneous
-reads.  (In k-mer spectral error analysis of genomes, low abundance reads
-can simply be assumed to be highly erroneous.)
+\subsection{K-mer counts from digitally normalized short reads can be used to error correct mRNAseq and metagenome data}
 
-(@This is where applying Quake to diginorm reads would be a useful demonstration.)
+Spectral error correction approaches typically rely on assumptions of
+uniform sequence coverage, but these assumptions are violated by
+several types of data, including mRNAseq and shotgun metagenome data.
+Digital normalization evens out this coverage, allowing existing
+spectral error correction approaches to be applied to data from
+samples with non-uniform abundances.  We demonstrated this by using
+spectral error detection with digitally normalized data to predict
+errors in both synthetic and real RNAseq and metagenome data
+(Table~\ref{tab:spectra_variable_real}.  We then again used Quake to
+error correct high-coverage portions of mRNAseq and shotgun metagenome
+data sets, which yielded good results (Table~\ref{tab:quake_variable}.
+This again demonstrates that digital normalized data can retain the
+information necessary to error correct high coverage reads.
 
-\subsection{A streaming algorithm for read analysis}
+Interestingly, we believe this to be a general approach that could
+allow any error correction software that separates k-mer counting from
+error correction to be applied to mRNAseq, shotgun metagenome, and
+whole-genome amplified samples.
 
-We introduce a few-pass algorithm ($\leq 2N$) for detecting and
-analyzing reads that belong to high-coverage regions of the De Bruijn
-graph.  As with digital normalization, the algorithm is sublinear in
-its memory use because only k-mer counts in the retained reads are
-tracked.  The algorithm looks at every read once, and some reads
-twice; the exact number is dictated by biological features of the
-data set as well as the error rate, but for several real data sets is below
-30\% (Table~\ref{tab:streaming_counts}).
+% @  (Comment on adaptation of existing
+% err corr, e.g. Lighter?)
 
-This algorithm can potentially be applied to any shotgun sequencing
-data set, including genomic, transcriptomic, metagenomic, and
-whole-genome amplified data.
+\subsection{Short-read error detection and trimming can be done efficiently with a streaming few-pass sublinear-memory algorithm}
 
-If better methods for read coverage estimation come along, they can be
-used in place of median k-mer abundance.
+K-mer spectral error detection, trimming, and correction approaches
+are typically implemented as a two-pass offline algorithm, in which
+k-mer counts are collected in a first pass and then reads are
+corrected in a second pass.  While several algorithms that run in sub
+linear memory do exist (e.g. Lighter), these are still offline
+algorithms that require at least two full passes across the data.  In
+high coverage data sets it is possible, however, to detect reads that
+are high coverage in the context of previously encountered reads.  By
+integrating k-mer spectral error analysis directly into the digital
+normalization algorithm, we showed that on both synthetic and real
+data sets, we achieved nearly identical predictions to the full
+two-pass algorithm with an algorithm that is less than two pass
+(compare Table~\ref{spectra_variable_real} to
+Table~\ref{tab:spectra_streaming_real}).
 
-Potentially opens up streaming error correction and variant calling.
+We next adapted the error detection algorithm to do streaming error
+trimming on genomic, metagenomic, and transcriptomic data.  On high
+coverage components of variable coverage data sets, this led to about
+a 10x decrease in errors.
 
-\subsection{Empirical error profiles can be calculated on subsets of Illumina shotgun data}
+\subsection{Data-set wide error profiles can be calculated in sub linear time and memory}
 
-XXXX
+The ability to analyze high-coverage reads without examining the
+entire data set offers some intriguing possibilities.  One concrete
+application is the use of high coverage reads to infer data-set wide
+error characteristics for shotgun data, in a way that is robust to the
+sample.  Can also be used to assess whether the necessary coverage has
+been obtained in order to truncate sequencing, in e.g. metagenomics
+workflows.
 
-Useful for cores etc: quick evaluation of sequencing quality, regardless
-of origin.
-
-Repeats could be pulled off first.
+More generally, the approach of using saturating coverage to truncate
+computational analysis may have application to streaming sequencing
+technologies such as Nanopore, where realtime feedback between
+sequencing and sequence analysis could be useful.
 
 \subsection{Concluding thoughts}
 
-Here we have demonstrated that a general streaming algorithm based on
-detection of graph-local saturation can be used to detect and remove
-errors in high-coverage shotgun sequencing data.  The algorithm is
-few-pass, in that some fraction of the data must be examined twice,
-although the precise fraction depends on biological features of the
-data set.  In addition, because the algorithm relies on
-abundance-normalized sequencing data, it can be applied to metagenomic
-and transcriptomic data as well as genomic.  And, finally, the approach
-may enable some sublinear-time analyses as well.
+We describe time- and memory- efficient general algorithmic approaches
+to k-mer spectral error detection and correction based on read-local
+analysis of coverage.
 
-From a pragmatic perspective, the error trimming approaches described
-here should only be used on metagenomes and transcriptomes prior to
-assembly, and should not be used prior to mapping.  Because they
-ignore low-abundance reads, those reads will not be trimmed, and may
-map poorly, in which case downstream analyses such as counting may be
-biased against low-abundance reads.
+These approaches can be applied to variable coverage data, including
+mRNAseq and shotgun metagenome reads.
 
-Time- and memory-efficient error profile calculation is practically useful
-for large sequencing cores.
-
-Dealing with variants is outside the scope of this work, but 50/50
-variants should not be trimmed.  What about repeats?
-
-Streaming methods for error correction and variant calling, more generally.
-
-Theory needed for thresholding, but, in theory, thresholds should be
-static.  (We can demonstrate that there is little variation.)  Interesting
-to examine theory, real parameters for data sets... for the future.
+Future applications include streaming error correction, reference-free
+variant calling, and reference-free analysis of streaming sequencing
+data.
 
 \end{document}

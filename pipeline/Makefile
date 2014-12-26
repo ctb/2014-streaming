@@ -45,6 +45,9 @@ include makefile.rseq
 ##### E. coli genome data set (real)
 include makefile.ecoli
 
+##### shotgun metagenome data set (real)
+include makefile.podar
+
 #####
 
 repeat-10.fa:
@@ -132,57 +135,6 @@ repgenome-compare.txt: repgenome-10-reads.calc.pos repgenome-10-reads.mut.pos
 	./compare-pos-2.py 10 repgenome-10-reads.mut.pos repgenome-10-reads.calc.pos repgenome-10-reads.fa >> repgenome-compare.txt
 
 ####
-
-podar:  podar.1.bt2 \
-	podar_compare2.txt podar_compare4.txt podar_compare5
-
-podar.1.bt2: podar-ref.fa
-	bowtie2-build podar-ref.fa podar
-	samtools faidx podar-ref.fa
-
-podar-reads.sam: podar-1.fastq.gz podar.1.bt2
-	gunzip -c podar-1.fastq.gz | bowtie2 -p 4 -x podar -U - -S podar-reads.sam
-
-podar-mapped.fq.gz: podar-reads.sam
-	./extract-sam-seqs-to-fq.py podar-reads.sam podar-1.fastq.gz | gzip > podar-mapped.fq.gz
-
-podar-reads.sam.pos: podar-reads.sam
-	./sam-scan.py podar-ref.fa podar-reads.sam > podar-reads.sam.pos
-
-podar.dn.kh: podar-mapped.fq.gz
-	 normalize-by-median.py -x 4e8 -N 4 -k 20 -C 10 -s podar.dn.kh podar-mapped.fq.gz -R podar-dn-report.txt
-
-podar-reads.errors.pos: podar-mapped.fq.gz podar.dn.kh
-	 ./report-errors-by-read.py -V --coverage 10 podar.dn.kh podar-mapped.fq.gz > podar-reads.errors.pos
-
-podar_compare2.txt: podar-reads.errors.pos podar-reads.sam.pos
-	./compare-pos.py -V podar-reads.errors.pos podar-reads.sam.pos podar-mapped.fq.gz > podar_compare2.txt
-
-podar-stream-mismatches.pos: podar-mapped.fq.gz
-	./calc-errors-few-pass.py -V -x 4e8 -N 4 -k 20 -Z 10 podar-mapped.fq.gz > podar-stream-mismatches.pos
-
-podar_compare4.txt: podar-stream-mismatches.pos podar-reads.sam.pos
-	./compare-pos.py -V podar-stream-mismatches.pos podar-reads.sam.pos podar-mapped.fq.gz > podar_compare4.txt
-
-podar-mapped.fq.gz.abundtrim: podar-mapped.fq.gz
-	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 10 -C 3 -x 4e8 -N 4 podar-mapped.fq.gz
-
-podar-abundtrim.sam: podar-mapped.fq.gz.abundtrim
-	bowtie2 -p 4 -x podar -U podar-mapped.fq.gz.abundtrim -S podar-abundtrim.sam
-
-podar-abundtrim.sam.pos: podar-abundtrim.sam
-	./sam-scan.py podar-ref.fa podar-abundtrim.sam > podar-abundtrim.sam.pos
-
-podar_compare5_pre.txt:podar-reads.sam.pos podar-mapped.fq.gz
-	./summarize-pos-file.py podar-reads.sam.pos podar-mapped.fq.gz > podar_compare5-pre.txt
-
-podar_compare5_post.txt: podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim
-	./summarize-pos-file.py podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim > podar_compare5_post.txt
-
-podar_compare5: podar_compare5_pre.txt podar_compare5_post.txt
-	cat podar_compare5_pre.txt podar_compare5_post.txt
-
-#####
 
 xxx:
 	sample-reads-randomly.py -R 1 -S 5 -N 1e6 ecoli-mapped.fq.gz

@@ -106,10 +106,6 @@ def main():
 
     n, o, matches, mismatches, n_ignoredXX = do_counting(a, b, ignore_set)
 
-    assert n <= total_reads
-    assert o <= total_reads
-    assert n_ignored == n_ignoredXX
-    
     print 'total # of reads: %d' % (total_reads,)
     print 'IGNORED due to -V: %d (%d, %.2f%%)' % (n_ignored,
                                                   tracked_reads,
@@ -161,6 +157,10 @@ def main():
     print 'sensitivity:', tp / float(tp + fn)
     print 'specificity:', tp / float(tn + fp)
 
+    assert n <= total_reads
+    assert o <= total_reads
+    assert n_ignored == n_ignoredXX
+    
     assert len(all_names) == tp + tn + fp + fn, \
            (len(all_names) - (tp+tn+fp+fn),
             len(all_names),

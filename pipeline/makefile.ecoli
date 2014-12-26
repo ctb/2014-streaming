@@ -10,7 +10,7 @@ ecoli.1.bt2: ecoliMG1655.fa
 
 # ecoli-reads.sam is the bowtie mapping of the reads to the reference genome.
 ecoli-reads.sam: ecoli_ref-5m.fastq.gz ecoli.1.bt2
-	gunzip -c ecoli_ref-5m.fastq.gz | bowtie2 -p 4 -x ecoli -U - -S ecoli-reads.sam
+	./trim-at-N.py ecoli_ref-5m.fastq.gz | bowtie2 -p 4 -x ecoli -U - -S ecoli-reads.sam
 
 # ecoli-reads.sam.pos is the 'pos' file containing the locations of mismatches,
 # i.e. errors, determined from mapping.
@@ -84,6 +84,9 @@ ecoli-errfree-report.txt: ecoli-errfree-reads.fa
 
 ecoli-mapped.fq.gz.errhist: ecoli-mapped.fq.gz
 	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz
+
+ecoli-mapped.fq.gz.errhist2: ecoli-mapped.fq.gz ecoli_ref.dn.kh
+	./report-errhist-2pass.py ecoli_ref.dn.kh ecoli-mapped.fq.gz  -o ecoli-mapped.fq.gz.errhist2
 
 ecoli-reads.sam.errhist: ecoli-reads.sam ecoliMG1655.fa
 	./sam-scan-errhist.py ecoliMG1655.fa ecoli-reads.sam -o ecoli-reads.sam.errhist

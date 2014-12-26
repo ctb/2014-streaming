@@ -58,6 +58,10 @@ def main():
 
         print >>args.outfile, readname, ",".join(map(str, errors))
 
+    # avoid log errors via pseudocount
+    n_fwd += 1
+    n_rev += 1
+    
     print >>sys.stderr, 'logratio of fwd to rev: %.2f' % (math.log(n_fwd / float(n_rev), 2))
     if n_skipped / float(n) > .01:
         raise Exception, "Error: too many reads ignored! %d of %d" % \
