@@ -69,6 +69,7 @@ def main():
         length_count[j] = sum([1 for i in lengths if i >= j])
 
     # write!
+    args.outfile.write('position error_count error_fraction\n')
     for n, i in enumerate(positions[:max_length]):
         print >>args.outfile, n, i, float(i) / float(length_count[n])
 

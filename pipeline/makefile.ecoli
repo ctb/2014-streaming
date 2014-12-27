@@ -1,7 +1,13 @@
 ECOLI_K=20
 
 ecoli: ecoli_compare2.txt ecoli_compare2_nodn.txt ecoli-mapped.fq.gz.errhist \
-	ecoli-reads.sam.errhist ecoli_compare4.txt
+	ecoli-reads.sam.errhist ecoli_compare4.txt \
+	ecoli-mapped.fq.gz.subset.0.errhist \
+	ecoli-mapped.fq.gz.subset.1.errhist \
+	ecoli-mapped.fq.gz.subset.2.errhist \
+	ecoli-mapped.fq.gz.subset.3.errhist \
+	ecoli-mapped.fq.gz.subset.4.errhist \
+	ecoli-mapped.fq.gz.errhist2
 
 # bowtie index for ecoliMG1655.fa
 ecoli.1.bt2: ecoliMG1655.fa
@@ -84,6 +90,21 @@ ecoli-errfree-report.txt: ecoli-errfree-reads.fa
 
 ecoli-mapped.fq.gz.errhist: ecoli-mapped.fq.gz
 	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz
+
+ecoli-mapped.fq.gz.subset.0.errhist: ecoli-mapped.fq.gz.subset.0
+	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz.subset.0
+
+ecoli-mapped.fq.gz.subset.1.errhist: ecoli-mapped.fq.gz.subset.1
+	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz.subset.1
+
+ecoli-mapped.fq.gz.subset.2.errhist: ecoli-mapped.fq.gz.subset.2
+	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz.subset.2
+
+ecoli-mapped.fq.gz.subset.3.errhist: ecoli-mapped.fq.gz.subset.3
+	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz.subset.3
+
+ecoli-mapped.fq.gz.subset.4.errhist: ecoli-mapped.fq.gz.subset.4
+	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz.subset.4
 
 ecoli-mapped.fq.gz.errhist2: ecoli-mapped.fq.gz ecoli_ref.dn.kh
 	./report-errhist-2pass.py ecoli_ref.dn.kh ecoli-mapped.fq.gz  -o ecoli-mapped.fq.gz.errhist2

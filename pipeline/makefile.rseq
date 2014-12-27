@@ -1,9 +1,14 @@
 rseq: rseq_compare2 rseq_compare4 rseq_compare5 \
 	rseq-reads-hicov-sam-mismatches-report.txt \
 	rseq-mapped.fq.gz.errhist rseq-reads.sam.errhist \
-	rseq-mapped.fq.gz.errhist2
+	rseq-mapped.fq.gz.errhist2 \
 	rseq-reads.hicov.cor.fq.gz \
-	rseq_compare6 rseq-reads.hicov.fq.keep.hist
+	rseq_compare6 rseq-reads.hicov.fq.keep.hist \
+	rseq-mapped.fq.gz.subset.0.errhist \
+	rseq-mapped.fq.gz.subset.1.errhist \
+	rseq-mapped.fq.gz.subset.2.errhist \
+	rseq-mapped.fq.gz.subset.3.errhist \
+	rseq-mapped.fq.gz.subset.4.errhist
 
 rseq-reads.fq.gz: mouse-5m.fq.gz
 	./trim-at-N.py mouse-5m.fq.gz | head -4000000 | gzip -9c > rseq-reads.fq.gz
@@ -141,3 +146,18 @@ rseq-mapped.fq.gz.errhist2: rseq-mapped.fq.gz rseq-reads.dn.kh
 
 rseq-reads.sam.errhist: rseq-reads.sam
 	./sam-scan-errhist.py rna.fa rseq-reads.sam -o rseq-reads.sam.errhist
+
+rseq-mapped.fq.gz.subset.0.errhist: rseq-mapped.fq.gz.subset.0
+	-$(KHMER)/sandbox/calc-error-profile.py rseq-mapped.fq.gz.subset.0
+
+rseq-mapped.fq.gz.subset.1.errhist: rseq-mapped.fq.gz.subset.1
+	-$(KHMER)/sandbox/calc-error-profile.py rseq-mapped.fq.gz.subset.1
+
+rseq-mapped.fq.gz.subset.2.errhist: rseq-mapped.fq.gz.subset.2
+	-$(KHMER)/sandbox/calc-error-profile.py rseq-mapped.fq.gz.subset.2
+
+rseq-mapped.fq.gz.subset.3.errhist: rseq-mapped.fq.gz.subset.3
+	-$(KHMER)/sandbox/calc-error-profile.py rseq-mapped.fq.gz.subset.3
+
+rseq-mapped.fq.gz.subset.4.errhist: rseq-mapped.fq.gz.subset.4
+	-$(KHMER)/sandbox/calc-error-profile.py rseq-mapped.fq.gz.subset.4

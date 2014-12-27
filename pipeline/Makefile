@@ -138,3 +138,6 @@ repgenome-compare.txt: repgenome-10-reads.calc.pos repgenome-10-reads.mut.pos
 
 xxx:
 	sample-reads-randomly.py -R 1 -S 5 -N 1e6 ecoli-mapped.fq.gz
+
+yyy:
+	sample-reads-randomly.py -R 1 -S 5 -N 3e5 rseq-mapped.fq.gz
