@@ -147,6 +147,9 @@ rseq-mapped.fq.gz.errhist2: rseq-mapped.fq.gz rseq-reads.dn.kh
 rseq-reads.sam.errhist: rseq-reads.sam
 	./sam-scan-errhist.py rna.fa rseq-reads.sam -o rseq-reads.sam.errhist
 
+rseq-mapped.fq.gz.subset.0: rseq-mapped.fq.gz
+	sample-reads-randomly.py -R 1 -S 5 -N 5e5 rseq-mapped.fq.gz
+
 rseq-mapped.fq.gz.subset.0.errhist: rseq-mapped.fq.gz.subset.0
 	-$(KHMER)/sandbox/calc-error-profile.py rseq-mapped.fq.gz.subset.0
 

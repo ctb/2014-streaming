@@ -3,9 +3,9 @@
 % TODO:
 % apply to larger data sets - ask Sherine to configure, run, write.
 %% examine lousy specificity
-% verify that compare-pos scripts etc are looking at same things
-% are Ns responsible for error profile ratio??
-% makefile => save details of streaming error trimming to file
+
+% Writing:
+% address lousy specificity, viz. streaming trimming
 
 \documentclass{article}
 \usepackage{graphicx}
@@ -823,37 +823,50 @@ small sample of sequencing data}
 With Illumina sequencing, average and per-position error rates may
 vary between sequencing runs, but are typically systematic within a
 run (cite?).  Per-position error rates are caused by fluidics etc.
+Ability to estimate and evaluate is good.
 
-We can use the approaches described above to calculate systematic
-error profiles for shotgun sequencing data across entire data sets,
-but the variable abundance approach developed above can also be
-applied to {\em subsets} of Illumina data.  The essential idea is to
-consume reads until sufficient data has been collected to calculate
-error rates, and then to calculate those error rates for the new reads
-based on the k-mer abundances from the old reads.  This can aso be
-done in one pass for data sets with sufficiently high coverage data:
-as shown above (Figure XXX), more than half of the reads will have
-sufficient coverage to call errors by the time 10\% of the data set
-has been consumed.
+K-mer spectral error analysis can be used to calculate per-position
+sequencing error for entire data sets (cite khmer-counting).  We can
+adapt the streaming approaches above to efficiently provide estimates
+for {\em subsets} of the data.  The essential idea is to consume reads
+until sufficient data has been collected to calculate error rates, and
+then to calculate those error rates for the new reads based on the
+k-mer abundances from the old reads.  This can aso be done in one pass
+for data sets with sufficiently high coverage data: as shown above
+(Figure XXX), more than half of the reads will have sufficient
+coverage to call errors by the time 10\% of the data set has been
+consumed.
 
-We first simulated a set of reads from the simple genome with errors
-only at even positions (0, 2, 4, etc.), and called errors in these
-reads using the single-pass algorithm described above (see Methods for
-implementation details).  We also separately called errors by mapping
-with bowtie and examining mismatches.  The results are shown in Figure
-YYY; the difference in predicted vs actual mismatch profiles has an
-average of 0.04\%, with a variance of 0.0002\% across positions.  The
-predicted per-base error rate is 0.57\%, while the true error rate is
-0.65\%; this underestimate may be due to ignoring reads with multiple
-errors in them that present as too low-coverage to assess.
+Using the same error detection code as above, we implemented a
+sublinear memory/sublinear time algorithm that collects reads until
+some regions have reached 20x coverage, or 200,000 reads have
+surpassed a coverage of 10x (see Methods for details).  In either
+case, all reads at or above a coverage of 10 are analyzed for errors,
+with a trusted k-mer cutoff of 3.  In Figure~\ref{fig:ecoli_err} and
+Figure~\ref{fig:rseq_err} we show the resulting error profiles for the
+{\em E. coli} data set and the mouse RNAseq data set, compared with
+the profile obtained by examining bowtie2 mismatches against the
+reference.
 
-@@show figure with shaded color indicating difference
+In the {\em E. coli} data set (Figure~\ref{fig:ecoli_err}), we see the
+typical increase in error rate towards the 3' end of the gene.  The
+bowtie and k-mer error profiles agree in shape (Pearson's correlation
+of 0.99) although they are offset considerably in absolute magnitude.
+The k-mer error profile was calculated from the first XXX reads, but
+is consistent across five other subsets of the data chosen randomly
+with reservoir sampling (data not shown); all five subsets had
+Pearson's correlation coefficients greater than 0.99 with the bowtie2
+calculation and each other.
 
-We next applied to ecoli data.@@
-
-@@error rates? apply regression?
-
-@@subsampling
+The RNAseq error profile exhibits two large spikes, one at position 34
+and one at position 69.  Both spikes appear to be genuine and
+correlate with large numbers of Ns in those positions in the original
+data set.  The spikes correlate across all of the measures of error,
+with the exception of the sublinear approach developed above.  This
+turns out to be due to the choice of subsample: other samples, taken
+randomly with reservoir sampling, match the position and relative magnitude
+of the spikes well.  All measures of error have a Pearson's correlation
+coefficient of greater than 0.96 on the RNAseq data set.
 
 \section{Discussion}
 

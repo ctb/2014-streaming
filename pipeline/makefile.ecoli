@@ -91,6 +91,9 @@ ecoli-errfree-report.txt: ecoli-errfree-reads.fa
 ecoli-mapped.fq.gz.errhist: ecoli-mapped.fq.gz
 	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz
 
+ecoli-mapped.fq.gz.subset.0: ecoli-mapped.fq.gz
+	sample-reads-randomly.py -R 1 -S 5 -N 1e6 ecoli-mapped.fq.gz
+
 ecoli-mapped.fq.gz.subset.0.errhist: ecoli-mapped.fq.gz.subset.0
 	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz.subset.0
 
