@@ -30,6 +30,17 @@ podar-paired: podar \
 	podar_compare5_post.txt
 
 
+mouse-paired: mouse \
+	mouse-reads.sam \
+	mouse-mapped.fq.gz \
+	mouse-reads.sam.pos \
+	mouse-dn-report.txt \
+	mouse-mapped.fq.gz.abundtrim \
+	mouse_compare5_pre.txt \
+	mouse-abundtrim.sam \
+	mouse-abundtrim.sam.pos \
+	mouse_compare5_post.txt
+
 clean:
 	-rm -f simple-genome.fa simple-genome-reads.dn.kh simple-genome-reads.sam
 	-rm -f *-reads.fa
@@ -86,7 +97,40 @@ podar-abundtrim.sam.pos: podar-abundtrim.sam
 podar_compare5_post.txt: podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim
 	./summarize-pos-file.py podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim > podar_compare5_post.txt 
 
-#---------------------------------------End Podar Work--------------
+#---------------------------------------Mouse  Work--------------
+mouse: mouse.fastq.gz mouse-ref.fa
+	bowtie2-build mouse-ref.fa mouse \
+	samtools faidx mouse-ref.fa 
+
+mouse-reads.sam: m.fastq.gz
+	./trim-at-N.py mouse.fastq.gz | bowtie2 -p 4 -x mouse -U - -S mouse-reads.sam
+
+mouse-mapped.fq.gz: mouse-reads.sam
+	./extract-sam-seqs-to-fq.py mouse-reads.sam m.fastq.gz > sam-seq \  
+	gzip -c sam-seq >mouse-mapped.fq.gz
+
+mouse-reads.sam.pos: mouse-reads.sam mouse-ref.fa
+	./sam-scan.py mouse-ref.fa mouse-reads.sam > mouse-reads.sam.pos
+
+mouse-dn-report.txt: mouse-mapped.fq.gz
+	normalize-by-median.py -x 4e8 -N 4 -k 20 -C 20 -s mouse.dn.kh mouse-mapped.fq.gz -R mouse-dn-report.txt
+
+mouse-mapped.fq.gz.abundtrim: mouse-mapped.fq.gz
+	/mnt/khmer/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 -x 4e8 -N 4 mouse-mapped.fq.gz
+
+mouse_compare5_pre.txt: mouse-mapped.fq.gz
+	./summarize-pos-file.py mouse-reads.sam.pos mouse-mapped.fq.gz > mouse_compare5_pre.txt
+
+mouse-abundtrim.sam: mouse-mapped.fq.gz.abundtrim
+	bowtie2 -p 4 -x mouse -U mouse-mapped.fq.gz.abundtrim -S mouse-abundtrim.sam
+
+mouse-abundtrim.sam.pos: mouse-abundtrim.sam
+	./sam-scan.py mouse-ref.fa mouse-abundtrim.sam > mouse-abundtrim.sam.pos 
+        
+mouse_compare5_post.txt: mouse-abundtrim.sam.pos mouse-mapped.fq.gz.abundtrim
+	./summarize-pos-file.py mouse-abundtrim.sam.pos mouse-mapped.fq.gz.abundtrim > mouse_compare5_post.txt 
+
+#--------------------------------------------------
 ecoli1: ecoli-report.txt ecoli-report-nodn.txt
 
 # bowtie index for ecoliMG1655.fa
