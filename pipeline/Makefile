@@ -1,7 +1,7 @@
 #TODO - put in spot checks for the trickier scripts!
 
 NULLGRAPH=~/dev/nullgraph
-KHMER=~/dev/khmer
+KHMER=/mnt/khmer
 
 all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	compare4 mcompare4 rcompare4 compare5 compare6 \
@@ -16,6 +16,19 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 	mrna-reads.sorted.bam
+
+podar-paired: podar \
+	trim-at-N \
+	podar-reads.sam \
+	podar-mapped.fq.gz \
+	podar-reads.sam.pos \
+	podar-dn-report.txt \
+	podar-mapped.fq.gz.abundtrim \
+	podar_compare5_pre.txt \
+	podar-abundtrim.sam \
+	podar-abundtrim.sam.pos \ 
+	podar_compare5_post.txt
+
 
 clean:
 	-rm -f simple-genome.fa simple-genome-reads.dn.kh simple-genome-reads.sam
@@ -32,7 +45,48 @@ include makefile.simple-metagenome
 include makefile.mrna
 
 #####
+#--------------------------------------Podar Work--------------------
+podar: podar-1.fastq.gz podar-2.fastq.gz podar-ref.fa
+	bowtie2-build podar-ref.fa podar \
+	samtools faidx podar-ref.fa 
 
+trim-at-N: podar 
+	./trim-at-N.py podar-1.fastq.gz >p1.fastq \
+	./trim-at-N.py podar-2.fastq.gz >p2.fastq  \
+	gzip -c p1.fastq >p1.fastq.gz \
+	gzip -c p2.fastq >p2.fastq.gz
+
+podar-reads.sam: p1.fastq.gz p2.fastq.gz 
+	bowtie2 -p 4 -x podar -1 p1.fastq.gz -2 p2.fastq.gz -S podar-reads.sam \
+
+podar-mapped.fq.gz: podar-reads.sam
+	./extract-sam-seqs-to-fq.py podar-reads.sam p1.fastq.gz > sam-seq-1 \  
+	./extract-sam-seqs-to-fq.py podar-reads.sam p2.fastq.gz > sam-seq-2 \
+	 cat sam-seq-1 sam-seq-2 >sam-seq \
+	 gzip -c sam-seq >podar-mapped.fq.gz
+
+podar-reads.sam.pos: podar-reads.sam podar-ref.fa
+	./sam-scan.py podar-ref.fa podar-reads.sam > podar-reads.sam.pos
+
+podar-dn-report.txt: podar-mapped.fq.gz 
+	normalize-by-median.py -x 4e8 -N 4 -k 20 -C 20 -s podar.dn.kh podar-mapped.fq.gz -R podar-dn-report.txt
+
+podar-mapped.fq.gz.abundtrim: podar-mapped.fq.gz 
+	/mnt/khmer/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 -x 4e8 -N 4 podar-mapped.fq.gz
+
+podar_compare5_pre.txt: podar-mapped.fq.gz
+	./summarize-pos-file.py podar-reads.sam.pos podar-mapped.fq.gz > podar_compare5_pre.txt
+
+podar-abundtrim.sam: podar-mapped.fq.gz.abundtrim
+	bowtie2 -p 4 -x podar -U podar-mapped.fq.gz.abundtrim -S podar-abundtrim.sam
+
+podar-abundtrim.sam.pos: podar-abundtrim.sam
+	./sam-scan.py podar-ref.fa podar-abundtrim.sam > podar-abundtrim.sam.pos 
+	
+podar_compare5_post.txt: podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim
+	./summarize-pos-file.py podar-abundtrim.sam.pos podar-mapped.fq.gz.abundtrim > podar_compare5_post.txt 
+
+#---------------------------------------End Podar Work--------------
 ecoli1: ecoli-report.txt ecoli-report-nodn.txt
 
 # bowtie index for ecoliMG1655.fa
