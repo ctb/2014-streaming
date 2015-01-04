@@ -535,11 +535,11 @@ coverage genomic data set, we would expect 50\% or more of the genome
 to be represented by more than 100 reads.  This is a consequence of
 the Poisson-random sampling that underlies shotgun sequencing (cite
 Waterman?).  This oversampling provides an opportunity, however: if we
-regard the read data set as a stream of incoming data, some portions
-of the reference will be more highly sampled earlier in the stream
-than others.  For example, in mRNAseq, highly expressed transcripts
-will on average be highly sampled much earlier than low-expressed
-transcripts.
+regard the read data set as a stream of incoming data randomly sampled
+from a pool of molecules, high-abundance species or subsequences
+within the pool will be more highly sampled earlier in the stream than
+others.  For example, in mRNAseq, highly expressed transcripts will on
+average be highly sampled much earlier than low-expressed transcripts.
 
 We can adapt the same approaches used in previous sections to do {\em
   streaming} error analysis by detecting high-coverage reads {\em
@@ -949,7 +949,7 @@ integrating k-mer spectral error analysis directly into the digital
 normalization algorithm, we showed that on both synthetic and real
 data sets, we achieved nearly identical predictions to the full
 two-pass algorithm with an algorithm that is less than two pass
-(compare Table~\ref{spectra_variable_real} to
+(compare Table~\ref{tab:spectra_variable_real} to
 Table~\ref{tab:spectra_streaming_real}).
 
 We next adapted the error detection algorithm to do streaming error
