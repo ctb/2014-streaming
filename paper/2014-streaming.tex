@@ -67,7 +67,7 @@ and correct errors in high-coverage shotgun sequencing data}
 Our initial question was whether we could apply spectral error analysis
 to genomic short read data after digital normalization.  We
 tested this on a synthetic data set and an {\em E. coli} data set.  We
-then compared the performance of Quake on the raw and digitally
+then compared the performance of Quake on the original and digitally
 normalized counts from the {\em E. coli data}.
 
 \paragraph{Simulated data:}
@@ -90,9 +90,11 @@ these low-count k-mers.
 
 \begin{figure}[!ht]
  \centerline{\includegraphics[width=4in]{./figures/kmer-spectrum}}
-\caption{\bf K-mer spectrum of a simple artificial data set, before and after digital normalization.  The peaks at 1 represents erroneous k-mers resulting
-from (simulated) error; the peaks centered at 80 (raw) and 20 (diginorm)
-represent k-mers truly present in the genome which are present in many reads.}
+\caption{\bf K-mer spectrum of a simple artificial data set, before
+  and after digital normalization.  The peaks at 1 represents
+  erroneous k-mers resulting from (simulated) error; the peaks
+  centered at 80 (original) and 20 (diginorm) represent k-mers truly
+  present in the genome, which are shared among many reads.}
 \label{fig:spectrum}
 \end{figure}
 
@@ -103,16 +105,18 @@ represent k-mers truly present in the genome which are present in many reads.}
 \begin{table}
 \begin{tabular}{|l|c|c|l|}
 \hline
-Name & Origin & Number of reads & Description \\
+Name & Origin & Number of reads \\
 \hline
-simple genome & 10,000 & No repeats\\
-{\em E. coli} MG1655 & 5,000,000 & Subset of NCXXXXX \\
-simple metagenome & 2,347 & Dynamic range of YYY \\
-simple transcriptome & 568 & Dynamic range of ZZZ; multiple exons\\
+simple genome & 10,000 & No repeats \\
+{\em E. coli} MG1655 & 5,000,000 & Subset of XXXXX \\
+simple transcriptome & 568 & 300:1 high:low abundance; shared exons\\
+mouse mRNAseq & 1,000,000 & Subset of XXXXX \\
+simple metagenome & 2,347 & 316:1 high:low abundance species  \\
+mock metagenome & 5,000,000 & Subset of XXXX \\
 \hline
 \end{tabular}
 
-\caption{Data sets used}
+\caption{{\bf Data sets used for evaluation.}}
 \label{tab:data}
 \end{table}
 
@@ -157,7 +161,7 @@ sensitivity of 100\% and a specificity of 80.7\% (Table~\ref{tab:a}).
 \begin{table}
 \begin{tabular}{|l|c|c|}
 \hline
-(Simple genome) & Raw counts & Diginorm counts \\
+{\bf Simple genome} & Original counts & Diginorm counts \\
 \hline
 Perfect detection (TP) & 474 & 485 \\
 No errors (TN) & 355 & 366 \\
@@ -170,10 +174,14 @@ Specificity & 73.5\% & 76.5\% \\
 \hline
 \end{tabular}
 
-\caption{Spectral error detection on 1000 synthetic reads from a
-  simulated 10kb genome, using raw and digitally normalized
-  counts.  The counts are the number of reads where all errors were
-  detected perfectly (TP), no errors were present (TN), one or more errors were miscalled (one type of FP), errors were mistakenly called in an error-free read (the other type of FP), and errors present in a read were missed (FN). }
+\caption{{\bf Results from spectral error detection on 1000 synthetic
+    reads from a simulated 10kb genome, using original and digitally
+    normalized reads.  The counts are the number of reads where all
+    errors were detected perfectly (TP), errors were present and none
+    were called (TN), one or more errors were miscalled (one type of
+    FP), errors were mistakenly called in an error-free read (the
+    other type of FP), and errors present in a read were missed
+    (FN).}}
 \label{tab:a}
 \end{table}
 
@@ -193,11 +201,11 @@ We then compared the results of k-mer spectral error detection with
 and without digital normalization.  We used the same parameters as on
 the simulated genome ($C_0=10$ for unnormalized, $C_0=3$ for
 normalized).  The results are presented in
-Table~\ref{tab:ecoli_dn_counts}. Using the raw counts, the
+Table~\ref{tab:ecoli_dn_counts}. Using the original counts, the
 sensitivities were close between the unnormalized and normalized
-predictions: using the raw counts, we achieved a sensitivity of
+predictions: using the original counts, we achieved a sensitivity of
 99.8\%, versus 99.4\% using the counts from the digitally normalized
-reads.  The specificities were also comparable -- 47.9\% using the raw
+reads.  The specificities were also comparable -- 47.9\% using the original
 counts, and 47.5\% using the digitally normalized counts.
 
 % @CTB why are specificities so low?
@@ -208,7 +216,7 @@ counts, and 47.5\% using the digitally normalized counts.
 \begin{table}
 \begin{tabular}{|l|c|c|}
 \hline
-(E. coli) & Raw counts & Diginorm counts \\
+{\bf E. coli} & Original counts & Diginorm counts \\
 \hline
 Distinct k-mers         & 39,677,503 & 26,296,651 (66\%) \\
 \hline
@@ -223,41 +231,43 @@ Specificity & 47.9\% & 47.5\% \\
 \hline
 \end{tabular}
 
-\caption{Spectral error detection on 5m {\em E. coli} reads, using raw and
-  digitally normalized counts.}
+\caption{{\bf Results from spectral error detection on 5m {\em
+      E. coli} reads, using k-mer counts from original and digitally
+    normalized reads.}}
+
 \label{tab:ecoli_dn_counts}
 \end{table}
 
 \begin{table}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-Sample              & N raw reads & N normalized reads \\
+Sample              & N reads & N normalized reads \\
 \hline
 {\em E. coli}       &            & \\
 \hline
 \end{tabular}
 
-\caption{Read counts (N) for raw and normalized data sets using a
-  k-mer size of 20 and the specified coverage cutoff. Digital
-  normalization reduces the total number of reads considered
-  informative.}
-\label{tab:kmer_counts}
+\caption{{\bf Read counts for original and normalized data sets using
+    a k-mer size of 20 and the specified coverage cutoff. Digital
+    normalization reduces the total number of reads considered
+    informative.}}
+\label{tab:read_counts}
 \end{table}
 
 \begin{table}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-Sample              & raw read M & normalized read M \\
+Sample              & original read M & normalized read M \\
 \hline
 {\em E. coli}       &            & \\
 \hline
 \end{tabular}
 
-\caption{Unique k-mer counts for raw and normalized data sets using a
+\caption{Unique k-mer counts for original and normalized data sets using a
   k-mer size of 20 and the specified coverage cutoff.  Digital
   normalization reduces the total number of k-mers being tracked.}
 
-\label{tab:streaming_counts}
+\label{tab:kmer_counts}
 \end{table}
 
 % @@why such poor results on E. coli? repeats, or what?
@@ -270,45 +280,43 @@ Sample              & raw read M & normalized read M \\
 \begin{table}
 \begin{tabular}{|l|c|c|}
 \hline
-Sample              & raw    & diginorm \\
+                                 & original    & diginorm \\
 \hline
-Erroneous reads        & 22,902      & 17,609 \\
-Total reads            & 4,906,469   & 4,905,853 \\
-Total errors remaining & 49,823      & 43,238 \\
-Total bp               & 450,687,634 & 450,630,551 \\
-Per-base error rate    & 0.011\%     & 0.010\% \\
+Total corrected reads            & 4,906,469   & 4,905,853 \\
+Erroneous reads discarded        & 22,902      & 17,609 \\
+Total bp                         & 450,687,634 & 450,630,551 \\
+Total errors remaining           & 49,823      & 43,238 \\
+Per-base error rate              & 0.011\%     & 0.010\% \\
 \hline
 \end{tabular}
 
-\caption{Comparison of Quake results when run on the same {\em
-    E. coli} data set, using k-mers from either the original data set
-  (``raw'') or just the digitally normalized reads (``diginorm'').
-  All numbers are post-error correction; the pre-correction error rate
-  was 1.60\%.}
+\caption{{\bf Comparison of Quake results when run on the same {\em
+      E. coli} data set, using k-mer counts from either the original
+    data set (original) or the digitally normalized reads
+    (diginorm).  All numbers are post-error correction; the original
+    error rate was 1.60\%.}}
 
 \label{tab:quake_ecoli}
 \end{table}
 
 While the results above suggest that simple spectral error detection
 works equally well both before and after digital normalization, we
-were concerned that we might lose informative reads or k-mers during
-digital normalization.  To evaluate this, we used a more sophisticated
-spectral error correction algorithm, implemented in Quake, to perform
-error correction using the digitally normalized counts.  Here, because
-Quake permits the use of a different k-mer counting table from the
-data being corrected, we could separately use the counts from the raw
-reads and the digitally normalized reads to correct the raw reads (see
-Methods for details).
+were concerned that we might lose informative reads and k-mers during
+digital normalization.  To evaluate this, we used Quake to perform
+error correction on the data set using the k-mer counts from the
+digitally normalized reads, and compared the results to error
+correction with the entire read data set.
 
-The results of running Quake on the raw data using counts from the raw
-and digitally normalized data are shown in
+The results of running Quake on the original data using counts from
+the original and digitally normalized data are shown in
 Table~\ref{tab:quake_ecoli}.  The performance was essentially the
 same: Quake brought the overall error rate in the data set from 1.60\%
 (8.0m errors) to 0.005\%-0.006\% (23,000 - 29,000 errors).
 
 These results demonstrate that digitally normalized counts retain all
 of the information necessary for effective error correction with
-Quake, despite there being many fewer distinct k-mers.
+Quake, despite there being many fewer distinct k-mers
+(Table~\ref{tab:kmer_counts}).
 
 %../pipeline/quake-ecoli-dn-cor.txt      ../pipeline/quake-ecoli-raw-cor.txt
 % posfile ecoli-reads.dn.cor.sam.pos: 17119 mutated reads of 4906448; 22984 mutations total
@@ -322,28 +330,29 @@ Quake, despite there being many fewer distinct k-mers.
 \subsection{Coverage-normalized data can be used to locate errors in variable
 coverage shotgun sequencing data}
 
-Digital normalization works on both genomic data, with even coverage,
-and variable coverage data such as transcriptome and metagenome data
-(cite diginorm, elijah).  However, one of the drawbacks of spectral
-abundance analysis is that it does not directly apply to data with
-uneven coverage.  For example, metagenomic or transcriptomic data sets
-typically contain reads from both high-abundance and low-abundance
-molecules.  This in turn leads to high coverage and low coverage reads
-in the same data set. This variability in coverage confounds naive
-spectral analysis for two reasons: first, erroneous k-mers from very
-high abundance regions can accumulate and increase in abundance over
-the threshold for trusted k-mers, thus appearing to be correct; and
-second, correct reads from low coverage regions yield k-mers below the
-trusted k-mer threshold that appear to be incorrect.  In practice,
-therefore, error analysis for metagenomic and transcriptome data uses
-other approaches than direct spectral error analysis (cite).
+Digital normalization works on genomic data, with even coverage, as
+well as on variable coverage data such as transcriptome and metagenome
+data (cite diginorm, elijah).  One of the drawbacks of
+spectral abundance analysis is that it does not directly apply to data
+with variable coverage.  For example, metagenomic or transcriptomic data
+sets typically contain reads from both high-abundance and
+low-abundance molecules.  This in turn leads to high coverage and low
+coverage reads in the same data set. This variability in coverage
+confounds naive spectral analysis for two reasons: first, erroneous
+k-mers from very high abundance regions can accumulate and increase in
+abundance over the threshold for trusted k-mers, thus appearing to be
+correct; and second, correct reads from low coverage regions yield
+k-mers below the trusted k-mer threshold that appear to be incorrect.
+In practice, therefore, error analysis for metagenomic and
+transcriptome data uses other approaches than direct spectral error
+analysis (cite).
 
-A key concept developed in digital normalization is that of an
-estimator of per-read coverage, the median k-mer abundance within a
-read.  Using median k-mer abundance, we developed a general approach
-that enables spectral error analysis to be used for variable coverage
-data.  We then applied this to two synthetic data sets as well as two
-real data sets, a mock shotgun metagenome and mRNAseq data from mouse.
+Digital normalization uses a reference-free {\em estimator} of
+per-read coverage, the median k-mer abundance within a read.  Using
+this estimator, we developed a general approach that enables spectral
+error analysis on variable coverage data.  We then applied this to two
+synthetic data sets as well as two real data sets, a mock shotgun
+metagenome and mRNAseq data from mouse.
 
 \begin{figure}[!ht]
  \centerline{\includegraphics[width=3in]{./figures/coverage-aware-spectrum}}
@@ -373,10 +382,10 @@ To test this approach, we generated two more synthetic data sets,
 ``simple metagenome'' and ``simple mRNAseq,'' which contain both high-
 and low-abundance species (see Table~\ref{tab:data} for data set
 details).  After generating synthetic reads with a 1\% error rate and
-applying digital normalization (k=20/C=20), we again did spectral
-error detection using the normalized counts.  However, this time we
-modified the algorithm so that only reads with a median k-mer
-abundance of C or greater were examined (see Methods).
+applying digital normalization (k=20/C=20), we again used the normalized
+counts to do spectral error detection.  However, we used a modified
+algorithm that only examined reads with a median k-mer abundance of C
+or greater.
 
 % make mcompare2
 % make rcompare2
@@ -384,7 +393,7 @@ abundance of C or greater were examined (see Methods).
 \begin{table}
 \begin{tabular}{|l|c||c|}
 \hline
-& simple metagenome & simple mRNAseq \\
+& {\bf simple metagenome} & {\bf simple mRNAseq} \\
 \hline
 K-mer coverage threshold & 20 & 20 \\
 Total reads & 2347 & 568 \\
@@ -401,12 +410,12 @@ Specificity & 84.7\% & 78.9\% \\
 \hline
 \end{tabular}
 
-\caption{Variable coverage spectral error detection on two synthetic
+\caption{{\bf Variable coverage spectral error detection on two synthetic
   data sets, a simple metagenome and a simple mRNAseq data set.
   Per-read coverage was estimated by median k-mer abundance within the
   read, and only the reads with estimated coverage at or above the
   specified threshold were analyzed.  Digitally normalized counts were
-  used for the spectral error analysis.}
+  used for the spectral error analysis.}}
 \label{tab:spectra_variable}
 \end{table}
 
@@ -415,7 +424,7 @@ mRNAseq data sets are shown in Table~\ref{tab:spectra_variable}. For the
 simple metagenome data set, 2254 of 2347 reads (96.0\%) met the
 coverage criterion.  Of the 2254 reads analyzed, the errors in 978
 erroneous reads were called perfectly (TP) and 1098 of the reads with
-no errors were correctly called as error-free (TN).  2 reads were
+no errors were correctly called as error-free (TN).  Only 2 reads were
 incorrectly determined to be error free (FN).  Of the remaining 176
 reads, 170 were miscalled (errors existed but were not exactly called)
 and 6 were incorrectly called as erroneous when they were in fact
@@ -436,31 +445,29 @@ same parameters; see Table~\ref{tab:a}).
 \begin{table}
 \begin{tabular}{|l|c||c|}
 \hline
-& Mock metagenome & mouse mRNAseq \\
+& {\bf mouse mRNAseq} & {\bf mock metagenome} \\
 \hline
-K-mer coverage threshold   & 10              & 20 \\
-Total reads                & 4,667,491       & 791,687 \\
-High coverage reads        & 404,896 (8.7\%) & 260,641 (32.9\%) \\
+K-mer coverage threshold   & 20              & 10              \\
+Total reads                & 791,687         & 4,667,491       \\
+High coverage reads        & 260,641 (32.9\%) & 404,896 (8.7\%) \\
 \hline
-Perfect detection (TP)     & 11,743          & 90,954 \\
-No errors (TN)             & 366,253         & 141,009 \\
-Miscalled errors (FP)      & 3,911           & 20,547 \\
-Mispredicted errors (FP)   & 21,750          & 1173 \\
-Missed errors (FN)         & 1239            & 6931 \\
+Perfect detection (TP)     & 90,954          & 11,743          \\
+No errors (TN)             & 141,009         & 366,253         \\
+Miscalled errors (FP)      & 20,547          & 3,911           \\
+Mispredicted errors (FP)   & 1173            & 21,750          \\
+Missed errors (FN)         & 6931            & 1239            \\
 \hline
-Sensitivity                & 90.5\%          & 92.9\% \\
-Specificity                & 31.4\%          & 80.7\% \\
+Sensitivity                & 92.9\%          & 90.5\%          \\
+Specificity                & 80.7\%          & 31.4\%          \\
 \hline
 \end{tabular}
 
-% @CTB flip columns
-
-\caption{The results of variable coverage spectral error detection on
+\caption{{\bf The results of variable coverage spectral error detection on
   two real variable coverage data sets, a mock shotgun metagenome and
   a mouse mRNAseq data set. Per-read coverage was estimated by median
   k-mer abundance within the read, and only the reads with estimated
   coverage at or above the specified threshold were analyzed.
-  Digitally normalized counts were used for the spectral error analysis.}
+  Digitally normalized counts were used for the spectral error analysis.}}
 \label{tab:spectra_variable_real}
 
 \end{table}
@@ -489,7 +496,9 @@ this coverage threshold.  Here errors were again calculated by mapping
 the reads to the known reference and finding mismatches.  The results
 are shown in Table~\ref{tab:spectra_variable_real}, second column.  We
 achieve 90.5\% sensitivity and 41.4\% specificity on the high coverage
-reads.
+reads; here, the poor specificity is probably due to the modified coverage
+cutoff needed for this low coverage subset of the high diversity
+mock metagenome (discussed below).
 
 \paragraph{Error correcting variable coverage data with Quake:}
 
@@ -510,12 +519,41 @@ unnormalized high-coverage reads using the k-mer counts from the
 normalized reads, as with the {\em E. coli} data set.  Quake discarded
 23,606 reads and corrected the remainder.
 
+% quake-ecoli-raw-cor.txt
+% quake-ecoli-dn-cor.txt
+
+\begin{table}
+\begin{tabular}{|l|c|}
+\hline
+{\bf mRNAseq}                    & diginorm \\
+\hline
+Total reads                      & 791,687 \\
+High coverage reads              & 260,641 \\
+Erroneous reads discarded        & 23,606 \\
+Total bp after correction        & 17,254,585 \\
+Total errors remaining           & 74,797 \\
+Per-base error rate              & 0.43\% \\
+\hline
+\end{tabular}
+
+\caption{{\bf Comparison of Quake results when run on the same {\em
+      E. coli} data set, using k-mer counts from either the original
+    data set (original) or the digitally normalized reads
+    (diginorm).  All numbers are post-error correction; the original
+    error rate was 1.60\%.}}
+
+\label{tab:quake_mrna}
+\end{table}
+
 We evaluated the corrected reads by mapping them against the mouse
 transcriptome, and found that, for the retained reads, Quake reduced
 the overall error rate from 1.28\% (230,125 mismatches in 18,012,456
-bp total) to 0.43\% (74,797 in 17,254,585 total).  As with {\em
-  E. coli}, this suggests that sufficient information remains in the
-digitally normalized data to do an effective job of error correction.
+bp total) to 0.43\% (74,797 in 17,254,585 total) - see
+Table~\ref{tab:quake_mrna}.  As with {\em E. coli}, this suggests that
+sufficient information remains in the digitally normalized data to do
+an effective job of error correction.  In addition, these results
+suggest that this may be a general approach for using genomic error
+correction software on variable coverage data.
 
 \subsection{A streaming algorithm for error analysis}
 
@@ -537,17 +575,20 @@ the Poisson-random sampling that underlies shotgun sequencing (cite
 Waterman?).  This oversampling provides an opportunity, however: if we
 regard the read data set as a stream of incoming data randomly sampled
 from a pool of molecules, high-abundance species or subsequences
-within the pool will be more highly sampled earlier in the stream than
-others.  For example, in mRNAseq, highly expressed transcripts will on
-average be highly sampled much earlier than low-expressed transcripts.
+within the pool will be more highly sampled in the stream than others,
+and will thus generally appear earlier in the stream.  For example, in
+mRNAseq, highly expressed transcripts will on average be highly
+sampled much more frequently than low-expressed transcripts, and more
+reads from highly expressed transcripts will be seen in any given
+subset.
 
 We can adapt the same approaches used in previous sections to do {\em
-  streaming} error analysis by detecting high-coverage reads {\em
-  during} the first pass.  Here we again use the median k-mer
+  streaming} error analysis by detecting and analyzing high-coverage
+reads {\em during} the first pass.  Here we again use the median k-mer
 abundance within a read to estimate read coverage (cite diginorm);
 crucially, this can be done at any point in a stream, by using the
 online k-mer counting functionality of khmer to determine the
-abundance of k-mers seen thus far (cite khmer-counting).
+abundance of k-mers seen thus far in the stream (cite khmer-counting).
 
 The conceptual idea is presented in Figure~\ref{fig:concept}.  On the
 first pass, low-coverage reads would be incorporated into the k-mer
@@ -595,7 +636,7 @@ data.
 \begin{table}
 \begin{tabular}{|l|c||c||c|}
 \hline
-& simple genome & simple metagenome & simple mRNAseq \\
+& {\bf simple genome} & {\bf simple metagenome} & {\bf simple mRNAseq} \\
 \hline
 Number of passes & 1.32 & 1.16 & 1.33 \\
 \hline
@@ -609,18 +650,22 @@ Sensitivity & 100.0\% & 99.9\% & 100.0\% \\
 Specificity & 76.4\% & 84.4\% & 78.9\% \\
 \hline
 \end{tabular}
-\caption{Results from applying streaming error detection to the same
-  synthetic data sets as in Table~\ref{tab:a} and
-  Table~\ref{tab:spectra_variable}.  Number of passes is the average
-  number of times each read in the data set was examined; numbers in
-  parentheses give the difference between these numbers and the
-  previous results.}
+\caption{{\bf Results from applying streaming error detection to the
+    same synthetic data sets as in Table~\ref{tab:a} and
+    Table~\ref{tab:spectra_variable}.  Number of passes is the average
+    number of times each read in the data set was examined; numbers in
+    parentheses give the difference between these numbers and the
+    previous results.}}
 \label{tab:spectra_streaming}
 
 \end{table}
 
-We first apply this streaming error detection approach to the three
-synthetic data sets used earlier, and then to the three real data sets.
+Moreover, because only the normalized counts are used in spectral
+analysis, the approach should apply equally well to data sets with
+uneven coverage, i.e. metagenomes and transcriptomes.  To test this,
+we first apply this streaming error detection approach to the three
+synthetic data sets used earlier, and then to the three real data
+sets.
 
 \paragraph{Streaming error analysis of synthetic data:}
 
@@ -648,25 +693,25 @@ the reads are examined twice, and on the metagenome, 380 of 2347
 \begin{table}
 \begin{tabular}{|l|c||c||c|}
 \hline
-& {\em E. coli} & mock metagenome & mouse mRNAseq \\
+& {\bf \em E. coli} & {\bf mouse mRNAseq} & {\bf mock metagenome} \\
 \hline
 Number of passes & xx & yy & zz \\
 \hline
-Perfect detection (TP)   & 1,033,261 & 11,726  & 91,133 \\
-No errors (TN)           & 2,781,961 & 364,627 & 140,461 \\
-Miscalled errors (FP)    & 1,138,940 & 3,951   & 20,742 \\
-Mispredicted errors (FP) & 778       & 23,376  & 1721 \\
-Missed errors (FN)       & 5308      & 1216    & 6584 \\
+Perfect detection (TP)   & 1,033,261 & 91,133  & 11,726  \\
+No errors (TN)           & 2,781,961 & 140,461 & 364,627 \\
+Miscalled errors (FP)    & 1,138,940 & 20,741  & 3,951   \\
+Mispredicted errors (FP) & 778       & 1721    & 23,376  \\
+Missed errors (FN)       & 5308      & 6584    & 1216    \\
 \hline
-Sensitivity            & 99.5\%      & 90.6\%  & 93.3\% \\
-Specificity            & 47.6\%      & 30.0\%  &  80.2\% \\
+Sensitivity            & 99.5\%      & 93.3\%  & 90.6\%  \\
+Specificity            & 47.6\%      & 80.2\%  & 30.0\%  \\
 \hline
 \end{tabular}
-\caption{Results from applying streaming error detection to the same
+\caption{{\bf Results from applying streaming error detection to the same
   real data sets as in Table~\ref{tab:ecoli_dn_counts} and
   Table~\ref{tab:spectra_variable_real}.  Number of passes is the average
   number of times each read in the data set was examined; unless noted in
-  parentheses, numbers were within 1\% of non-streaming results.}
+  parentheses, numbers were within 1\% of non-streaming results.}}
 \label{tab:spectra_streaming_real}
 
 \end{table}
@@ -694,10 +739,10 @@ Once errors can be {\em detected} with a streaming algorithm, errors
 can also be {\em removed} by trimming reads at the first base
 predicted to be erroneous in a read.  This approach is remarkably
 effective, but can require considerably more memory than quality-score
-based trimming, and is currently implemented as an offline algorithm
-(cite khmer-counting).  Below, we apply the same approach shown in
-Figure~\cite{fig:concept}, but instead of predicting errors, we trim
-each read at the first predicted error.
+based trimming (cite khmer counting).  Moreover, it is currently
+implemented as an offline algorithm.  Below, we apply the same
+streaming approach shown in Figure~\ref{fig:concept} to {\em trimming}
+reads.
 
 %  (While it is possible to split reads around errors
 %rather than truncating them, this introduces complications in
@@ -737,12 +782,13 @@ Data set        & pre-trim error & \% bp trim & \% reads trim & post-trim error 
 Mock metagenome & 0.32\%         &                  &             & 0.30\% \\
 mouse mRNAseq   & 2.07\%         &                  &             & 1.84\% \\
 (high coverage only) & 1.61\%    &                  &             & 0.66\% \\
-
+mock metagenome &                &                  &             &        \\
+(high coverage only) &           &                  &             &        \\
 \hline
 \end{tabular}
 
-\caption{A summary of trimming statistics for streaming error trimming.
-Error rates before and after trimming were estimated by mapping mismatches.}
+\caption{{\bf A summary of trimming statistics for streaming error trimming.
+Error rates before and after trimming were estimated by mapping mismatches.}}
 \label{tab:trimming}
 \end{table}
 
@@ -923,7 +969,7 @@ spectral error detection with digitally normalized data to predict
 errors in both synthetic and real RNAseq and metagenome data
 (Table~\ref{tab:spectra_variable_real}.  We then again used Quake to
 error correct high-coverage portions of mRNAseq and shotgun metagenome
-data sets, which yielded good results (Table~\ref{tab:quake_variable}.
+data sets, which yielded good results (Table~\ref{tab:quake_mrna}.
 This again demonstrates that digital normalized data can retain the
 information necessary to error correct high coverage reads.
 
