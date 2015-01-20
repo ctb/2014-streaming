@@ -939,16 +939,22 @@ two-pass spectral approach and the bowtie2 mismatches.
 
 % @CTb discuss subsample in discussion
 
+\subsection{Time and memory constraints}
+
+  Because streaming error
+trimming relies on digital normalization for the first pass, the
+memory performance of digital nor
+
 \section{Discussion}
 
 \subsection{Digital normalization can be applied effectively to short reads prior to error detection and correction.}
 
 Tracking k-mer abundances in large short-read data sets is part of
 many error detection and correction algorithms, but this process can
-be time and memory intensive.  Our results demonstrate that digital
-normalization can be used to reduce the total number of k-mers under
-consideration, without strongly affecting performance.  We showed
-this in both simulated and real data.
+be time and memory intensive.  Here we show that for some data sets,
+digital normalization can be used to reduce the total number of k-mers
+under consideration without strongly affecting results.
+We showed this in both simulated and real data.
 
 With a real {\em E. coli} data set, digital normalization reduced the
 number of k-mers by a third (Table~\ref{tab:ecoli_dn_counts}, Distinct
@@ -956,7 +962,7 @@ k-mers) yielding essentially the same sensitivity and specificity of
 error predictions.  Moreover, when we ran the Quake error corrector on
 the reads using unnormalized and normalized counts
 (Table~\ref{tab:quake_ecoli}), we achieved nearly identical results,
-demonstrating that the digital normalized data sets retain all of the
+demonstrating that the digital normalized data set retained all of the
 information necessary for error correction.
 
 \subsection{K-mer counts from digitally normalized short reads can be used to error correct mRNAseq and metagenome data}
@@ -971,14 +977,24 @@ spectral error detection with digitally normalized data to predict
 errors in both synthetic and real RNAseq and metagenome data
 (Table~\ref{tab:spectra_variable_real}).  We then again used Quake to
 error correct high-coverage portions of mRNAseq and shotgun metagenome
-data sets, which yielded good results (Table~\ref{tab:quake_mrna}).
-This again demonstrates that digitally normalized data retains the
-information necessary to error correct high coverage reads.
+data sets, which yielded promising results
+(Table~\ref{tab:quake_mrna}).  This again demonstrates that digitally
+normalized data retains the information necessary to error correct
+high coverage reads.
 
-We believe this is a general approach that could allow any error
-correction software that separates k-mer counting from error
-correction to be applied to mRNAseq, shotgun metagenome, and
-whole-genome amplified samples.
+It is not clear how widely applicable diginorm is as a pre-processor
+for k-mer spectral analyses: here we used only three real data sets,
+with one set of diginorm parameters.  Absent a theoretical
+understanding of digital normalization, we cannot extend these results
+to all short-read data sets nor can we predict which parameter
+combinations will succeed.  However, with these parameters, digital
+normalization retains the vast majority of ``true'' k-mers in several
+data sets (cite diginorm), which speaks directly to the basis of k-mer
+spectral analysis.  In addition, digital normalization and derivative
+approaches have proven to be fairly robust in leading to good
+assemblies with genomic data, RNAseq data, single-cell data, and
+metagenome data (cite cite cite).  We are therefore hopeful that this
+will prove to be a general practical approach.
 
 % @  (Comment on adaptation of existing
 % err corr, e.g. Lighter?)
@@ -990,14 +1006,17 @@ are typically implemented as a two-pass offline algorithm, in which
 k-mer counts are collected in a first pass and then reads are
 corrected in a second pass.  While several algorithms that run in sub
 linear memory do exist (e.g. Lighter), these are still offline
-algorithms that require at least two full passes across the data.  In
-high coverage data sets it is possible, however, to detect reads that
-are high coverage in the context of previously encountered reads.  By
-integrating k-mer spectral error analysis directly into the digital
-normalization algorithm, we showed that on both synthetic and real
-data sets, we achieved nearly identical predictions to the full
-two-pass algorithm with an algorithm that is less than two pass
-(compare Table~\ref{tab:spectra_variable_real} to
+algorithms that require at least two full passes across the data.
+
+In high coverage data sets it is possible to implement a more
+algorithmically efficient approach, by detecting reads that are high
+coverage in the context of reads previously encountered in the same
+pass of the data.  We implemented this by integrating k-mer spectral
+error analysis directly into the digital normalization algorithm, and
+showed that on several synthetic and real data sets, we achieved
+nearly identical predictions to the full two-pass algorithm with an
+algorithm that is less than two pass (compare
+Table~\ref{tab:spectra_variable_real} to
 Table~\ref{tab:spectra_streaming_real}).
 
 We also adapted the error detection algorithm to do streaming error
@@ -1005,6 +1024,21 @@ trimming on genomic, metagenomic, and transcriptomic data.  On high
 coverage components of variable coverage data sets, this led to
 a substantial decrease in errors - up to an order of magnitude.
 (XXX Talk about large, real data sets - Sherine work.)
+
+As with digital normalization, a basic streaming approach is very
+simple to implement: given an online way to count k-mers, the
+algorithm is approximately 10 lines of Python code.  The approach also
+requires very few parameter choices: the only two parameters are k-mer
+size and target coverage.  However, we do not yet know how these
+parameters interact with read length, error rate, or data set
+coverage; systematic evaluation of parameters and the development of
+underlying theory is left for future work.
+
+The implementation of streaming error trimming used in this paper is
+somewhat inefficient, and relies on redundantly storing all of the
+reads needed for the second pass on disk during the first pass.  In
+the worst case (discussed below) a complete copy of the data set may
+need to be stored on disk!  This is an area for future improvement.
 
 \subsection{Data-set wide error profiles can be calculated in sub linear time and memory}
 
@@ -1020,6 +1054,50 @@ More generally, the approach of using saturating coverage to truncate
 computational analysis may have application to streaming sequencing
 technologies such as Nanopore, where realtime feedback between
 sequencing and sequence analysis could be useful.
+
+\subsection{Worst-case and best-case scenarios: when is streaming error
+trimming best applied?}
+
+Here we introduce an approach to removing erroneous k-mers from large
+sequencing data sets with a streaming algorithm that takes into
+account variable coverage data sets.  When should this be applied?
+
+The general streaming algorithm is most time-efficient on data sets
+where most of the data is high coverage, because the second pass
+across the data is limited to the set of reads that is low coverage on
+the first pass (Figure~\ref{fig:concept}).  Even though the coverage
+of the data sets may not be known in advance, the approach is robust
+to low-coverage data: low-coverage reads will simply be ignored by any
+approach based.
+
+One particularly appealing aspect of the variable coverage error
+trimming approach is that it does not need to be modified for
+different data sets: the underlying algorithm can be applied equally
+to genomic, mRNAseq, and metagenome data sets, although read lengths,
+error rates, and data set coverage will affect the quality of results.
+On high coverage genomic data sets, trimming can be made more
+stringent by eliminating all low-abundance k-mers as erroneous, but
+even if this is not done, the underlying approach is equally
+efficient.
+
+Digital normalization was developed primarily to decrease the memory
+requirements for De Bruijn graph assembly by eliminating erroneous
+k-mers; diginorm can reduce the memory requirements for Velvet by more
+than an order of magnitude.  However, diginorm also alters the
+coverage of the data set, which may affect the performance of
+assemblers or other downstream analysis steps that rely on coverage.
+While streaming error trimming removes at least as many k-mers as
+digital normalization (and generally should remove many more), k-mer
+based error trimming should have a much smaller effect on data set
+coverage.  Moreover, trimming generally eliminates far less of the
+data set than digital normalization.  This may make trimming a more
+palatable pre-filter for assembly than digital normalization.
+
+We would caution against using variable coverage error trimming before
+mapping-based abundance analyses such as transcript quantification,
+ChIP-seq, or variant calling.  Variable coverage error trimming
+preferentially retains low-abundance reads and eliminates portions of
+high abundance reads, which may bias results.
 
 \subsection{Concluding thoughts}
 
