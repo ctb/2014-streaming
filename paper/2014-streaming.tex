@@ -12,6 +12,8 @@
 
 \documentclass{article}
 \usepackage{graphicx}
+\bibliographystyle{plos2009}
+
 
 \begin{document}
 
@@ -27,7 +29,7 @@ correction in shotgun sequencing data that uses k-mer abundances to
 determine likely errors (cite Pevzner, Quake, khmer-counting paper).
 Approaches derived from spectral analysis can be very accurate: Zhang
 et al. (2014) show that spectral analysis is considerably more
-effective at finding errors than quality-based approaches (cite).
+effective at finding errors than quality-based approaches \cite{Zhang2014}.
 However, spectral analysis is also very compute intensive; most
 implementations must count k-mers across entire sequencing data sets,
 which can be memory- or I/O-intensive for large data sets.
@@ -43,7 +45,7 @@ distributions from sequencing data.
 
 Brown et al. (2012) introduced a streaming algorithm for downsampling
 read data sets to normalize read coverage spectra, termed ``digital
-normalization'' (abbreviated as ``diginorm'').  This procedure
+normalization'' (abbreviated as ``diginorm'') \cite{Brown2012}.  This procedure
 estimates the k-mer coverage of each read in an online algorithm,
 calculating the median k-mer abundance of the read given all previous
 reads; reads above a certain estimated coverage are set aside and
@@ -1111,5 +1113,7 @@ mRNAseq and shotgun metagenome reads.
 Future applications include streaming error correction, reference-free
 variant calling, and reference-free analysis of streaming sequencing
 data.
+
+\bibliography{2014-streaming}
 
 \end{document}

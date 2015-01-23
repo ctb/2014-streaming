@@ -1,0 +1,768 @@
+%% This BibTeX bibliography file was created using BibDesk.
+%% http://bibdesk.sourceforge.net/
+
+
+%% Created for Qingpeng Zhang at 2014-06-18 15:54:26 -0400 
+
+
+%% Saved with string encoding Unicode (UTF-8) 
+
+
+
+@inproceedings{DBLP:conf/padl/MaldeO09,
+	Abstract = {Analysis of biological data often involves large data sets and computationally expensive algorithms. Databases of biological data continue to grow, leading to an increasing demand for improved algorithms and data structures. Despite having many advantages over more traditional indexing structures, the Bloom filter is almost unused in bioinformatics. Here we present a robust and efficient Bloom filter implementation in Haskell, and implement a simple bioinformatics application for indexing and matching sequence data. We use this to index the chromosomes that make up the human genome, and map all available gene sequences to it. Our experiences with developing and tuning our application suggest that for bioinformatics applications, Haskell offers a compelling combination of rapid development, quality assurance, and high performance.},
+	Author = {Ketil Malde and Bryan O'Sullivan},
+	Bibsource = {DBLP, http://dblp.uni-trier.de},
+	Booktitle = {PADL},
+	Crossref = {DBLP:conf/padl/2009},
+	Date-Added = {2014-05-06 22:27:05 +0000},
+	Date-Modified = {2014-05-06 22:27:05 +0000},
+	Pages = {183-194},
+	Title = {Using Bloom Filters for Large Scale Gene Sequence Analysis in Haskell},
+	Year = {2009},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1007/978-3-540-92995-6_13}}
+
+@proceedings{DBLP:conf/padl/2009,
+	Bibsource = {DBLP, http://dblp.uni-trier.de},
+	Booktitle = {PADL},
+	Date-Added = {2014-05-06 22:27:05 +0000},
+	Date-Modified = {2014-05-06 22:27:05 +0000},
+	Editor = {Andy Gill and Terrance Swift},
+	Isbn = {978-3-540-92994-9},
+	Publisher = {Springer},
+	Series = {Lecture Notes in Computer Science},
+	Title = {Practical Aspects of Declarative Languages, 11th International Symposium, PADL 2009, Savannah, GA, USA, January 19-20, 2009. Proceedings},
+	Volume = {5418},
+	Year = {2009},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1007/978-3-540-92995-6}}
+
+@inproceedings{DBLP:conf/sigmod/CohenM03,
+	Abstract = {A Bloom Filter is a space-efficient randomized data structure allowing membership queries over sets with certain allowable errors. It is widely used in many applications which take advantage of its ability to compactly represent a set, and filter out effectively any element that does not belong to the set, with small error probability. This paper introduces the Spectral Bloom Filter (SBF), an extension of the original Bloom Filter to multi-sets, allowing the filtering of elements whose multiplicities are below a threshold given at query time. Using memory only slightly larger than that of the original Bloom Filter, the SBF supports queries on the multiplicities of individual keys with a guaranteed, small error probability. The SBF also supports insertions and deletions over the data set. We present novel methods for reducing the probability and magnitude of errors. We also present an efficient data structure and algorithms to build it incrementally and maintain it over streaming data, as well as over materialized data with arbitrary insertions and deletions. The SBF does not assume any a priori filtering threshold and effectively and efficiently maintains information over the entire data-set, allowing for ad-hoc queries with arbitrary parameters and enabling a range of new applications.},
+	Author = {Saar Cohen and Yossi Matias},
+	Bibsource = {DBLP, http://dblp.uni-trier.de},
+	Booktitle = {SIGMOD Conference},
+	Crossref = {DBLP:conf/sigmod/2003},
+	Date-Added = {2014-05-06 22:23:00 +0000},
+	Date-Modified = {2014-05-06 22:23:00 +0000},
+	Pages = {241-252},
+	Title = {Spectral Bloom Filters},
+	Year = {2003},
+	Bdsk-Url-1 = {http://doi.acm.org/10.1145/872757.872787}}
+
+@proceedings{DBLP:conf/sigmod/2003,
+	Bibsource = {DBLP, http://dblp.uni-trier.de},
+	Booktitle = {SIGMOD Conference},
+	Date-Added = {2014-05-06 22:23:00 +0000},
+	Date-Modified = {2014-05-06 22:23:00 +0000},
+	Editor = {Alon Y. Halevy and Zachary G. Ives and AnHai Doan},
+	Isbn = {1-58113-634-X},
+	Publisher = {ACM},
+	Title = {Proceedings of the 2003 ACM SIGMOD International Conference on Management of Data, San Diego, California, USA, June 9-12, 2003},
+	Year = {2003}}
+
+@inproceedings{DBLP:conf/sigcomm/EstanV02,
+	Abstract = {Accurate network traffic measurement is required for accounting, bandwidth provisioning and detecting DoS attacks. These applications see the traffic as a collection of flows they need to measure. As link speeds and the number of flows increase, keeping a counter for each flow is too expensive (using SRAM) or slow (using DRAM). The current state-of-the-art methods (Cisco's sampled NetFlow) which log periodically sampled packets are slow, inaccurate and resource-intensive. Previous work showed that at different granularities a small number of heavy hitters accounts for a large share of traffic. Our paper introduces a paradigm shift for measurement by concentrating only on large flows --- those above some threshold such as 0.1% of the link capacity.We propose two novel and scalable algorithms for identifying the large flows: sample and hold and multistage filters, which take a constant number of memory references per packet and use a small amount of memory. If $M$ is the available memory, we show analytically that the errors of our new algorithms are proportional to $1/M$; by contrast, the error of an algorithm based on classical sampling is proportional to $1/sqrtM$, thus providing much less accuracy for the same amount of memory. We also describe further optimizations such as early removal and conservative update that further improve the accuracy of our algorithms, as measured on real traffic traces, by an order of magnitude. Our schemes allow a new form of accounting called threshold accounting in which only flows above a threshold are charged by usage while the rest are charged a fixed fee. Threshold accounting generalizes usage-based and duration based pricing.},
+	Author = {Cristian Estan and George Varghese},
+	Bibsource = {DBLP, http://dblp.uni-trier.de},
+	Booktitle = {SIGCOMM},
+	Crossref = {DBLP:conf/sigcomm/2002},
+	Date-Added = {2014-05-06 22:21:14 +0000},
+	Date-Modified = {2014-05-06 22:21:14 +0000},
+	Pages = {323-336},
+	Title = {New directions in traffic measurement and accounting},
+	Year = {2002},
+	Bdsk-Url-1 = {http://doi.acm.org/10.1145/633025.633056}}
+
+@proceedings{DBLP:conf/sigcomm/2002,
+	Bibsource = {DBLP, http://dblp.uni-trier.de},
+	Booktitle = {SIGCOMM},
+	Date-Added = {2014-05-06 22:21:14 +0000},
+	Date-Modified = {2014-05-06 22:21:14 +0000},
+	Isbn = {1-58113-570-X},
+	Publisher = {ACM},
+	Title = {Proceedings of the ACM SIGCOMM 2002 Conference on Applications, Technologies, Architectures, and Protocols for Computer Communication, August 19-23, 2002, Pittsburgh, PA, USA},
+	Year = {2002}}
+
+@article{flajolet2008hyperloglog,
+	Author = {Flajolet, Philippe and Fusy, {\'E}ric and Gandouet, Olivier and Meunier, Fr{\'e}d{\'e}ric},
+	Date-Added = {2014-05-03 02:17:23 +0000},
+	Date-Modified = {2014-05-03 02:17:23 +0000},
+	Journal = {DMTCS Proceedings},
+	Number = {1},
+	Title = {HyperLogLog: the analysis of a near-optimal cardinality estimation algorithm},
+	Year = {2008}}
+
+@article{Fan:2000:SCS:343571.343572,
+	Acmid = {343572},
+	Address = {Piscataway, NJ, USA},
+	Author = {Fan, Li and Cao, Pei and Almeida, Jussara and Broder, Andrei Z.},
+	Date-Added = {2014-05-03 02:09:38 +0000},
+	Date-Modified = {2014-05-03 02:09:38 +0000},
+	Doi = {10.1109/90.851975},
+	Issn = {1063-6692},
+	Issue_Date = {June 2000},
+	Journal = {IEEE/ACM Trans. Netw.},
+	Keywords = {ICP, Web cache, Web proxy, bloom filter, cache sharing},
+	Month = jun,
+	Number = {3},
+	Numpages = {13},
+	Pages = {281--293},
+	Publisher = {IEEE Press},
+	Title = {Summary Cache: A Scalable Wide-area Web Cache Sharing Protocol},
+	Url = {http://dx.doi.org/10.1109/90.851975},
+	Volume = {8},
+	Year = {2000},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1109/90.851975}}
+
+@article{broder2004network,
+	Author = {Broder, Andrei and Mitzenmacher, Michael},
+	Date-Added = {2014-04-20 17:14:01 +0000},
+	Date-Modified = {2014-04-20 17:14:01 +0000},
+	Journal = {Internet mathematics},
+	Number = {4},
+	Pages = {485--509},
+	Publisher = {Taylor \& Francis},
+	Title = {Network applications of bloom filters: A survey},
+	Volume = {1},
+	Year = {2004}}
+
+@manual{khmer,
+	Author = {Crusoe, Michael and Edvenson, Greg and Fish, Jordan and Howe, Adina and McDonald, Eric and Nahum, Joshua and Nanlohy, Kaben and Ortiz-Zuazaga, Humberto and Pell, Jason and Simpson, Jared and Scott, Camille and Srinivasan, Ramakrishnan and Zhang, Qingpeng and Brown, C. Titus},
+	Date-Added = {2014-04-18 23:29:55 +0000},
+	Date-Modified = {2014-06-10 21:44:59 +0000},
+	Title = {The khmer software package: enabling efficient sequence analysis},
+	Url = {http://dx.doi.org/10.6084/m9.figshare.979190},
+	Year = {2014},
+	Bdsk-Url-1 = {-%20http://figshare.com/articles/The_khmer_software_package_enabling_efficient_sequence_analysis/979190}}
+
+@article{Audano2014,
+	Abstract = {MOTIVATION: Converting nucleotide sequences into short overlapping fragments of uniform length, k-mers, is a common step in many bioinformatics applications. While existing software packages count k-mers, few are optimized for speed, offer an API (Application Programming Interface), a graphical interface, or contain features that make it extensible and maintainable. We designed KAnalyze to compete with the fastest k-mer counters, to produce reliable output, and to support future development efforts through well architected, documented, and testable code. Currently, KAnalyze can output k-mer counts in a sorted tab-delimited file or stream k-mers as they are read. KAnalyze can process large data sets with 2GB of memory. This project is implemented in Java 7, and the CLI (Command Line Interface) is designed to integrate into pipelines written in any language.
+RESULTS: As a k-mer counter, KAnalyze outperforms Jellyfish (Mar{\c c}ais and Kingsford, 2011), DSK (Rizk et al., 2013), and a pipeline built on a Perl and Linux utilities. Through extensive unit and system testing, we have verified that KAnalyze produces the correct k-mer counts over multiple data sets and k-mer sizes.
+AVAILABILITY: KAnalyze is available on SourceForge: https://sourceforge.net/projects/kanalyze/ SUPPLEMENTARY INFORMATION: Supplementary data are available at Bioinformatics online.
+CONTACT: fredrik.vannberg@biology.gatech.edu.},
+	Author = {Audano, Peter and Vannberg, Fredrik},
+	Date-Added = {2014-04-18 20:50:07 +0000},
+	Date-Modified = {2014-06-10 21:36:18 +0000},
+	Doi = {10.1093/bioinformatics/btu152},
+	Journal = {Bioinformatics: Advance Access published March 18, 2014},
+	Journal-Full = {Bioinformatics (Oxford, England)},
+	Month = {Mar},
+	Pages = {doi: 10.1093/bioinformatics/btu152},
+	Pmid = {24642064},
+	Pst = {aheadofprint},
+	Title = {KAnalyze: A Fast Versatile Pipelined K-mer Toolkit},
+	Year = {2014},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1093/bioinformatics/btu152}}
+
+@article{Roy2014,
+	Abstract = {MOTIVATION: Counting the frequencies of k-mers in read libraries is often a first step in the analysis of high-throughput sequencing data. Infrequent k-mers are assumed to be a result of sequencing errors. The frequent k-mers constitute a reduced but error-free representation of the experiment, which can inform read error correction or serve as the input to de novo assembly methods. Ideally, the memory requirement for counting should be linear in the number of frequent k-mers and not in the, typically much larger, total number of k-mers in the read library.
+RESULTS: We present a novel method that balances time, space and accuracy requirements to efficiently extract frequent k-mers even for high-coverage libraries and large genomes such as human. Our method is designed to minimize cache misses in a cache-efficient manner by using a pattern-blocked Bloom filter to remove infrequent k-mers from consideration in combination with a novel sort-and-compact scheme, instead of a hash, for the actual counting. Although this increases theoretical complexity, the savings in cache misses reduce the empirical running times. A variant of method can resort to a counting Bloom filter for even larger savings in memory at the expense of false-negative rates in addition to the false-positive rates common to all Bloom filter-based approaches. A comparison with the state-of-the-art shows reduced memory requirements and running times.
+AVAILABILITY AND IMPLEMENTATION: The tools are freely available for download at http://bioinformatics.rutgers.edu/Software/Turtle and http://figshare.com/articles/Turtle/791582.
+CONTACT: rajatroy@cs.rutgers.edu or schliep@cs.rutgers.edu SUPPLEMENTARY INFORMATION: Supplementary data are available at Bioinformatics online.},
+	Author = {Roy, Rajat Shuvro and Bhattacharya, Debashish and Schliep, Alexander},
+	Date-Added = {2014-04-18 20:48:21 +0000},
+	Date-Modified = {2014-06-10 21:35:20 +0000},
+	Doi = {10.1093/bioinformatics/btu132},
+	Journal = {Bioinformatics: Advance Access published March 10, 2014},
+	Journal-Full = {Bioinformatics (Oxford, England)},
+	Month = {Apr},
+	Pages = {doi: 10.1093/bioinformatics/btu132},
+	Pmid = {24618471},
+	Pst = {aheadofprint},
+	Title = {Turtle: Identifying frequent k-mers with cache-efficient algorithms},
+	Year = {2014},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1093/bioinformatics/btu132}}
+
+@inproceedings{CormodeM05,
+	Author = {Graham Cormode and S. Muthukrishnan},
+	Bibsource = {DBLP, http://dblp.uni-trier.de},
+	Booktitle = {SDM},
+	Crossref = {DBLP:conf/sdm/2005},
+	Date-Added = {2014-04-18 20:43:06 +0000},
+	Date-Modified = {2014-04-18 20:43:35 +0000},
+	Pages = {44-55},
+	Title = {Summarizing and Mining Skewed Data Streams},
+	Year = {2005},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1137/1.9781611972757.5}}
+
+@proceedings{DBLP:conf/sdm/2005,
+	Bibsource = {DBLP, http://dblp.uni-trier.de},
+	Booktitle = {SDM},
+	Date-Added = {2014-04-18 20:43:06 +0000},
+	Date-Modified = {2014-04-18 20:43:06 +0000},
+	Editor = {Hillol Kargupta and Jaideep Srivastava and Chandrika Kamath and Arnold Goodman},
+	Isbn = {978-0-89871-593-4, 978-1-61197-275-7},
+	Publisher = {SIAM},
+	Title = {Proceedings of the 2005 SIAM International Conference on Data Mining, SDM 2005, Newport Beach, CA, USA, April 21-23, 2005},
+	Year = {2005},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1137/1.9781611972757}}
+
+@article{Li2003,
+	Abstract = {In shotgun sequencing projects, the genome or BAC length is not always known. We approach estimating genome length by first estimating the repeat structure of the genome or BAC, sometimes of interest in its own right, on the basis of a set of random reads from a genome project. Moreover, we can find the consensus for repeat families before assembly. Our methods are based on the l-tuple content of the reads.},
+	Author = {Li, Xiaoman and Waterman, Michael S},
+	Date-Added = {2014-04-18 19:55:32 +0000},
+	Date-Modified = {2014-04-18 19:55:32 +0000},
+	Doi = {10.1101/gr.1251803},
+	Journal = {Genome Res},
+	Journal-Full = {Genome research},
+	Mesh = {Algorithms; Base Composition; Chromosome Mapping; Chromosomes, Artificial, Bacterial; Computational Biology; Computer Simulation; Consensus Sequence; DNA, Bacterial; Mathematical Computing; Poisson Distribution; Repetitive Sequences, Nucleic Acid; Software},
+	Month = {Aug},
+	Number = {8},
+	Pages = {1916-22},
+	Pmc = {PMC403783},
+	Pmid = {12902383},
+	Pst = {ppublish},
+	Title = {Estimating the repeat structure and length of DNA sequences using L-tuples},
+	Volume = {13},
+	Year = {2003},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1101/gr.1251803}}
+
+@article{Howe2012,
+	Abstract = {The large volumes of sequencing data required to sample deeply the microbial communities of complex environments pose new challenges to sequence analysis. De novo metagenomic assembly effectively reduces the total amount of data to be analyzed but requires substantial computational resources. We combine two preassembly filtering approaches-digital normalization and partitioning-to generate previously intractable large metagenome assemblies. Using a human-gut mock community dataset, we demonstrate that these methods result in assemblies nearly identical to assemblies from unprocessed data. We then assemble two large soil metagenomes totaling 398 billion bp (equivalent to 88,000 Escherichia coli genomes) from matched Iowa corn and native prairie soils. The resulting assembled contigs could be used to identify molecular interactions and reaction networks of known metabolic pathways using the Kyoto Encyclopedia of Genes and Genomes Orthology database. Nonetheless, more than 60% of predicted proteins in assemblies could not be annotated against known databases. Many of these unknown proteins were abundant in both corn and prairie soils, highlighting the benefits of assembly for the discovery and characterization of novelty in soil biodiversity. Moreover, 80% of the sequencing data could not be assembled because of low coverage, suggesting that considerably more sequencing data are needed to characterize the functional content of soil.},
+	Author = {Howe, Adina Chuang and Jansson, Janet K and Malfatti, Stephanie A and Tringe, Susannah G and Tiedje, James M and Brown, C Titus},
+	Date-Added = {2014-04-18 18:35:19 +0000},
+	Date-Modified = {2014-04-18 18:35:55 +0000},
+	Doi = {10.1073/pnas.1402564111},
+	Journal = {Proc Natl Acad Sci U S A},
+	Journal-Full = {Proceedings of the National Academy of Sciences of the United States of America},
+	Month = {Apr},
+	Number = {13},
+	Pages = {4904-9},
+	Pmid = {24632729},
+	Pst = {ppublish},
+	Title = {Tackling soil diversity with the assembly of large, complex metagenomes},
+	Volume = {111},
+	Year = {2014},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1073/pnas.1402564111}}
+
+@article{Chikhi:2014aa,
+	Abstract = {MOTIVATION: Genome assembly tools based on the de Bruijn graph framework rely on a parameter k, which represents a trade-off between several competing effects that are difficult to quantify. There is currently a lack of tools that would automatically estimate the best k to use and/or quickly generate histograms of k-mer abundances that would allow the user to make an informed decision.
+RESULTS: We develop a fast and accurate sampling method that constructs approximate abundance histograms with several orders of magnitude performance improvement over traditional methods. We then present a fast heuristic that uses the generated abundance histograms for putative k values to estimate the best possible value of k. We test the effectiveness of our tool using diverse sequencing datasets and find that its choice of k leads to some of the best assemblies.
+AVAILABILITY: Our tool KmerGenie is freely available at: http://kmergenie.bx.psu.edu/.
+CONTACT: pashadag@cse.psu.edu.},
+	Author = {Chikhi, Rayan and Medvedev, Paul},
+	Date-Added = {2014-01-21 16:11:48 +0000},
+	Date-Modified = {2014-01-21 16:11:48 +0000},
+	Doi = {10.1093/bioinformatics/btt310},
+	Journal = {Bioinformatics},
+	Journal-Full = {Bioinformatics (Oxford, England)},
+	Month = {Jan},
+	Number = {1},
+	Pages = {31-7},
+	Pmid = {23732276},
+	Pst = {ppublish},
+	Title = {Informed and automated k-mer size selection for genome assembly},
+	Volume = {30},
+	Year = {2014},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1093/bioinformatics/btt310}}
+
+@article{Jones:2012aa,
+	Abstract = {We present Quip, a lossless compression algorithm for next-generation sequencing data in the FASTQ and SAM/BAM formats. In addition to implementing reference-based compression, we have developed, to our knowledge, the first assembly-based compressor, using a novel de novo assembly algorithm. A probabilistic data structure is used to dramatically reduce the memory required by traditional de Bruijn graph assemblers, allowing millions of reads to be assembled very efficiently. Read sequences are then stored as positions within the assembled contigs. This is combined with statistical compression of read identifiers, quality scores, alignment information and sequences, effectively collapsing very large data sets to <15% of their original size with no loss of information. Availability: Quip is freely available under the 3-clause BSD license from http://cs.washington.edu/homes/dcjones/quip.},
+	Author = {Jones, Daniel C and Ruzzo, Walter L and Peng, Xinxia and Katze, Michael G},
+	Date-Added = {2014-01-21 16:11:26 +0000},
+	Date-Modified = {2014-01-21 16:11:26 +0000},
+	Doi = {10.1093/nar/gks754},
+	Journal = {Nucleic Acids Res},
+	Journal-Full = {Nucleic acids research},
+	Mesh = {Algorithms; Data Compression; High-Throughput Nucleotide Sequencing; Probability; Software},
+	Month = {Dec},
+	Number = {22},
+	Pages = {e171},
+	Pmc = {PMC3526293},
+	Pmid = {22904078},
+	Pst = {ppublish},
+	Title = {Compression of next-generation sequencing reads aided by highly efficient de novo assembly},
+	Volume = {40},
+	Year = {2012},
+	Bdsk-Url-1 = {http://dx.doi.org/10.1093/nar/gks754}}
+
+@article{4160251,
+	Author = {P{\'e}rez, F. and Granger, B.E.},
+	Journal = {Computing in Science Engineering},
+	Number = {3},
+	Pages = {21-29},
+	Title = {IPython: A System for Interactive Scientific Computing},
+	Volume = {9},
+	Year = {2007}}
+
+@article{Luo2009,
+	Author = {Luo, Weijun and Friedman, Michael S and Shedden, Kerby and Hankenson, Kurt D and Woolf, Peter J},
+	Journal = {BMC Bioinformatics},
+	Pages = {161},
+	Title = {GAGE: generally applicable gene set enrichment for pathway analysis},
+	Volume = {10},
+	Year = {2009}}
+
+@incollection{McDonald2013,
+	Author = {Eric McDonald and C. Titus Brown},
+	Booktitle = {The Performance of Open Source Applications},
+	Chapter = {12},
+	Date-Modified = {2014-06-10 21:39:36 +0000},
+	Editor = {Tavish Armstrong},
+	Pages = {151},
+	Publisher = {lulu.com},
+	Title = {Working with Big Data in Bioinformatics},
+	Year = {2013}}
+
+@unpublished{Brown2012blog,
+	Author = {C. Titus Brown},
+	Date-Modified = {2014-06-18 19:54:14 +0000},
+	Title = {What does Trinity's In Silico normalization do?},
+	Url = {http://dx.doi.org/10.6084/m9.figshare.98198},
+	Year = {2012},
+	Bdsk-Url-1 = {http://ivory.idyll.org/blog/trinity-in-silico-normalize.html}}
+
+@article{Haas2013,
+	Author = {Haas, Brian J and Papanicolaou, Alexie and Yassour, Moran and Grabherr, Manfred and Blood, Philip D and Bowden, Joshua and Couger, Matthew Brian and Eccles, David and Li, Bo and Lieber, Matthias and Macmanes, Matthew D and Ott, Michael and Orvis, Joshua and Pochet, Nathalie and Strozzi, Francesco and Weeks, Nathan and Westerman, Rick and William, Thomas and Dewey, Colin N and Henschel, Robert and Leduc, Richard D and Friedman, Nir and Regev, Aviv},
+	Journal = {Nat Protoc},
+	Month = {Aug},
+	Number = {8},
+	Pages = {1494-512},
+	Title = {De novo transcript sequence reconstruction from RNA-seq using the Trinity platform for reference generation and analysis},
+	Volume = {8},
+	Year = {2013}}
+
+@article{pubmed19997069,
+	Author = {ML Metzker},
+	Journal = {Nat Rev Genet},
+	Number = {1},
+	Pages = {31-46},
+	Title = {Sequencing technologies - the next generation.},
+	Volume = {11},
+	Year = {2010}}
+
+@article{pubmed21926975,
+	Author = {H Chitsaz and JL Yee-Greenbaum and G Tesler and MJ Lombardo and CL Dupont and JH Badger and M Novotny and DB Rusch and LJ Fraser and NA Gormley and O Schulz-Trieglaff and GP Smith and DJ Evers and PA Pevzner and RS Lasken},
+	Journal = {Nat Biotechnol},
+	Number = {10},
+	Pages = {915-21},
+	Title = {Efficient de novo assembly of single-cell bacterial genomes from short-read data sets.},
+	Volume = {29},
+	Year = {2011}}
+
+@article{Mackelprang2011,
+	Author = {Mackelprang, Rachel and Waldrop, Mark P and DeAngelis, Kristen M and David, Maude M and Chavarria, Krystle L and Blazewicz, Steven J and Rubin, Edward M and Jansson, Janet K},
+	Journal = {Nature},
+	Month = {Dec},
+	Number = {7377},
+	Pages = {368-71},
+	Title = {Metagenomic analysis of a permafrost microbial community reveals a rapid response to thaw},
+	Volume = {480},
+	Year = {2011}}
+
+@article{Kelley2010,
+	Author = {Kelley, David R and Schatz, Michael C and Salzberg, Steven L},
+	Journal = {Genome Biol},
+	Number = {11},
+	Pages = {R116},
+	Title = {Quake: quality-aware detection and correction of sequencing errors},
+	Volume = {11},
+	Year = {2010}}
+
+@article{Medvedev2011,
+	Author = {Medvedev, Paul and Scott, Eric and Kakaradov, Boyko and Pevzner, Pavel},
+	Journal = {Bioinformatics},
+	Month = {Jul},
+	Number = {13},
+	Pages = {i137-41},
+	Title = {Error correction of high-throughput sequencing datasets with non-uniform coverage},
+	Volume = {27},
+	Year = {2011}}
+
+@article{Brown2012,
+	Author = {C. Titus Brown and Adina Howe and Qingpeng Zhang and Alexis B. Pyrkosz and Timothy H. Brom},
+	Date-Modified = {2014-06-10 21:23:40 +0000},
+	Journal = {arXiv},
+	Month = {03},
+	Pages = {1203.4802},
+	Title = {A Reference-Free Algorithm for Computational Normalization of Shotgun Sequencing Data},
+	Year = {2012}}
+
+@article{adina2013,
+	Author = {Adina Chuang Howe and Jason Pell and Rosangela Canino-Koning and Rachel Mackelprang and Susannah Tringe and Janet Jansson and James M. Tiedje and C. Titus Brown},
+	Date-Modified = {2014-06-10 21:26:01 +0000},
+	Journal = {arXiv},
+	Pages = {1212.0159},
+	Title = {Illumina Sequencing Artifacts Revealed by Connectivity Analysis of Metagenomic Datasets},
+	Year = {2012}}
+
+@article{Deorowicz2013,
+	Author = {Deorowicz, Sebastian and Debudaj-Grabysz, Agnieszka and Grabowski, Szymon},
+	Journal = {BMC Bioinformatics},
+	Month = {May},
+	Number = {1},
+	Pages = {160},
+	Title = {Disk-based k-mer counting on a PC},
+	Volume = {14},
+	Year = {2013}}
+
+@article{Minoche2011,
+	Author = {Minoche, Andr{\'e} E and Dohm, Juliane C and Himmelbauer, Heinz},
+	Journal = {Genome Biol},
+	Number = {11},
+	Pages = {R112},
+	Title = {Evaluation of genomic high-throughput sequencing data generated on Illumina HiSeq and genome analyzer systems},
+	Volume = {12},
+	Year = {2011}}
+
+@article{Rizk2013,
+	Author = {Rizk, Guillaume and Lavenier, Dominique and Chikhi, Rayan},
+	Journal = {Bioinformatics},
+	Month = {Mar},
+	Number = {5},
+	Pages = {652-3},
+	Title = {DSK: k-mer counting with very low memory usage},
+	Volume = {29},
+	Year = {2013}}
+
+@article{Pell2012,
+	Author = {Pell, Jason and Hintze, Arend and Canino-Koning, Rosangela and Howe, Adina and Tiedje, James M and Brown, C Titus},
+	Journal = {Proc Natl Acad Sci U S A},
+	Month = {Aug},
+	Number = {33},
+	Pages = {13272-7},
+	Title = {Scaling metagenome sequence assembly with probabilistic de Bruijn graphs},
+	Volume = {109},
+	Year = {2012}}
+
+@article{BroderM03,
+	Author = {Andrei Z. Broder and Michael Mitzenmacher},
+	Journal = {Internet Mathematics},
+	Number = {4},
+	Pages = {485-509},
+	Title = {Survey: Network Applications of Bloom Filters: A Survey},
+	Volume = {1},
+	Year = {2003}}
+
+@article{Bloom70,
+	Author = {Burton H. Bloom},
+	Journal = {Commun. ACM},
+	Number = {7},
+	Pages = {422-426},
+	Title = {Space/Time Trade-offs in Hash Coding with Allowable Errors},
+	Volume = {13},
+	Year = {1970}}
+
+@article{Li2010,
+	Author = {Li, Ruiqiang and Zhu, Hongmei and Ruan, Jue and Qian, Wubin and Fang, Xiaodong and Shi, Zhongbin and Li, Yingrui and Li, Shengting and Shan, Gao and Kristiansen, Karsten and Li, Songgang and Yang, Huanming and Wang, Jian and Wang, Jun},
+	Journal = {Genome Res},
+	Month = {Feb},
+	Number = {2},
+	Pages = {265-72},
+	Title = {De novo assembly of human genomes with massively parallel short read sequencing},
+	Volume = {20},
+	Year = {2010}}
+
+@article{Simpson2009,
+	Author = {Simpson, Jared T and Wong, Kim and Jackman, Shaun D and Schein, Jacqueline E and Jones, Steven J M and Birol, Inan{\c c}},
+	Journal = {Genome Res},
+	Month = {Jun},
+	Number = {6},
+	Pages = {1117-23},
+	Title = {ABySS: a parallel assembler for short read sequence data},
+	Volume = {19},
+	Year = {2009}}
+
+@article{Butler2008,
+	Author = {Butler, Jonathan and MacCallum, Iain and Kleber, Michael and Shlyakhter, Ilya A and Belmonte, Matthew K and Lander, Eric S and Nusbaum, Chad and Jaffe, David B},
+	Journal = {Genome Res},
+	Month = {May},
+	Number = {5},
+	Pages = {810-20},
+	Title = {ALLPATHS: de novo assembly of whole-genome shotgun microreads},
+	Volume = {18},
+	Year = {2008}}
+
+@article{Zerbino2008,
+	Author = {Zerbino, Daniel R and Birney, Ewan},
+	Journal = {Genome Res},
+	Month = {May},
+	Number = {5},
+	Pages = {821-9},
+	Title = {Velvet: algorithms for de novo short read assembly using de Bruijn graphs},
+	Volume = {18},
+	Year = {2008}}
+
+@article{Pevzner2001,
+	Author = {Pevzner, P A and Tang, H and Waterman, M S},
+	Journal = {Proc Natl Acad Sci U S A},
+	Month = {Aug},
+	Number = {17},
+	Pages = {9748-53},
+	Title = {An Eulerian path approach to DNA fragment assembly},
+	Volume = {98},
+	Year = {2001}}
+
+@article{Marcais2011,
+	Author = {Mar\c{c}ais, Guillaume and Kingsford, Carl},
+	Journal = {Bioinformatics},
+	Number = {6},
+	Pages = {764--770},
+	Title = {{A fast, lock-free approach for efficient parallel counting of occurrences of k-mers.}},
+	Volume = {27},
+	Year = {2011}}
+
+@article{Qin2010,
+	Author = {Qin, Junjie and Li, Ruiqiang and Raes, Jeroen and Arumugam, Manimozhiyan and Burgdorf, Kristoffer Solvsten and Manichanh, Chaysavanh and Nielsen, Trine and Pons, Nicolas and Levenez, Florence and Yamada, Takuji and Mende, Daniel R and Li, Junhua and Xu, Junming and Li, Songgang Shaochuan Shengting and Li, Dongfang and Cao, Jianjun and Wang, Bo and Liang, Huiqing and Zheng, Huisong and Xie, Yinlong and Tap, Julien and Lepage, Patricia and Bertalan, Marcelo and Batto, Jean-Michel and Hansen, Torben and {Le Paslier}, Denis and Linneberg, Allan and Nielsen, H Bj\o rn and Pelletier, Eric and Renault, Pierre and Sicheritz-Ponten, Thomas and Turner, Keith and Zhu, Hongmei and Yu, Chang and Jian, Min and Zhou, Yan and Li, Yingrui and Zhang, Xiuqing and Qin, Nan and Yang, Huanming and Wang, Jun Jian and Brunak, S\o ren and Dor\'{e}, Joel and Guarner, Francisco and Kristiansen, Karsten and Pedersen, Oluf and Parkhill, Julian and Weissenbach, Jean and Bork, Peer and Ehrlich, S Dusko},
+	Journal = {Nature},
+	Number = {7285},
+	Pages = {59--65},
+	Title = {{A human gut microbial gene catalogue established by metagenomic sequencing.}},
+	Volume = {464},
+	Year = {2010}}
+
+@article{Kurtz2008,
+	Author = {Kurtz, Stefan and Narechania, Apurva and Stein, Joshua C and Ware, Doreen},
+	Journal = {BMC Genomics},
+	Number = {1},
+	Pages = {517},
+	Title = {{A new method to compute K-mer frequencies and its application to annotate large repetitive plant genomes}},
+	Volume = {9},
+	Year = {2008}}
+
+@article{Shi2010,
+	Author = {Shi, Haixiang and Schmidt, Bertil and Liu, Weiguo and M\"{u}ller-Wittig, Wolfgang},
+	Journal = {Journal of computational biology a journal of computational molecular cell biology},
+	Number = {4},
+	Pages = {603--615},
+	Title = {{A parallel algorithm for error correction in high-throughput short-read data on CUDA-enabled graphics hardware.}},
+	Volume = {17},
+	Year = {2010}}
+
+@article{Davenport2010,
+	Author = {Davenport, Colin F and T\"{u}mmler, Burkhard},
+	Journal = {PLoS ONE},
+	Number = {3},
+	Pages = {8},
+	Title = {{Abundant Oligonucleotides Common to Most Bacteria}},
+	Volume = {5},
+	Year = {2010}}
+
+@article{Cormode2005,
+	Author = {Cormode, Graham and Muthukrishnan, S},
+	Journal = {Journal of Algorithms},
+	Month = apr,
+	Number = {1},
+	Pages = {58--75},
+	Title = {{An improved data stream summary: the count-min sketch and its applications}},
+	Volume = {55},
+	Year = {2005}}
+
+@article{Healy2003,
+	Author = {Healy, John and Thomas, Elizabeth E and Schwartz, Jacob T and Wigler, Michael},
+	Journal = {Genome Research},
+	Number = {10},
+	Pages = {2306--2315},
+	Title = {{Annotating large genomes with exact word matches.}},
+	Volume = {13},
+	Year = {2003}}
+
+@article{Miller2010,
+	Author = {Miller, Jason R and Koren, Sergey and Sutton, Granger},
+	Journal = {Genomics},
+	Month = {Jun},
+	Number = {6},
+	Pages = {315-27},
+	Title = {Assembly algorithms for next-generation sequencing data},
+	Volume = {95},
+	Year = {2010}}
+
+@article{Bar-yossef,
+	Author = {Bar-yossef, Ziv and Jayram, T S and Kumar, Ravi and Sivakumar, D},
+	Journal = {Memory},
+	Title = {{Counting distinct elements in a data stream}}}
+
+@article{Hampson2002,
+	Author = {Hampson, Steven and Kibler, Dennis and Baldi, Pierre},
+	Journal = {Bioinformatics},
+	Number = {4},
+	Pages = {513--528},
+	Title = {{Distribution patterns of over-represented k-mers in non-coding yeast DNA.}},
+	Volume = {18},
+	Year = {2002}}
+
+@article{Sindi2008,
+	Author = {Sindi, Suzanne S and Hunt, Brian R and Yorke, James A},
+	Journal = {Physical Review E - Statistical, Nonlinear and Soft Matter Physics},
+	Number = {6 Pt 1},
+	Pages = {061912},
+	Title = {{Duplication count distributions in DNA sequences.}},
+	Volume = {78},
+	Year = {2008}}
+
+@article{Melsted2011,
+	Author = {Melsted, P\'{a}ll and Pritchard, Jonathan K},
+	Journal = {BMC bioinformatics},
+	Month = jan,
+	Pages = {333},
+	Title = {{Efficient counting of k-mers in DNA sequences using a bloom filter.}},
+	Volume = {12},
+	Year = {2011}}
+
+@article{Hooper2010,
+	Author = {Hooper, Sean D and Dalevi, Daniel and Pati, Amrita and Mavromatis, Konstantinos and Ivanova, Natalia N and Kyrpides, Nikos C},
+	Journal = {Bioinformatics},
+	Number = {3},
+	Pages = {295--301},
+	Title = {{Estimating DNA coverage and abundance in metagenomes using a gamma approximation}},
+	Volume = {26},
+	Year = {2010}}
+
+@article{Charikar2004,
+	Author = {Charikar, M},
+	Journal = {Theoretical Computer Science},
+	Month = jan,
+	Number = {1},
+	Pages = {3--15},
+	Title = {{Finding frequent items in data streams}},
+	Volume = {312},
+	Year = {2004}}
+
+@article{Trifonov2010,
+	Author = {Trifonov, Vladimir and Rabadan, Raul},
+	Journal = {mBio},
+	Number = {3},
+	Pages = {1--8},
+	Title = {{Frequency Analysis Techniques for Identification of Viral Genetic Data}},
+	Volume = {1},
+	Year = {2010}}
+
+@article{Chor2009,
+	Author = {Chor, Benny and Horn, David and Goldman, Nick and Levy, Yaron and Massingham, Tim},
+	Journal = {Genome Biology},
+	Number = {10},
+	Pages = {R108},
+	Title = {{Genomic DNA k-mer spectra: models and modalities}},
+	Volume = {10},
+	Year = {2009}}
+
+@article{Kirsch2006,
+	Author = {Kirsch, Adam and Mitzenmacher, Michael},
+	Journal = {Building},
+	Pages = {456--467},
+	Title = {{Less Hashing , Same Performance : Building a Better Bloom Filter}},
+	Year = {2006}}
+
+@article{Hess2011,
+	Author = {Hess, M and Sczyrba, A and Egan, R and Kim, T W and Chokhawala, H and Schroth, G and Luo, S and Clark, D S and Chen, F and Zhang, T and Mackie, R I and Pennacchio, L A and Tringe, S G and Visel, A and Woyke, T and Wang, Z and Rubin, E M},
+	Journal = {Science},
+	Number = {6016},
+	Pages = {463--467},
+	Title = {{Metagenomic Discovery of Biomass-Degrading Genes and Genomes from Cow Rumen}},
+	Volume = {331},
+	Year = {2011}}
+
+@article{Richter2008,
+	Author = {Richter, Daniel C and Ott, Felix and Auch, Alexander F and Schmid, Ramona and Huson, Daniel H},
+	Journal = {PLoS ONE},
+	Number = {10},
+	Pages = {12},
+	Title = {{MetaSim---A Sequencing Simulator for Genomics and Metagenomics}},
+	Volume = {3},
+	Year = {2008}}
+
+@article{Chen2005,
+	Author = {Chen, Yaw-Hwang and Nyeo, Su-Long and Yeh, Chiung-Yuh},
+	Journal = {Physical Review E},
+	Number = {1},
+	Pages = {1--7},
+	Title = {{Model for the distributions of k-mers in DNA sequences}},
+	Volume = {72},
+	Year = {2005}}
+
+@article{Woyke2010,
+	Author = {Woyke, Tanja and Tighe, Damon and Mavromatis, Konstantinos and Clum, Alicia and Copeland, Alex and Schackwitz, Wendy and Lapidus, Alla and Wu, Dongying and McCutcheon, John P and McDonald, Bradon R and Moran, Nancy A and Bristow, James and Cheng, Jan-Fang},
+	Journal = {PLoS ONE},
+	Number = {4},
+	Pages = {8},
+	Title = {{One Bacterial Cell, One Complete Genome}},
+	Volume = {5},
+	Year = {2010}}
+
+@article{Kane2010,
+	Author = {Kane, Daniel M and Nelson, Jelani and Woodruff, David P and Road, Harry and Jose, San},
+	Journal = {PODS '10 P},
+	Pages = {41--52},
+	Title = {An Optimal Algorithm for the Distinct Elements Problem},
+	Year = {2010}}
+
+@article{Campagna2005,
+	Author = {Campagna, Davide and Romualdi, Chiara and Vitulo, Nicola and {Del Favero}, Micky and Lexa, Matej and Cannata, Nicola and Valle, Giorgio},
+	Journal = {Bioinformatics},
+	Number = {5},
+	Pages = {582--588},
+	Title = {{RAP: a new computer program for de novo identification of repeated sequences in whole genomes.}},
+	Volume = {21},
+	Year = {2005}}
+
+@article{Yang2011,
+	Author = {Yang, Xiao and Aluru, Srinivas and Dorman, Karin S},
+	Journal = {BMC Bioinformatics},
+	Number = {Suppl 1},
+	Pages = {S52},
+	Title = {{Repeat-aware modeling and correction of short read errors}},
+	Volume = {12},
+	Year = {2011}}
+
+@article{Rusu2008,
+	Author = {Rusu, Florin and Dobra, Alin},
+	Journal = {ACM Transactions on Database Systems},
+	Month = aug,
+	Number = {3},
+	Pages = {1--46},
+	Title = {{Sketches for size of join estimation}},
+	Volume = {33},
+	Year = {2008}}
+
+@article{Do2008,
+	Author = {Do, Huy Hoang and Choi, Kwok Pui and Preparata, Franco P and Sung, Wing Kin and Zhang, Louxin},
+	Journal = {Journal of computational biology a journal of computational molecular cell biology},
+	Number = {5},
+	Pages = {469--487},
+	Title = {{Spectrum-based de novo repeat detection in genomic sequences.}},
+	Volume = {15},
+	Year = {2008}}
+
+@article{Conway2011,
+	Author = {Conway, Thomas C and Bromage, Andrew J},
+	Journal = {Bioinformatics},
+	Month = {Feb},
+	Number = {4},
+	Pages = {479-86},
+	Title = {Succinct data structures for assembling large genomes},
+	Volume = {27},
+	Year = {2011}}
+
+@article{Stein2010,
+	Author = {Stein, Lincoln D},
+	Journal = {Genome Biol},
+	Number = {5},
+	Pages = {207},
+	Title = {The case for cloud computing in genome informatics},
+	Volume = {11},
+	Year = {2010}}
+
+@article{Sboner2011,
+	Author = {Sboner, Andrea and Mu, Xinmeng Jasmine and Greenbaum, Dov and Auerbach, Raymond K and Gerstein, Mark B},
+	Journal = {Genome Biol},
+	Number = {8},
+	Pages = {125},
+	Title = {The real cost of sequencing: higher than you think!},
+	Volume = {12},
+	Year = {2011}}
+
+@article{McElroy2012,
+	Author = {McElroy, Kerensa E and Luciani, Fabio and Thomas, Torsten},
+	Journal = {BMC Genomics},
+	Pages = {74},
+	Title = {GemSIM: general, error-model based simulator of next-generation sequencing data},
+	Volume = {13},
+	Year = {2012}}
+
+@article{Zhang2014,
+    Author = {Qingpeng Zhang and Jason Pell and Rosangela Canino-Koning and Adina Chuang Howe and C. Titus Brown},
+	Journal = {PLoS ONE},
+	Number = {9},
+	Title = {These are not the k-mers you are looking for: efficient online k-mer counting using a probabilistic data structure.},
+	Volume = {7},
+	Year = {2014}}
