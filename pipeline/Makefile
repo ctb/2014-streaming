@@ -16,7 +16,7 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 
 bam: simple-genome-reads.sorted.bam simple-metagenome-reads.sorted.bam \
 	mrna-reads.sorted.bam
-
+#########
 podar-paired: podar \
 	trim-at-N \
 	podar-mapped \
