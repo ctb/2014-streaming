@@ -66,6 +66,47 @@ provide an approach for estimating per-position sequencing error rates
 that operates in sublinear time and memory with respect to the input
 data.
 
+\section{Methods}
+
+The code used to generate all of the results in this paper is
+available at http://github.com/ged-lab/2014-streaming/; see README.md
+in that directory for instructions.  The paper is completely
+reproducible from source data.  The screed and khmer packages (screed
+v@@ and khmer v@@) were used to generate the results in this paper;
+both are freely available at http://github.com/ged-lab/ under a BSD
+license.
+
+We used Quake v0.3.5, Jellyfish 1.1.11, Boost 1.57.0, and bowtie2 v2.1.0
+to generate the results in this paper.
+
+\subsection{Making synthetic data sets}
+
+\subsection{Real data sets}
+
+Prior to analysis, we eliminated any read with an 'N' in it and
+filtered the reads by mapping to the known references.
+
+\subsection{K-mer spectral analysis}
+
+We used the khmer function {\tt find\_spectral\_error\_positions} to find
+the beginning and end of regions of low-abundance k-mers.  For
+normalized data, we used a low-abundance cutoff of 3; for
+non-normalized data, we used a low-abundance cutoff of 10.  We used
+{\tt report-errors-by-read.py} to predict errors on normalized data,
+and {\tt calc-errors-few-pass.py} to do streaming error analysis; both
+scripts are in {\tt 2014-streaming/pipeline/}.
+
+\subsection{Digital normalization}
+
+We ran digital normalization on all data sets using khmer's {\tt
+  normalize-by-median.py} script, with a k-mer size of 20 and a target
+coverage of 20, except for the metagenomics data set, where we used
+a coverage of 10.  Memory parameters were chosen for each data set so
+that the false positive rate was under 1\%, which has no significant
+effect on outcomes \cite{Zhang2014}.
+
+
+
 \section{Results}
 
 \subsection{Coverage-normalized data can be used to locate
@@ -112,20 +153,23 @@ these low-count k-mers.
 %% make compare2
 
 \begin{table}
+
+\centering
 \begin{tabular}{|l|c|c|l|}
 \hline
-Name & Origin & Number of reads \\
+Name & Number of reads & Description \\
 \hline
-simple genome & 10,000 & No repeats \\
-{\em E. coli} MG1655 & 5,000,000 & Subset of XXXXX \\
+simple genome & 1000 & No repeats \\
+{\em E. coli} MG1655 & 4,863,836 & Subset of XXXXX \\
 simple transcriptome & 568 & 300:1 high:low abundance; shared exons\\
-mouse mRNAseq & 1,000,000 & Subset of XXXXX \\
+mouse mRNAseq & 791,687 & Subset of XXXXX \\
 simple metagenome & 2,347 & 316:1 high:low abundance species  \\
-mock metagenome & 5,000,000 & Subset of XXXX \\
+mock metagenome & 4,663,661 & Subset of XXXX \\
 \hline
 \end{tabular}
 
 \caption{{\bf Data sets used for evaluation.}}
+
 \label{tab:data}
 \end{table}
 
@@ -168,6 +212,8 @@ sensitivity of 100\% and a specificity of 80.7\% (Table~\ref{tab:a}).
 % @CTB here we could describe # of k-mers, etc.
 
 \begin{table}
+\centering
+
 \begin{tabular}{|l|c|c|}
 \hline
 {\bf Simple genome} & Original counts & Diginorm counts \\
@@ -223,6 +269,7 @@ counts, and 47.5\% using the digitally normalized counts.
 % make ecoli_compare2_nodn.txt
 
 \begin{table}
+\centering
 \begin{tabular}{|l|c|c|}
 \hline
 {\bf E. coli} & Original counts & Diginorm counts \\
@@ -248,11 +295,15 @@ Specificity & 47.9\% & 47.5\% \\
 \end{table}
 
 \begin{table}
+\centering
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-Sample              & N reads & N normalized reads \\
+Sample              & N reads    & N normalized reads \\
 \hline
-{\em E. coli}       &    @@        & \\
+{\em E. coli}       & 4,863,836  & 1,609,639 (33.1\%) \\
+Mouse RNAseq        & 791,687    & 617,297 (78.0\%) \\
+Mock metagenome     & 4,663,661  & 4,642,038 (99.5\%) \\
+
 \hline
 \end{tabular}
 
@@ -266,9 +317,9 @@ Sample              & N reads & N normalized reads \\
 \begin{table}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-Sample              & original read M & normalized read M \\
+Sample              & original M & normalized M \\
 \hline
-{\em E. coli}       &            & @@ \\
+{\em E. coli}       & 39,677,503 & 26,510,104 (67.8\%)\\
 \hline
 \end{tabular}
 
