@@ -76,9 +76,6 @@ v@@ and khmer v@@) were used to generate the results in this paper;
 both are freely available at http://github.com/ged-lab/ under a BSD
 license.
 
-We used Quake v0.3.5, Jellyfish 1.1.11, Boost 1.57.0, and bowtie2 v2.1.0
-to generate the results in this paper.
-
 \subsection{Making synthetic data sets}
 
 \subsection{Real data sets}
@@ -94,18 +91,39 @@ normalized data, we used a low-abundance cutoff of 3; for
 non-normalized data, we used a low-abundance cutoff of 10.  We used
 {\tt report-errors-by-read.py} to predict errors on normalized data,
 and {\tt calc-errors-few-pass.py} to do streaming error analysis; both
-scripts are in {\tt 2014-streaming/pipeline/}.
+scripts are in {\tt 2014-streaming/pipeline/}.  Variable coverage error
+analysis is enabled with the {\tt -V} parameter to both scripts.
 
 \subsection{Digital normalization}
 
 We ran digital normalization on all data sets using khmer's {\tt
   normalize-by-median.py} script, with a k-mer size of 20 and a target
-coverage of 20, except for the metagenomics data set, where we used
-a coverage of 10.  Memory parameters were chosen for each data set so
-that the false positive rate was under 1\%, which has no significant
-effect on outcomes \cite{Zhang2014}.
+coverage of 20, except for the metagenomics data set, where we used a
+coverage of 10.  Memory parameters were chosen for each data set so
+that the false positive rate was under 1\%, below which it has
+no significant effect on outcomes \cite{Zhang2014}.
 
+\subsection{Read mapping and error correction}
 
+We used Quake v0.3.5, Jellyfish 1.1.11, Boost 1.57.0, and bowtie2
+v2.1.0 to generate the results in this paper.  {\tt bowtie2} was run with
+default parameters.  Quake's {\tt count-qmers} was used to generate a k-mer
+count with {\tt -q 33 -k 14}, and {\tt correct} was als run
+with {\tt -q 33 -k 14}.   The correction threshold ({\tt -c}) was chosen
+automatically by Quake and was 7.94 for {\em E. coli} diginorm, 7.2 for
+{\em E. coli} original, @@.
+
+\subsection{Streaming error analysis and trimming}
+
+The script {\tt calc-errors-few-pass.py} was used to do streaming
+error analysis; it is available in the {\tt 2014-streaming}
+repository.  Cutoffs @@ were used.
+
+The khmer script {\tt trim-low-abund.py} was used for streaming error
+trimming, with parameters @@.  The khmer script {\tt
+  calc-error-profile.py} was used for sublinear time and space error
+analysis with default parameters.  The pipeline script {\tt
+  report-errhist-2pass.py} was used for comparison purposes.
 
 \section{Results}
 
@@ -315,11 +333,14 @@ Mock metagenome     & 4,663,661  & 4,642,038 (99.5\%) \\
 \end{table}
 
 \begin{table}
+\centering
 \begin{tabular}{|l|c|c|c|c|}
 \hline
 Sample              & original M & normalized M \\
 \hline
-{\em E. coli}       & 39,677,503 & 26,510,104 (67.8\%)\\
+{\em E. coli}       & 39,677,503 & 26,510,104 (67.8\%) \\
+mouse mRNAseq       & 11,950,923 & 11,793,039 (98.7\%) \\
+mock metagenome     & 139,030,490  & 139,030,490 (100\%) \\
 \hline
 \end{tabular}
 
