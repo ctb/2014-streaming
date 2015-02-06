@@ -23,8 +23,8 @@ ecoli-reads.sam: ecoli_ref-5m.fastq.gz ecoli.1.bt2
 ecoli-reads.sam.pos: ecoli-reads.sam
 	./sam-scan.py ecoliMG1655.fa ecoli-reads.sam -o ecoli-reads.sam.pos
 
-ecoli-mapped.fq.gz: ecoli_ref-5m.fastq.gz
-	./extract-sam-seqs-to-fq.py ecoli-reads.sam ecoli_ref-5m.fastq.gz | gzip >& ecoli-mapped.fq.gz
+ecoli-mapped.fq.gz: ecoli_ref-5m.fastq.gz ecoli-reads.sam
+	./extract-sam-seqs-to-fq.py ecoli-reads.sam ecoli_ref-5m.fastq.gz | gzip > ecoli-mapped.fq.gz
 
 # ecoli_ref.kh contains the counting table of k-mers in the raw read data set.
 ecoli_ref.kh: ecoli-mapped.fq.gz
@@ -33,7 +33,7 @@ ecoli_ref.kh: ecoli-mapped.fq.gz
 ecoli-reads-nodn.errors.pos: ecoli_ref.kh
 	./report-errors-by-read.py -C 15 ecoli_ref.kh ecoli-mapped.fq.gz -o ecoli-reads-nodn.errors.pos
 
-ecoli_compare2_nodn.txt: ecoli-reads-nodn.errors.pos
+ecoli_compare2_nodn.txt: ecoli-reads-nodn.errors.pos ecoli-reads.sam.pos
 	./compare-pos.py ecoli-reads-nodn.errors.pos ecoli-reads.sam.pos ecoli-mapped.fq.gz > ecoli_compare2_nodn.txt
 
 # ecoli_ref.dn.kh contains the counting table output by digital normalization
@@ -92,7 +92,7 @@ ecoli-mapped.fq.gz.errhist: ecoli-mapped.fq.gz
 	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz
 
 ecoli-mapped.fq.gz.subset.0: ecoli-mapped.fq.gz
-	sample-reads-randomly.py -R 1 -S 5 -N 1e6 ecoli-mapped.fq.gz
+	sample-reads-randomly.py -R 1 -S 5 -N 1000000 ecoli-mapped.fq.gz
 
 ecoli-mapped.fq.gz.subset.0.errhist: ecoli-mapped.fq.gz.subset.0
 	-$(KHMER)/sandbox/calc-error-profile.py ecoli-mapped.fq.gz.subset.0

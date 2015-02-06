@@ -13,7 +13,10 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	simple-genome-dn-kmers.hist \
 	ecoli \
 	ecoli-errfree-report.txt \
-	rseq podar ecoli_corr
+	rseq podar ecoli_corr readstats.txt
+
+readstats.txt:
+	readstats.py simple-*.fa{,.keep} *-mapped.fq.gz{,.keep} -o readstats.txt
 
 # delete the targets of rules on an error
 .DELETE_ON_ERROR:
