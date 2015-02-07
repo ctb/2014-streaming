@@ -1,5 +1,6 @@
 #TODO - put in spot checks for the trickier scripts!
 
+SHELL=/bin/bash
 NULLGRAPH=~/dev/nullgraph
 KHMER=~/dev/khmer
 QUAKE=../Quake
