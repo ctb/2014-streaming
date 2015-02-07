@@ -10,8 +10,8 @@ rseq: rseq_compare2 rseq_compare4 rseq_compare5 \
 	rseq-mapped.fq.gz.subset.3.errhist \
 	rseq-mapped.fq.gz.subset.4.errhist
 
-rseq-reads.fq.gz: mouse-5m.fq.gz
-	./trim-at-N.py mouse-5m.fq.gz | head -4000000 | gzip -9c > rseq-reads.fq.gz
+rseq-reads.fq.gz: mouse-rnaseq.fq.gz
+	./trim-at-N.py mouse-rnaseq.fq.gz | head -20000000 | gzip -9c > rseq-reads.fq.gz
 
 rseq.1.bt2: rna.fa
 	bowtie2-build rna.fa rseq > /dev/null
