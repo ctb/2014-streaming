@@ -10,8 +10,8 @@ rseq: rseq_compare2 rseq_compare4 rseq_compare5 \
 	rseq-mapped.fq.gz.subset.3.errhist \
 	rseq-mapped.fq.gz.subset.4.errhist
 
-rseq-reads.fq.gz: mouse-5m.fq.gz
-	./trim-at-N.py mouse-5m.fq.gz | head -4000000 | gzip -9c > rseq-reads.fq.gz
+rseq-reads.fq.gz: mouse-rnaseq.fq.gz
+	./trim-at-N.py mouse-rnaseq.fq.gz | head -20000000 | gzip -9c > rseq-reads.fq.gz
 
 rseq.1.bt2: rna.fa
 	bowtie2-build rna.fa rseq > /dev/null
@@ -114,7 +114,7 @@ rseq-reads.hicov.cor.fq.gz: rseq-reads.hicov.fq rseq-reads.hicov.fq.keep
 	echo rseq-reads.hicov.fq > rseq_quake_list.txt
 	ln -fs /usr/local/bin/jellyfish .
 	cat rseq-reads.hicov.fq.keep | $(QUAKE)/bin/count-qmers -q 33 -k 14 > rseq_dn_counts.out
-	$(QUAKE)/bin/cov_model.py rseq_dn_counts.out > rseq_dn_counts.cov
+	-$(QUAKE)/bin/cov_model.py rseq_dn_counts.out > rseq_dn_counts.cov
 	$(QUAKE)/bin/correct -f rseq_quake_list.txt -p 4 -k 14 -q 33 -c 6.26 -z -m rseq_dn_counts.out
 
 rseq-reads.hicov.cor.sam: rseq-reads.hicov.cor.fq.gz

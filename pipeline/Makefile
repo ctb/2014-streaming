@@ -1,5 +1,6 @@
 #TODO - put in spot checks for the trickier scripts!
 
+SHELL=/bin/bash
 NULLGRAPH=~/dev/nullgraph
 KHMER=~/dev/khmer
 QUAKE=../Quake
@@ -12,8 +13,8 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	simple-genome-kmers.hist \
 	simple-genome-dn-kmers.hist \
 	ecoli \
-	ecoli-errfree-report.txt \
-	rseq podar ecoli_corr readstats.txt
+	ecoli-errfree-report.txt ecoli_corr \
+	rseq podar readstats.txt
 
 readstats.txt:
 	readstats.py simple-*.fa{,.keep} *-mapped.fq.gz{,.keep} -o readstats.txt
