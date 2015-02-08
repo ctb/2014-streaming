@@ -1,5 +1,5 @@
 #---------------------------------------------------------------------
-podar-combined: cpodar \
+cpodar-combined: cpodar \
 	cpodar-reads.sam \
 	cpodar-mapped \
 	cpodar-reads.sam.pos \
