@@ -27,7 +27,7 @@ cpodar: cpodar.fastq.gz  podar-ref.fa
 cpodar-reads.sam: cpodar
 	./trim-at-N.py cpodar.fastq.gz | bowtie2 -p 4 -x cpodar -U - -S cpodar-reads.sam
 
-cpodar-mapped: cpodar.fastq.gz cpodar-reads-sam
+cpodar-mapped: cpodar.fastq.gz cpodar-reads.sam
 	./extract-sam-seqs-to-fq.py cpodar-reads.sam cpodar.fastq.gz > csam-seq \
 	gzip -c csam-seq  > cpodar-mapped.fq.gz
 
@@ -58,7 +58,7 @@ cmouse: cmouse.fastq.gz mouse-ref.fa
 cmouse-reads.sam: cmouse
 	./trim-at-N.py cmouse.fastq.gz | bowtie2 -p 4 -x cmouse -U - -S cmouse-reads.sam
 
-cmouse-mapped: cmouse.fastq.gz cmouse-reads-sam
+cmouse-mapped: cmouse.fastq.gz cmouse-reads.sam
 	./extract-sam-seqs-to-fq.py cmouse-reads.sam cmouse.fastq.gz > csam-seq \
 	gzip -c csam-seq  > cmouse-mapped.fq.gz
 
