@@ -8,7 +8,7 @@ podar.1.bt2: podar-ref.fa
 	samtools faidx podar-ref.fa
 
 podar-reads.sam: podar-1.fastq.gz podar.1.bt2
-	./trim-at-N.py podar-1.fastq.gz | bowtie2 -p 4 -x podar -U - -S podar-reads.sam
+	./trim-at-N.py podar-1.fastq.gz | head -80000000 | bowtie2 -p 4 -x podar -U - -S podar-reads.sam
 
 podar-mapped.fq.gz: podar-reads.sam
 	./extract-sam-seqs-to-fq.py podar-reads.sam podar-1.fastq.gz | gzip > podar-mapped.fq.gz
