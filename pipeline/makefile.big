@@ -1,7 +1,6 @@
 #---------------------------------------------------------------------
-cpodar-combined: cpodar \
-	cpodar-reads.sam \
-	cpodar-mapped \
+cpodar-combined: cpodar-reads.sam \
+	cpodar-mapped.fq.gz \
 	cpodar-reads.sam.pos \
 	cpodar-mapped.fq.gz.abundtrim \
 	cpodar-compare5-pre.txt \
@@ -9,9 +8,8 @@ cpodar-combined: cpodar \
 	cpodar-abundtrim.sam.pos \
 	cpodar-compare5-post.txt
 
-cmouse-combined: cmouse \
-	cmouse-reads.sam \
-	cmouse-mapped \
+cmouse-combined: cmouse-reads.sam \
+	cmouse-mapped.fq.gz \
 	cmouse-reads.sam.pos \
 	cmouse-mapped.fq.gz.abundtrim \
 	cmouse-compare5-pre.txt \
@@ -20,28 +18,24 @@ cmouse-combined: cmouse \
 	cmouse-compare5-post.txt
 
 #--------------------------------------Podar Work--------------------
-cpodar: cpodar.fastq.gz  podar-ref.fa
-	bowtie2-build podar-ref.fa cpodar \
-	samtools faidx podar-ref.fa
 
-cpodar-reads.sam: cpodar
-	./trim-at-N.py cpodar.fastq.gz | bowtie2 -p 4 -x cpodar -U - -S cpodar-reads.sam
+cpodar-reads.sam: podar.1.bt2
+	./trim-at-N.py cpodar.fastq.gz | bowtie2 -p 4 -x podar -U - -S cpodar-reads.sam
 
-cpodar-mapped: cpodar.fastq.gz cpodar-reads.sam
-	./extract-sam-seqs-to-fq.py cpodar-reads.sam cpodar.fastq.gz > csam-seq \
-	gzip -c csam-seq  > cpodar-mapped.fq.gz
+cpodar-mapped.fq.gz: cpodar.fastq.gz cpodar-reads.sam
+	./extract-sam-seqs-to-fq.py cpodar-reads.sam cpodar.fastq.gz | gzip -9c > cpodar-mapped.fq.gz
 
 cpodar-reads.sam.pos: cpodar-reads.sam podar-ref.fa
 	./sam-scan.py podar-ref.fa cpodar-reads.sam > cpodar-reads.sam.pos
 
 cpodar-mapped.fq.gz.abundtrim: cpodar-mapped.fq.gz
-	/mnt/khmer/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 -x 4e9 -N 4 cpodar-mapped.fq.gz
+	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 -x 2e9 -N 4 cpodar-mapped.fq.gz
 
 cpodar-compare5-pre.txt: cpodar-mapped.fq.gz
 	./summarize-pos-file.py cpodar-reads.sam.pos cpodar-mapped.fq.gz > cpodar-compare5-pre.txt
 
 cpodar-abundtrim.sam: cpodar-mapped.fq.gz.abundtrim
-	bowtie2 -p 4 -x cpodar -U cpodar-mapped.fq.gz.abundtrim -S cpodar-abundtrim.sam
+	bowtie2 -p 4 -x podar -U cpodar-mapped.fq.gz.abundtrim -S cpodar-abundtrim.sam
 
 cpodar-abundtrim.sam.pos: cpodar-abundtrim.sam
 	./sam-scan.py podar-ref.fa cpodar-abundtrim.sam > cpodar-abundtrim.sam.pos
@@ -51,31 +45,27 @@ cpodar-compare5-post.txt: cpodar-abundtrim.sam.pos cpodar-mapped.fq.gz.abundtrim
 
 
 #---------------------------------------Mouse  Work--------------
-cmouse: cmouse.fastq.gz mouse-ref.fa
-	bowtie2-build mouse-ref.fa cmouse \
-	samtools faidx mouse-ref.fa
 
-cmouse-reads.sam: cmouse
-	./trim-at-N.py cmouse.fastq.gz | bowtie2 -p 4 -x cmouse -U - -S cmouse-reads.sam
+cmouse-reads.sam: rseq.1.bt2
+	./trim-at-N.py cmouse.fastq.gz | bowtie2 -p 4 -x rseq -U - -S cmouse-reads.sam
 
-cmouse-mapped: cmouse.fastq.gz cmouse-reads.sam
-	./extract-sam-seqs-to-fq.py cmouse-reads.sam cmouse.fastq.gz > csam-seq \
-	gzip -c csam-seq  > cmouse-mapped.fq.gz
+cmouse-mapped.fq.gz: cmouse.fastq.gz cmouse-reads.sam
+	./extract-sam-seqs-to-fq.py cmouse-reads.sam cmouse.fastq.gz | gzip -9c > cmouse-mapped.fq.gz
 
-cmouse-reads.sam.pos: cmouse-reads.sam mouse-ref.fa
-	./sam-scan.py mouse-ref.fa cmouse-reads.sam > cmouse-reads.sam.pos
+cmouse-reads.sam.pos: cmouse-reads.sam rna.fa
+	./sam-scan.py rna.fa cmouse-reads.sam > cmouse-reads.sam.pos
 
 cmouse-mapped.fq.gz.abundtrim: cmouse-mapped.fq.gz
-	/mnt/khmer/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 -x 4e8 -N 4 cmouse-mapped.fq.gz
+	$(KHMER)/sandbox/trim-low-abund.py -V -k 20 -Z 20 -C 3 -x 4e8 -N 4 cmouse-mapped.fq.gz
 
 cmouse-compare5-pre.txt: cmouse-mapped.fq.gz
 	./summarize-pos-file.py cmouse-reads.sam.pos cmouse-mapped.fq.gz > cmouse-compare5-pre.txt
 
 cmouse-abundtrim.sam: cmouse-mapped.fq.gz.abundtrim
-	bowtie2 -p 4 -x cmouse -U cmouse-mapped.fq.gz.abundtrim -S cmouse-abundtrim.sam
+	bowtie2 -p 4 -x rseq -U cmouse-mapped.fq.gz.abundtrim -S cmouse-abundtrim.sam
 
 cmouse-abundtrim.sam.pos: cmouse-abundtrim.sam
-	./sam-scan.py mouse-ref.fa cmouse-abundtrim.sam > cmouse-abundtrim.sam.pos
+	./sam-scan.py rna.fa cmouse-abundtrim.sam > cmouse-abundtrim.sam.pos
 
 cmouse-compare5-post.txt: cmouse-abundtrim.sam.pos cmouse-mapped.fq.gz.abundtrim
 	./summarize-pos-file.py cmouse-abundtrim.sam.pos cmouse-mapped.fq.gz.abundtrim > cmouse-compare5-post.txt

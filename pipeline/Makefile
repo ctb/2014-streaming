@@ -14,10 +14,24 @@ all: compare mcompare compare3 mcompare3 rcompare rcompare3 bam \
 	simple-genome-dn-kmers.hist \
 	ecoli \
 	ecoli-errfree-report.txt ecoli_corr \
-	rseq podar readstats.txt
+	rseq podar readstats.txt kmer-counts.txt
 
-readstats.txt:
+readstats.txt: podar-mapped.fq.gz.keep rseq-mapped.fq.gz.keep ecoli-mapped.fq.gz.keep
 	readstats.py simple-*.fa{,.keep} *-mapped.fq.gz{,.keep} -o readstats.txt
+
+kmer-counts.txt:
+	echo ecoli > kmer-counts.txt
+	$(KHMER)/sandbox/unique-kmers.py -k 20 ecoli-mapped.fq.gz >> kmer-counts.txt
+	echo ecoli-dn >> kmer-counts.txt
+	$(KHMER)/sandbox/unique-kmers.py -k 20 ecoli-mapped.fq.gz.keep >> kmer-counts.txt
+	echo rseq >> kmer-counts.txt
+	$(KHMER)/sandbox/unique-kmers.py -k 20 rseq-mapped.fq.gz >> kmer-counts.txt
+	echo rseq-dn >> kmer-counts.txt
+	$(KHMER)/sandbox/unique-kmers.py -k 20 rseq-mapped.fq.gz.keep >> kmer-counts.txt
+	echo podar >> kmer-counts.txt
+	$(KHMER)/sandbox/unique-kmers.py -k 20 podar-mapped.fq.gz >> kmer-counts.txt
+	echo podar-dn >> kmer-counts.txt
+	$(KHMER)/sandbox/unique-kmers.py -k 20 podar-mapped.fq.gz.keep >> kmer-counts.txt
 
 # delete the targets of rules on an error
 .DELETE_ON_ERROR:
@@ -52,7 +66,8 @@ include makefile.ecoli
 ##### shotgun metagenome data set (real)
 include makefile.podar
 
-
+# final set of big analyses
+include makefile.big
 
 #####
 
